@@ -1,6 +1,3 @@
-#ifndef __MODULE_H__
-#define __MODULE_H__
-
 #pragma once
 
 class App;
@@ -27,17 +24,17 @@ public:
 		return true;
 	}
 
-	virtual bool PreUpdate()
+	virtual bool PreUpdate(float dt)
 	{
 		return true;
 	}
 
-	virtual bool Update(double dt)
+	virtual bool Update(float dt)
 	{
 		return true;
 	}
 
-	virtual bool PostUpdate()
+	virtual bool PostUpdate(float dt)
 	{
 		return true;
 	}
@@ -68,5 +65,3 @@ public:
 	bool active;
 	App* app;
 };
-
-#endif // !__MODULE_H__

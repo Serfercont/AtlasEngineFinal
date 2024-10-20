@@ -2,7 +2,6 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-
 typedef unsigned int uint;
 
 class Mesh
@@ -10,8 +9,8 @@ class Mesh
 public:
 	void InitMesh();
 	void DrawMesh();
-	void DrawMeshDebug();
-	glm::vec3 GetVector(float* value);
+	void CleanUpMesh();
+
 public:
 	uint indicesId = 0;
 	uint indicesCount = 0;

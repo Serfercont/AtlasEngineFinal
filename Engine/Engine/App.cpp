@@ -2,9 +2,9 @@
 
 App::App(int argc, char* argv[])
 {
-	window = new ModuleWindow();
-	input = new ModuleInput();
-	renderer3D = new ModuleRenderer3D();
+	window = new ModuleWindow(this);
+	input = new ModuleInput(this);
+	renderer3D = new ModuleRenderer3D(this);
 
 	AddModule(window);
 	AddModule(input);
@@ -28,6 +28,8 @@ bool App::Awake()
 		ret = module->Awake();
 	}
 
+	ms_timer.Start();
+
 	return ret;
 }
 
@@ -48,7 +50,8 @@ bool App::Start()
 
 void App::PrepareUpdate()
 {
-
+	dt = (float)ms_timer.Read() / 1000.0f;
+	ms_timer.Start();
 }
 
 bool App::Update()
@@ -64,7 +67,7 @@ bool App::Update()
 			if (!module->active)
 				continue;
 
-			ret = module->PreUpdate();
+			ret = module->PreUpdate(dt);
 		}
 	}
 
@@ -75,7 +78,7 @@ bool App::Update()
 			if (!module->active)
 				continue;
 
-			ret = module->Update(0.0f);
+			ret = module->Update(dt);
 		}
 	}
 
@@ -86,7 +89,7 @@ bool App::Update()
 			if (!module->active)
 				continue;
 
-			ret = module->PostUpdate();
+			ret = module->PostUpdate(dt);
 		}
 	}
 

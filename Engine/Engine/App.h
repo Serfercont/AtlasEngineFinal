@@ -1,6 +1,3 @@
-#ifndef __APP_H__
-#define __APP_H__
-
 #pragma once
 
 #include "Module.h"
@@ -8,12 +5,9 @@
 #include "ModuleInput.h"
 #include "ModuleRenderer3D.h"
 
-#include <list>
+#include "Timer.h"
 
-class Module;
-class ModuleWindow;
-class ModuleInput;
-class ModuleRenderer3D;
+#include <list>
 
 class App
 {
@@ -38,9 +32,10 @@ public:
 	ModuleRenderer3D* renderer3D = nullptr;
 	
 private:
+	Timer	ms_timer;
+	float	dt;
+
 	std::list<Module*> modules;
 };
 
 extern App* app;
-
-#endif // !__APP_H__

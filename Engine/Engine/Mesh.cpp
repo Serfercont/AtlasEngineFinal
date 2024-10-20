@@ -1,10 +1,8 @@
 #include "Mesh.h"
 
-using namespace glm;
-
-
 void Mesh::InitMesh()
 {
+	//Vertices
 	glGenBuffers(1, (GLuint*)&(verticesId));
 	glBindBuffer(GL_ARRAY_BUFFER, verticesId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verticesCount * 3, vertices, GL_STATIC_DRAW);
@@ -53,4 +51,22 @@ void Mesh::DrawMesh()
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+void Mesh::CleanUpMesh()
+{
+	glDeleteBuffers(1, &verticesId);
+	glDeleteBuffers(1, &indicesId);
+	glDeleteBuffers(1, &normalsId);
+	glDeleteBuffers(1, &texCoordsId);
+
+	delete[] vertices;
+	delete[] indices;
+	delete[] normals;
+	delete[] texCoords;
+
+	vertices = nullptr;
+	indices = nullptr;
+	normals = nullptr;
+	texCoords = nullptr;
 }
