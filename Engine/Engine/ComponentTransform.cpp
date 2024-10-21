@@ -76,7 +76,7 @@ void ComponentTransform::OnEditor()
 
         // Scale
         ImGui::AlignTextToFramePadding();
-        ImGui::Text("Scale      ");
+        ImGui::Text("Scale  ");
         ImGui::SameLine();
 
         if (ImGui::Button("##Constrained", ImVec2(20, 20))) {
@@ -149,6 +149,7 @@ void ComponentTransform::SetTransformMatrix(float3 position, quat rotation, floa
 
     eulerRotation = degrees(glm::eulerAngles(rotation));
 
+    localTransform = float4x4(1.0f);
     localTransform = glm::translate(localTransform, position);
     localTransform *= glm::mat4_cast(rotation);
     localTransform = glm::scale(localTransform, scale);
@@ -163,6 +164,7 @@ void ComponentTransform::UpdateTransform()
 {
     rotation = quat(vec3(radians(eulerRotation.x), radians(eulerRotation.y), radians(eulerRotation.z)));
 
+    localTransform = float4x4(1.0f);
     localTransform = glm::translate(localTransform, position);
     localTransform *= glm::mat4_cast(rotation);
     localTransform = glm::scale(localTransform, scale);

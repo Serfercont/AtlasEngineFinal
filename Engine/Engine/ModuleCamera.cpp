@@ -50,16 +50,8 @@ bool ModuleCamera::Update(float dt)
 		if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
 	}
 
-	if (app->input->GetMouseZ() > 0)
-	{
-		newPos -= Z * zoomSpeed;
-		printf("\n -=");
-	}
-	if (app->input->GetMouseZ() < 0)
-	{
-		newPos += Z * zoomSpeed;
-		printf("\n +=");
-	}
+	if (app->input->GetMouseZ() > 0) newPos -= Z * zoomSpeed;
+	if (app->input->GetMouseZ() < 0) newPos += Z * zoomSpeed;
 
 	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT &&
 		app->input->GetKey(SDL_SCANCODE_LALT) == KEY_IDLE)
@@ -131,7 +123,7 @@ bool ModuleCamera::Update(float dt)
 		LookAt(Reference);
 	}
 
-	/*if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT &&
+	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT &&
 		app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
 	{
 		int dy = app->input->GetMouseYMotion();
@@ -144,7 +136,7 @@ bool ModuleCamera::Update(float dt)
 			vec3 direction = normalize(Position - Reference);
 			Position -= direction * zoomDelta;
 		}
-	}*/
+	}
 
 	if (app->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
 	{

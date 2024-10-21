@@ -75,12 +75,72 @@ void ModuleEditor::HierarchyWindow()
 {
     ImGui::Begin("Hierarchy");
 
+    HierarchyTree(app->scene->root, true);
+
     ImGui::End();
+}
+
+void ModuleEditor::HierarchyTree(GameObject* node, bool isRoot)
+{
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+
+    if (isRoot)
+    {
+        flags |= ImGuiTreeNodeFlags_DefaultOpen;
+    }
+
+    if (node->children.empty())
+    {
+        flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+    }
+
+    bool isSelected = (selectedGameObject == node);
+
+    if (isSelected)
+    {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
+    
+    bool isOpen = ImGui::TreeNodeEx(node, flags, node->name.c_str());
+
+    if (ImGui::IsItemClicked())
+    {
+        if (selectedGameObject && selectedGameObject->isEditing)
+        {
+            selectedGameObject->isEditing = false;
+        }
+        selectedGameObject = node;
+    }
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+    {
+        node->isEditing = true;
+    }
+
+    // Create child nodes
+    if (isOpen && !node->children.empty())
+    {
+        for (unsigned int i = 0; i < node->children.size(); i++)
+        {
+            HierarchyTree(node->children[i], false);
+        }
+        ImGui::TreePop();
+    }
 }
 
 void ModuleEditor::InspectorWindow()
 {
     ImGui::Begin("Inspector");
+
+    if (selectedGameObject != nullptr && selectedGameObject->parent != nullptr)
+    {
+        ImGui::Checkbox("##Active", &selectedGameObject->isActive);
+
+        for (auto i = 0; i < selectedGameObject->components.size(); i++)
+        {
+            selectedGameObject->components[i]->OnEditor();
+        }
+    }
 
     ImGui::End();
 }

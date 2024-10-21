@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Module.h"
+#include "GameObject.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -22,4 +23,9 @@ public:
 	void ProjectWindow();
 	void Docking();
 	void MainMenuBar();
+
+	void HierarchyTree(GameObject* node, bool isRoot = false);
+
+public:
+	GameObject* selectedGameObject = nullptr;
 };

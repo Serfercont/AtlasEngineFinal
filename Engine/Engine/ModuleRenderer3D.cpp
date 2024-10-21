@@ -115,8 +115,8 @@ bool ModuleRenderer3D::Awake()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
-	meshLoader.ImportFBX("Assets/LaserGun_P1.fbx", mesh, app->scene->root);
-	LoadTextureImage("Assets/LaserGun_P1.jpeg");
+	meshLoader.ImportFBX("Assets/BakerHouse.fbx", mesh, app->scene->root);
+	LoadTextureImage("Assets/Baker_House.png");
 
 	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -131,11 +131,11 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(app->camera->GetViewMatrix());
 
-	for (unsigned int i = 0; i < mesh.size(); i++)
-	{
-		glScaled(0.05f, 0.05f, 0.05f);
-		mesh[i]->DrawMesh();
-	}
+	//for (unsigned int i = 0; i < mesh.size(); i++)
+	//{
+	//	//glScaled(0.05f, 0.05f, 0.05f);
+	//	mesh[i]->DrawMesh();
+	//}
 
 	return true;
 }
