@@ -72,6 +72,9 @@ bool App::Update()
 				continue;
 
 			ret = module->PreUpdate(dt);
+
+			if (!ret)
+				break;
 		}
 	}
 
@@ -83,6 +86,9 @@ bool App::Update()
 				continue;
 
 			ret = module->Update(dt);
+
+			if (!ret)
+				break;
 		}
 	}
 
@@ -94,6 +100,9 @@ bool App::Update()
 				continue;
 
 			ret = module->PostUpdate(dt);
+
+			if (!ret)
+				break;
 		}
 	}
 

@@ -1,6 +1,8 @@
 #include "ModuleInput.h"
 #include "App.h"
 
+#include <string>
+
 ModuleInput::ModuleInput(App* app) : Module(app)
 {
 	for (int i = 0; i < MAX_KEYS; ++i) keyboard[i] = KEY_IDLE;
@@ -32,6 +34,8 @@ bool ModuleInput::Awake()
 
 bool ModuleInput::PreUpdate(float dt)
 {
+	bool ret = true;
+
 	SDL_PumpEvents();
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
@@ -55,6 +59,10 @@ bool ModuleInput::PreUpdate(float dt)
 	}
 
 	Uint32 buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+
+	mouse_x /= 1;
+	mouse_y /= 1;
+	mouse_z = 0;
 
 	for (int i = 0; i < 5; ++i)
 	{
@@ -94,10 +102,40 @@ bool ModuleInput::PreUpdate(float dt)
 			mouse_x_motion = e.motion.xrel;
 			mouse_y_motion = e.motion.yrel;
 			break;
+
+		case (SDL_DROPFILE):
+		{
+			std::string droppedFileDir(e.drop.file);
+
+			if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "fbx"
+				|| droppedFileDir.substr(droppedFileDir.find(".") + 1) == "FBX")
+			{
+				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->renderer3D->mesh, app->renderer3D->textureId);
+			}
+			else if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "png")
+			{
+				app->renderer3D->LoadTextureImage(e.drop.file);
+			}
+			else
+			{
+				printf("File format not supported");
+			}
+
+			SDL_free(e.drop.file);
+			break;
+		}
+		case SDL_WINDOWEVENT:
+			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+				app->renderer3D->OnResize(e.window.data1, e.window.data2);
+			break;
+
+		case SDL_QUIT:
+			ret = false;
+			break;
 		}
 	}
 
-	return true;
+	return ret;
 }
 
 bool ModuleInput::CleanUp()
