@@ -4,11 +4,13 @@ App::App(int argc, char* argv[])
 {
 	window = new ModuleWindow(this);
 	input = new ModuleInput(this);
-	renderer3D = new ModuleRenderer3D(this);
+	renderer3D = new ModuleRenderer3D(this);	
+	editor = new ModuleEditor(this);
 
 	AddModule(window);
 	AddModule(input);
-	AddModule(renderer3D);
+	AddModule(renderer3D);	
+	AddModule(editor);
 }
 
 App::~App()

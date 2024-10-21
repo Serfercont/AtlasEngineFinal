@@ -4,6 +4,7 @@
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer3D.h"
+#include "ModuleEditor.h"
 
 #include "Timer.h"
 
@@ -30,6 +31,7 @@ public:
 	ModuleWindow* window = nullptr;
 	ModuleInput* input = nullptr;
 	ModuleRenderer3D* renderer3D = nullptr;
+	ModuleEditor* editor = nullptr;
 	
 private:
 	Timer	ms_timer;
