@@ -115,7 +115,7 @@ bool ModuleRenderer3D::Awake()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
-	meshLoader.ImportFBX("Assets/LaserGun_P1.fbx", mesh, textureId);
+	meshLoader.ImportFBX("Assets/LaserGun_P1.fbx", mesh, app->scene->root);
 	LoadTextureImage("Assets/LaserGun_P1.jpeg");
 
 	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);

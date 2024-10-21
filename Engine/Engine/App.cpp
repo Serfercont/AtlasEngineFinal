@@ -1,16 +1,22 @@
 #include "App.h"
 
+extern App* app = nullptr;
+
 App::App(int argc, char* argv[])
 {
+	app = this;
+
 	window = new ModuleWindow(this);
 	camera = new ModuleCamera(this);
 	input = new ModuleInput(this);
+	scene = new ModuleScene(this);
 	renderer3D = new ModuleRenderer3D(this);	
 	editor = new ModuleEditor(this);
 
 	AddModule(window);
 	AddModule(camera);
 	AddModule(input);
+	AddModule(scene);
 	AddModule(renderer3D);	
 	AddModule(editor);
 }
