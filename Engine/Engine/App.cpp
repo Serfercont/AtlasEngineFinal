@@ -3,11 +3,13 @@
 App::App(int argc, char* argv[])
 {
 	window = new ModuleWindow(this);
+	camera = new ModuleCamera(this);
 	input = new ModuleInput(this);
 	renderer3D = new ModuleRenderer3D(this);	
 	editor = new ModuleEditor(this);
 
 	AddModule(window);
+	AddModule(camera);
 	AddModule(input);
 	AddModule(renderer3D);	
 	AddModule(editor);

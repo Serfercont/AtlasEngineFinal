@@ -129,11 +129,7 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 	glLoadIdentity();
 
 	glMatrixMode(GL_MODELVIEW);
-	//glLoadMatrixf(app->camera->GetViewMatrix());
-
-	gluLookAt(1.5, 1.5, 1.5,
-		0.0, 0.0, 0.0,
-		0.0, 1.0, 0.0);
+	glLoadMatrixf(app->camera->GetViewMatrix());
 
 	for (unsigned int i = 0; i < mesh.size(); i++)
 	{

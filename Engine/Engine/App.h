@@ -2,6 +2,7 @@
 
 #include "Module.h"
 #include "ModuleWindow.h"
+#include "ModuleCamera.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleEditor.h"
@@ -29,6 +30,7 @@ private:
 
 public:
 	ModuleWindow* window = nullptr;
+	ModuleCamera* camera = nullptr;
 	ModuleInput* input = nullptr;
 	ModuleRenderer3D* renderer3D = nullptr;
 	ModuleEditor* editor = nullptr;
