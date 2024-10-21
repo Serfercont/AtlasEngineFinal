@@ -13,12 +13,12 @@ ModuleWindow::~ModuleWindow()
 
 bool ModuleWindow::Awake()
 {
-	printf("Init SDL window & surface");
+	LOG(LogType::LOG_INFO, "Init SDL window & surface");
 	bool ret = true;
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		printf("SDL_VIDEO could not initialize! SDL_Error: %s\n", SDL_GetError());
+		LOG(LogType::LOG_ERROR, "SDL_VIDEO could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
 	else
@@ -54,7 +54,7 @@ bool ModuleWindow::Awake()
 
 		if(window == NULL)
 		{
-			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+			LOG(LogType::LOG_ERROR, "Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;
 		}
 		else
@@ -68,7 +68,7 @@ bool ModuleWindow::Awake()
 
 bool ModuleWindow::CleanUp()
 {
-	printf("Destroying SDL window and quitting all SDL systems");
+	LOG(LogType::LOG_INFO, "Destroying SDL window and quitting all SDL systems");
 
 	if (window != NULL)
 	{

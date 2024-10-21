@@ -12,7 +12,7 @@ ModuleEditor::~ModuleEditor()
 
 bool ModuleEditor::Awake()
 {
-    printf("ModuleEditor");
+    LOG(LogType::LOG_INFO, "ModuleEditor");
     bool ret = true;
 
     IMGUI_CHECKVERSION();
@@ -34,7 +34,7 @@ bool ModuleEditor::Awake()
 
 bool ModuleEditor::CleanUp()
 {
-    printf("Cleaning ModuleEditor");
+    LOG(LogType::LOG_INFO, "Cleaning ModuleEditor");
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -151,6 +151,41 @@ void ModuleEditor::InspectorWindow()
 void ModuleEditor::ConsoleWindow()
 {
     ImGui::Begin("Console", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(15, 15));
+
+	string logType;
+	ImVec4 logColor;
+
+    for (const auto& log : logger.GetLogs())
+    {
+        switch (log.type)
+        {
+        case LogType::LOG_INFO:
+            logType = "[INFO]";
+            logColor = ImVec4(1, 1, 1, 1);
+            break;
+
+        case LogType::LOG_WARNING:
+            logType = "[WARNING]";
+            logColor = ImVec4(1, 1, 0, 1);
+            break;
+
+        case LogType::LOG_ERROR:
+            logType = "[ERROR]";
+            logColor = ImVec4(1, 0, 0, 1);
+            break;
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Text, logColor);
+        ImGui::Text(logType.c_str());
+        ImGui::PopStyleColor();
+
+        ImGui::SameLine();
+        ImGui::Text(log.message.c_str());
+    }
+
+	ImGui::PopStyleVar();
 
     ImGui::End();
 }

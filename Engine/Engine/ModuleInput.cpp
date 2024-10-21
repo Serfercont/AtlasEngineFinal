@@ -17,13 +17,13 @@ ModuleInput::~ModuleInput()
 
 bool ModuleInput::Awake()
 {
-	printf("Init SDL input event system");
+	LOG(LogType::LOG_INFO, "Init SDL input event system");
 	bool ret = true;
 	SDL_Init(0);
 
 	if (SDL_InitSubSystem(SDL_INIT_EVENTS) < 0)
 	{
-		printf("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
+		LOG(LogType::LOG_ERROR, "SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
 
@@ -118,7 +118,7 @@ bool ModuleInput::PreUpdate(float dt)
 			}
 			else
 			{
-				printf("File format not supported");
+				LOG(LogType::LOG_WARNING, "File format not supported");
 			}
 
 			SDL_free(e.drop.file);
@@ -140,7 +140,7 @@ bool ModuleInput::PreUpdate(float dt)
 
 bool ModuleInput::CleanUp()
 {
-	printf("Quitting SDL input event subsystem");
+	LOG(LogType::LOG_INFO, "Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
 }

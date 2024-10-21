@@ -18,7 +18,7 @@ ModuleCamera::~ModuleCamera()
 
 bool ModuleCamera::Start()
 {
-	printf("Setting up the camera");
+	LOG(LogType::LOG_INFO, "Setting up the camera");
 	bool ret = true;
 
 	LookAt(Reference);
@@ -27,7 +27,7 @@ bool ModuleCamera::Start()
 
 bool ModuleCamera::CleanUp()
 {
-	printf("Cleaning camera");
+	LOG(LogType::LOG_INFO, "Cleaning camera");
 
 	return true;
 }

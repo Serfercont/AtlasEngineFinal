@@ -23,7 +23,7 @@ ModuleRenderer3D::~ModuleRenderer3D()
 
 bool ModuleRenderer3D::Awake()
 {
-	printf("Creating 3D Renderer context");
+	LOG(LogType::LOG_INFO, "Creating 3D Renderer context");
 	bool ret = true;
 
 	meshLoader.EnableDebugger();
@@ -31,16 +31,16 @@ bool ModuleRenderer3D::Awake()
 	context = SDL_GL_CreateContext(app->window->window);
 	if (context == NULL)
 	{
-		printf("OpenGL context could not be created! SDL_Error: %s\n", SDL_GetError());
+		LOG(LogType::LOG_ERROR, "OpenGL context could not be created! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
-		printf("Error in loading Glew: %s\n", glewGetErrorString(err));
+		LOG(LogType::LOG_ERROR, "Error in loading Glew: %s\n", glewGetErrorString(err));
 	}
 	else {
-		printf("Successfully using Glew %s", glewGetString(GLEW_VERSION));
+		LOG(LogType::LOG_INFO, "Successfully using Glew %s", glewGetString(GLEW_VERSION));
 	}
 
 	if (ret == true)
@@ -51,7 +51,7 @@ bool ModuleRenderer3D::Awake()
 		GLenum error = glGetError();
 		if (error != GL_NO_ERROR)
 		{
-			printf("Error initializing OpenGL! %s\n", gluErrorString(error));
+			LOG(LogType::LOG_ERROR, "Error initializing OpenGL! %s\n", gluErrorString(error));
 			ret = false;
 		}
 
@@ -61,7 +61,7 @@ bool ModuleRenderer3D::Awake()
 		error = glGetError();
 		if (error != GL_NO_ERROR)
 		{
-			printf("Error initializing OpenGL! %s\n", gluErrorString(error));
+			LOG(LogType::LOG_ERROR, "Error initializing OpenGL! %s\n", gluErrorString(error));
 			ret = false;
 		}
 
@@ -75,7 +75,7 @@ bool ModuleRenderer3D::Awake()
 		error = glGetError();
 		if (error != GL_NO_ERROR)
 		{
-			printf("Error initializing OpenGL! %s\n", gluErrorString(error));
+			LOG(LogType::LOG_ERROR, "Error initializing OpenGL! %s\n", gluErrorString(error));
 			ret = false;
 		}
 
@@ -153,7 +153,7 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 
 bool ModuleRenderer3D::CleanUp()
 {
-	printf("Destroying 3D Renderer");
+	LOG(LogType::LOG_INFO, "Destroying 3D Renderer");
 
 	meshLoader.DisableDebugger();
 
@@ -187,7 +187,7 @@ void ModuleRenderer3D::LoadTextureImage(const char* file)
 	ilGenImages(1, &image);
 	ilBindImage(image);
 
-	if (!ilLoadImage((wchar_t*)file)) printf("Image not loaded");
+	if (!ilLoadImage((wchar_t*)file)) LOG(LogType::LOG_WARNING, "Image not loaded");
 
 	for (unsigned int i = 0; i < mesh.size(); i++)
 	{

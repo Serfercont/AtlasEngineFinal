@@ -49,7 +49,7 @@ void MeshLoader::ImportFBX(const char* path, vector<Mesh*>& meshes, GameObject* 
 
 		aiReleaseImport(scene);
 	}
-	else printf("Error loading scene % s", path);
+	else LOG(LogType::LOG_ERROR, "Error loading scene % s", path);
 }
 
 void MeshLoader::LoadNode(aiNode* node, vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
@@ -85,7 +85,7 @@ Mesh* MeshLoader::LoadMesh(aiMesh* newMesh)
 	mesh->verticesCount = newMesh->mNumVertices;
 	mesh->vertices = new float[mesh->verticesCount * 3];
 	memcpy(mesh->vertices, newMesh->mVertices, sizeof(float) * mesh->verticesCount * 3);
-	printf("New mesh with %d vertices", mesh->verticesCount);
+	LOG(LogType::LOG_INFO, "New mesh with %d vertices", mesh->verticesCount);
 
 	// Normals
 	if (newMesh->HasNormals())
@@ -94,7 +94,7 @@ Mesh* MeshLoader::LoadMesh(aiMesh* newMesh)
 
 		mesh->normals = new float[mesh->normalsCount * 3];
 		memcpy(mesh->normals, newMesh->mNormals, sizeof(float) * mesh->normalsCount * 3);
-		printf("New mesh with %d normals", mesh->normalsCount);
+		LOG(LogType::LOG_INFO, "New mesh with %d normals", mesh->normalsCount);
 	}
 
 	// Faces
@@ -106,7 +106,7 @@ Mesh* MeshLoader::LoadMesh(aiMesh* newMesh)
 		{
 			if (newMesh->mFaces[i].mNumIndices != 3)
 			{
-				printf("WARNING, geometry face with != 3 indices!");
+				LOG(LogType::LOG_WARNING, "Geometry face with != 3 indices!");
 			}
 			else
 			{
@@ -127,7 +127,7 @@ Mesh* MeshLoader::LoadMesh(aiMesh* newMesh)
 			mesh->texCoords[i * 2 + 1] = newMesh->mTextureCoords[0][i].y;
 		}
 
-		printf("New mesh with %d texture coords", mesh->texCoordsCount);
+		LOG(LogType::LOG_INFO, "New mesh with %d texture coords", mesh->texCoordsCount);
 	}
 
 	mesh->InitMesh();

@@ -66,6 +66,7 @@
     <ClCompile Include="Grid.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -119,5 +120,6 @@
     <ClInclude Include="Grid.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Logger.h" />
   </ItemGroup>
 </Project>

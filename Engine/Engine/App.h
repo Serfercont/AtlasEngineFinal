@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Logger.h"
 #include "Module.h"
 #include "ModuleWindow.h"
 #include "ModuleCamera.h"

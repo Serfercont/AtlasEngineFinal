@@ -1,4 +1,5 @@
 #include "ModuleScene.h"
+#include "App.h"
 
 ModuleScene::ModuleScene(App* app) : Module(app), root(nullptr)
 {
@@ -24,7 +25,7 @@ bool ModuleScene::Update(float dt)
 
 bool ModuleScene::CleanUp()
 {
-	printf("Cleaning ModuleScene");
+	LOG(LogType::LOG_INFO, "Cleaning ModuleScene");
 
 	return true;
 }

@@ -1,6 +1,6 @@
 #include "App.h"
 
-extern App* app = nullptr;
+App* app = nullptr;
 
 App::App(int argc, char* argv[])
 {
