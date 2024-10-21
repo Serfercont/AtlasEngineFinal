@@ -21,6 +21,7 @@ public:
 	void InspectorWindow();
 	void ConsoleWindow();
 	void ProjectWindow();
+	void PreferencesWindow();
 	void Docking();
 	void MainMenuBar();
 

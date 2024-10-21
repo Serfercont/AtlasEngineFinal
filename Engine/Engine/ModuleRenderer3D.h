@@ -2,6 +2,7 @@
 
 #include "Module.h"
 #include "MeshLoader.h"
+#include "Grid.h"
 
 #include <SDL2/SDL_video.h>
 #include <GL/glew.h>
@@ -34,4 +35,6 @@ public:
 
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
 	unsigned int textureId;
+
+	Grid grid;
 };

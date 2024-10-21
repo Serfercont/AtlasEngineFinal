@@ -142,6 +142,8 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 
 bool ModuleRenderer3D::PostUpdate(float dt)
 {
+	grid.Render();
+
 	app->editor->DrawEditor();
 
 	SDL_GL_SwapWindow(app->window->window);
