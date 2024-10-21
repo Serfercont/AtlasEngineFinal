@@ -10,6 +10,9 @@
     <Filter Include="Sources\Tools">
       <UniqueIdentifier>{bf0c45e2-c122-462a-95d3-1ee50470b3c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Components">
+      <UniqueIdentifier>{9473a9b9-6caa-4a9a-b954-29b851a5b12c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -42,6 +45,11 @@
     <ClCompile Include="ModuleCamera.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ComponentTransform.cpp" />
+    <ClCompile Include="ComponentMesh.cpp" />
+    <ClCompile Include="ComponentMaterial.cpp" />
+    <ClCompile Include="GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -74,5 +82,10 @@
     <ClInclude Include="ModuleCamera.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentTransform.h" />
+    <ClInclude Include="ComponentMesh.h" />
+    <ClInclude Include="ComponentMaterial.h" />
+    <ClInclude Include="GameObject.h" />
   </ItemGroup>
 </Project>
