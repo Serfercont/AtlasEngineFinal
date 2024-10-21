@@ -2,7 +2,8 @@
 
 #include "Component.h"
 #include "glm/glm.hpp"
-#include "glm/gtc/quaternion.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/euler_angles.hpp"
 
 using namespace glm;
 
@@ -18,12 +19,14 @@ public:
 	void SetTransformMatrix(float3 position, quat rotation, float3 scale, ComponentTransform* parent);
 	void UpdateTransform();
 
+	bool Decompose(const float4x4& transform, glm::vec3& translation, glm::quat& rotation, glm::vec3& scale);
+
 public:
 	float4x4 localTransform;
 	float4x4 globalTransform;
 
 	float3 position;
-	Quat rotation;
+	quat rotation;
 	float3 eulerRotation;
 	float3 scale;
 
