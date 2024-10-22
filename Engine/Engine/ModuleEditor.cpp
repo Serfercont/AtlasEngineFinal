@@ -201,20 +201,23 @@ void ModuleEditor::PreferencesWindow()
 {
     ImGui::Begin("Preferences");
 
-    ImGui::ColorEdit4("Grid Color", app->renderer3D->grid.lineColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
+    ImGui::ColorEdit4("Grid Color", app->renderer3D->grid.lineColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar);
 
     ImGui::PushItemWidth(100);
-	ImGui::SliderFloat("Cell Size", &app->renderer3D->grid.cellSize, 1.0f, 10.0f, "%1.0f");
+	ImGui::SliderFloat("Cell Size", &app->renderer3D->grid.cellSize, 1.f, 10.f, "%1.f");
     ImGui::PopItemWidth();
 
-    float gridSizeOptions[] = { 50.0f, 100.0f, 150.0f, 200.0f };
-    float gridSizeIncrements = app->renderer3D->grid.gridSize;
-    float currentOption = (gridSizeIncrements / 50.0f) - 1;
+    int gridSizeOptions[] = { 50.f, 100.f, 150.f, 200.f };
+    int currentOption = (app->renderer3D->grid.gridSize / 50.f);
 
     ImGui::PushItemWidth(100);
-    if (ImGui::SliderFloat("Grid Size", &currentOption, 0, 3, "%1.0f")) {
-        app->renderer3D->grid.gridSize = gridSizeOptions[(int)currentOption];
+    if (ImGui::SliderInt("Grid Size", &currentOption, 1, 4)) {
+        app->renderer3D->grid.gridSize = gridSizeOptions[currentOption - 1];
     }
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(100);
+    ImGui::SliderFloat("Line Width", &app->renderer3D->grid.lineWidth, 1.f, 5.f, "%1.f");
     ImGui::PopItemWidth();
 
     ImGui::End();
