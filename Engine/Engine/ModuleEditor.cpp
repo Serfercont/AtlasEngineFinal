@@ -78,12 +78,14 @@ void ModuleEditor::HierarchyWindow()
 {
     ImGui::Begin("Hierarchy");
 
-    HierarchyTree(app->scene->root, true);
+    ImGui::InputText("##Search", searchInput, 256);
+
+    HierarchyTree(app->scene->root, true, searchInput);
 
     ImGui::End();
 }
 
-void ModuleEditor::HierarchyTree(GameObject* node, bool isRoot)
+void ModuleEditor::HierarchyTree(GameObject* node, bool isRoot, const char* searchText)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
 
@@ -104,31 +106,77 @@ void ModuleEditor::HierarchyTree(GameObject* node, bool isRoot)
         flags |= ImGuiTreeNodeFlags_Selected;
     }
     
-    bool isOpen = ImGui::TreeNodeEx(node, flags, node->name.c_str());
-
-    if (ImGui::IsItemClicked())
+    if (!node->isActive)
     {
-        if (selectedGameObject && selectedGameObject->isEditing)
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+    }
+
+    if (FilterNode(node, searchText))
+    {
+        bool isOpen = ImGui::TreeNodeEx(node, flags, node->name.c_str());
+
+        if (ImGui::IsItemClicked())
         {
-            selectedGameObject->isEditing = false;
+            if (selectedGameObject && selectedGameObject->isEditing)
+            {
+                selectedGameObject->isEditing = false;
+            }
+            selectedGameObject = node;
         }
-        selectedGameObject = node;
-    }
 
-    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-    {
-        node->isEditing = true;
-    }
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+        {
+            node->isEditing = true;
+        }
 
-    // Create child nodes
-    if (isOpen && !node->children.empty())
+        // Rename node
+        if (node->isEditing)
+        {
+            strcpy_s(inputName, selectedGameObject->name.c_str());
+            ImGui::SetNextItemWidth(ImGui::CalcTextSize(node->name.c_str()).x + 100);
+            if (ImGui::InputText("##edit", inputName, sizeof(inputName), inputTextFlags)
+                || (!ImGui::IsItemActive() && !ImGui::IsAnyItemActive()))
+            {
+                if (inputName[0] != '\0') node->name = inputName;
+                node->isEditing = false;
+            }
+
+            ImGui::SetKeyboardFocusHere(-1);
+        }
+
+        // Create child nodes
+        if (isOpen && !node->children.empty())
+        {
+            for (unsigned int i = 0; i < node->children.size(); i++)
+            {
+                HierarchyTree(node->children[i], false, searchText);
+            }
+            ImGui::TreePop();
+        }
+
+        if (!node->isActive)
+        {
+            ImGui::PopStyleColor();
+        }
+    }
+    else
     {
         for (unsigned int i = 0; i < node->children.size(); i++)
         {
-            HierarchyTree(node->children[i], false);
+            HierarchyTree(node->children[i], false, searchText);
         }
-        ImGui::TreePop();
     }
+}
+
+bool ModuleEditor::FilterNode(GameObject* node, const char* searchText)
+{
+    std::string nodeNameLower = node->name;
+    std::transform(nodeNameLower.begin(), nodeNameLower.end(), nodeNameLower.begin(), ::tolower);
+
+    std::string searchTextLower = searchText;
+    std::transform(searchTextLower.begin(), searchTextLower.end(), searchTextLower.begin(), ::tolower);
+
+    return nodeNameLower.find(searchTextLower) != std::string::npos;
 }
 
 void ModuleEditor::InspectorWindow()
@@ -138,6 +186,22 @@ void ModuleEditor::InspectorWindow()
     if (selectedGameObject != nullptr && selectedGameObject->parent != nullptr)
     {
         ImGui::Checkbox("##Active", &selectedGameObject->isActive);
+        ImGui::SameLine();
+
+        strcpy_s(inputName, selectedGameObject->name.c_str());
+
+        if (ImGui::InputText("##InspectorName", inputName, sizeof(inputName), inputTextFlags)
+            || (isEditingInspector && !ImGui::IsItemActive() && !ImGui::IsAnyItemActive()))
+        {
+            if (inputName[0] != '\0') selectedGameObject->name = inputName;
+            isEditingInspector = false;
+        }
+
+        if (ImGui::IsItemClicked())
+        {
+            isEditingInspector = true;
+            ImGui::SetKeyboardFocusHere(-1);
+        }
 
         for (auto i = 0; i < selectedGameObject->components.size(); i++)
         {

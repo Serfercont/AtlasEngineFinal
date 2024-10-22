@@ -25,12 +25,19 @@ public:
 	void Docking();
 	void MainMenuBar();
 
-	void HierarchyTree(GameObject* node, bool isRoot = false);
+	void HierarchyTree(GameObject* node, bool isRoot = false, const char* searchText = "");
+	bool FilterNode(GameObject* node, const char* searchText);
 
 public:
 	GameObject* selectedGameObject = nullptr;
 
 private:
+	//Inspector
+	char searchInput[256] = "";
+	char inputName[256] = "GameObject";
+	ImGuiInputTextFlags inputTextFlags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll;
+	bool isEditingInspector = false;
+
 	//Console
 	bool showLogInfo = true;
 	bool showLogWarnings = true;
