@@ -181,7 +181,7 @@ void ModuleRenderer3D::LoadTextureImage(const char* file)
 	ilGenImages(1, &image);
 	ilBindImage(image);
 
-	if (!ilLoadImage((wchar_t*)file)) LOG(LogType::LOG_WARNING, "Image not loaded");
+	if (!ilLoadImage(file)) LOG(LogType::LOG_WARNING, "Image not loaded");
 
 	if (app->editor->selectedGameObject != nullptr)
 	{
