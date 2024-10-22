@@ -2,6 +2,8 @@
 
 #include "Component.h"
 #include "ComponentTransform.h"
+#include "ComponentMesh.h"
+#include "ComponentMaterial.h"
 
 #include <string>
 #include <vector>
@@ -23,7 +25,10 @@ public:
 public:
 	GameObject* parent;
 	std::string name;
+
 	ComponentTransform* transform;
+	ComponentMesh* mesh;
+	ComponentMaterial* material;
 
 	std::vector<Component*> components;
 	std::vector<GameObject*> children;

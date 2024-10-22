@@ -59,7 +59,7 @@ void MeshLoader::LoadNode(aiNode* node, vector<Mesh*>& meshes, GameObject* paren
 		Mesh* meshPtr = meshes[node->mMeshes[i]];
 
 		GameObject* gameObjectNode = new GameObject(node->mName.C_Str(), parent);
-		ComponentMesh* componentMesh = dynamic_cast<ComponentMesh*>(gameObjectNode->AddComponent(new ComponentMesh(gameObjectNode)));
+		ComponentMesh* componentMesh = dynamic_cast<ComponentMesh*>(gameObjectNode->AddComponent(gameObjectNode->mesh));
 
 		componentMesh->mesh = meshPtr;
 		parent->children.push_back(gameObjectNode);

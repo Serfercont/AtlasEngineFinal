@@ -11,6 +11,8 @@ public:
 	void Update() override;
 	void OnEditor() override;
 
+	void AddMaterial(int id);
+
 public:
 	int textureId;
 };

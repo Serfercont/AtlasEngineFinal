@@ -131,12 +131,6 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(app->camera->GetViewMatrix());
 
-	//for (unsigned int i = 0; i < mesh.size(); i++)
-	//{
-	//	//glScaled(0.05f, 0.05f, 0.05f);
-	//	mesh[i]->DrawMesh();
-	//}
-
 	return true;
 }
 
@@ -167,7 +161,6 @@ bool ModuleRenderer3D::CleanUp()
 	return true;
 }
 
-
 void ModuleRenderer3D::OnResize(int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -189,10 +182,15 @@ void ModuleRenderer3D::LoadTextureImage(const char* file)
 
 	if (!ilLoadImage((wchar_t*)file)) LOG(LogType::LOG_WARNING, "Image not loaded");
 
-	for (unsigned int i = 0; i < mesh.size(); i++)
+	if (app->editor->selectedGameObject != nullptr)
 	{
-		mesh[i]->textureID = ilutGLBindTexImage();
+		if (app->editor->selectedGameObject->material != nullptr)
+			app->editor->selectedGameObject->material->AddMaterial(ilutGLBindTexImage());
+		else
+			LOG(LogType::LOG_WARNING, "No materials found");
 	}
+	else 
+		LOG(LogType::LOG_WARNING, "GameObject not found");
 
 	ilDeleteImages(1, &image);
 }
