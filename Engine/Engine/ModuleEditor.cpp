@@ -152,7 +152,34 @@ void ModuleEditor::ConsoleWindow()
 {
     ImGui::Begin("Console", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(15, 15));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, infoColor);
+    ImGui::PushStyleColor(ImGuiCol_Text, infoColor);
+    ImGui::Checkbox("Info", &showLogInfo);
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, warningColor);
+    ImGui::PushStyleColor(ImGuiCol_Text, warningColor);
+    ImGui::Checkbox("Warning", &showLogWarnings);
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, errorColor);
+    ImGui::PushStyleColor(ImGuiCol_Text, errorColor);
+    ImGui::Checkbox("Error", &showLogErrors);
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+
+    ImGui::SameLine();
+    if (ImGui::Button("Clear"))
+        logger.Clear();
+
+    ImGui::Separator();
+    ImGui::Spacing();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(15, 10));
 
 	string logType;
 	ImVec4 logColor;
@@ -163,17 +190,20 @@ void ModuleEditor::ConsoleWindow()
         {
         case LogType::LOG_INFO:
             logType = "[INFO]";
-            logColor = ImVec4(1, 1, 1, 1);
+            logColor = infoColor;
+            if (!showLogInfo) continue;
             break;
 
         case LogType::LOG_WARNING:
             logType = "[WARNING]";
-            logColor = ImVec4(1, 1, 0, 1);
+            logColor = warningColor;
+            if (!showLogWarnings) continue;
             break;
 
         case LogType::LOG_ERROR:
             logType = "[ERROR]";
-            logColor = ImVec4(1, 0, 0, 1);
+            logColor = errorColor;
+            if (!showLogErrors) continue;
             break;
         }
 
@@ -203,20 +233,20 @@ void ModuleEditor::PreferencesWindow()
 
     ImGui::ColorEdit4("Grid Color", app->renderer3D->grid.lineColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar);
 
-    ImGui::PushItemWidth(100);
+    ImGui::PushItemWidth(100.f);
 	ImGui::SliderFloat("Cell Size", &app->renderer3D->grid.cellSize, 1.f, 10.f, "%1.f");
     ImGui::PopItemWidth();
 
-    int gridSizeOptions[] = { 50.f, 100.f, 150.f, 200.f };
-    int currentOption = (app->renderer3D->grid.gridSize / 50.f);
+    float gridSizeOptions[] = { 50.f, 100.f, 150.f, 200.f };
+    float currentOption = (app->renderer3D->grid.gridSize / 50.f);
 
-    ImGui::PushItemWidth(100);
-    if (ImGui::SliderInt("Grid Size", &currentOption, 1, 4)) {
-        app->renderer3D->grid.gridSize = gridSizeOptions[currentOption - 1];
+    ImGui::PushItemWidth(100.f);
+    if (ImGui::SliderFloat("Grid Size", &currentOption, 1, 4, "%1.f")) {
+        app->renderer3D->grid.gridSize = gridSizeOptions[(int)currentOption - 1];
     }
     ImGui::PopItemWidth();
 
-    ImGui::PushItemWidth(100);
+    ImGui::PushItemWidth(100.f);
     ImGui::SliderFloat("Line Width", &app->renderer3D->grid.lineWidth, 1.f, 5.f, "%1.f");
     ImGui::PopItemWidth();
 

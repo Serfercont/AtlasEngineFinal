@@ -1,28 +1,32 @@
 #include "Logger.h"
 
 #include <windows.h>
-#include <stdio.h>
 
 Logger logger;
 
 void Logger::Log(const char file[], int line, LogType type, const char* format, ...)
 {
-	static char tmpString1[4096];
-	static char tmpString2[4096];
-	static va_list ap;
+    static char tmpString1[4096];
+    static char tmpString2[4096];
+    static va_list ap;
 
-	va_start(ap, format);
-	vsprintf_s(tmpString1, sizeof(tmpString1), format, ap);
-	va_end(ap);
-	sprintf_s(tmpString2, sizeof(tmpString2), "\n%s(%d) : %s", file, line, tmpString1);
-	OutputDebugStringA(tmpString2);
+    const char* filename = strrchr(file, '\\');
+    if (!filename) {
+        filename = strrchr(file, '/');
+    }
+    filename = filename ? filename + 1 : file;
 
-	logger.AddLog(type, tmpString2);
+    va_start(ap, format);
+    vsprintf_s(tmpString1, sizeof(tmpString1), format, ap);
+    va_end(ap);
+    sprintf_s(tmpString2, sizeof(tmpString2), "%s(%d) : %s", filename, line, tmpString1);
+    OutputDebugStringA(tmpString2);
+
+    logger.AddLog(type, tmpString2);
 }
 
 void Logger::AddLog(LogType type, string message)
 {
-	message.erase(std::remove(message.begin(), message.end(), '\n'), message.end());
 	logs.push_back({ type, message });
 }
 

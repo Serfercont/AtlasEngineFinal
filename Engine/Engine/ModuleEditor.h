@@ -29,4 +29,14 @@ public:
 
 public:
 	GameObject* selectedGameObject = nullptr;
+
+private:
+	//Console
+	bool showLogInfo = true;
+	bool showLogWarnings = true;
+	bool showLogErrors = true;
+
+	ImVec4 infoColor = ImVec4(.25f, .5f, 1, 1);
+	ImVec4 warningColor = ImVec4(1, .5f, 0, 1);
+	ImVec4 errorColor = ImVec4(1, 0, 0, 1);
 };

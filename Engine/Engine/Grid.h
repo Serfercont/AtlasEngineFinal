@@ -8,7 +8,7 @@ class Grid
 {
 public:
 	Grid();
-	void Render();
+	void Render() const;
 public:
 	vec3 normal = vec3(0, 1, 0);
 

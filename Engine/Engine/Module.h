@@ -62,6 +62,6 @@ public:
 
 public:
 
-	bool active;
-	App* app;
+	bool active = true;
+	App* app = nullptr;
 };

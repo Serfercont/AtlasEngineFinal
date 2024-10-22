@@ -6,7 +6,7 @@ Grid::Grid()
 	
 }
 
-void Grid::Render()
+void Grid::Render() const
 {
 	glLineWidth(lineWidth);
 
