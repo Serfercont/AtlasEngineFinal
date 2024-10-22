@@ -8,7 +8,7 @@ class Mesh
 {
 public:
 	void InitMesh();
-	void DrawMesh();
+	void DrawMesh(GLuint textureID);
 	void CleanUpMesh();
 
 public:
@@ -24,5 +24,4 @@ public:
 	uint texCoordsId = 0;
 	uint texCoordsCount = 0;
 	float* texCoords = nullptr;
-	GLuint textureID = 0;
 };

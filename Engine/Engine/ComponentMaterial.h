@@ -11,8 +11,11 @@ public:
 	void Update() override;
 	void OnEditor() override;
 
-	void AddMaterial(int id);
+	void AddMaterial(int id, int width, int height, const char* path);
 
 public:
 	int textureId;
+	int textureWidth;
+	int textureHeight;
+	const char* texturePath;
 };

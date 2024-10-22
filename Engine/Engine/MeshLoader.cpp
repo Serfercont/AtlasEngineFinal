@@ -28,7 +28,7 @@ void MeshLoader::ImportFBX(const char* path, vector<Mesh*>& meshes, GameObject* 
 {
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 	string fileName = path;
-	fileName = fileName.substr(fileName.find_last_of("\\") + 1);
+	fileName = fileName.substr(fileName.find_last_of("/\\") + 1);
 	fileName = fileName.substr(0, fileName.find_last_of("."));
 
 	if (scene != nullptr && scene->HasMeshes())

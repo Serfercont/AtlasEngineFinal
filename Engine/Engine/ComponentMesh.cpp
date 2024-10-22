@@ -21,7 +21,7 @@ void ComponentMesh::Update()
 		glMultMatrixf(glm::value_ptr(transform->globalTransform));
 	}
 
-	mesh->DrawMesh();
+	mesh->DrawMesh(gameObject->material->textureId);
 
 	if (transform != nullptr) glPopMatrix();
 }

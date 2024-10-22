@@ -26,7 +26,7 @@ void Mesh::InitMesh()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::DrawMesh()
+void Mesh::DrawMesh(GLuint textureID)
 {
 	glBindTexture(GL_TEXTURE_2D, textureID);
 

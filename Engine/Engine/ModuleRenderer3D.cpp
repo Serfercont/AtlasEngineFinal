@@ -116,6 +116,7 @@ bool ModuleRenderer3D::Awake()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
 	meshLoader.ImportFBX("Assets/BakerHouse.fbx", mesh, app->scene->root);
+	app->editor->selectedGameObject = app->scene->root->children[0];
 	LoadTextureImage("Assets/Baker_House.png");
 
 	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -185,7 +186,7 @@ void ModuleRenderer3D::LoadTextureImage(const char* file)
 	if (app->editor->selectedGameObject != nullptr)
 	{
 		if (app->editor->selectedGameObject->material != nullptr)
-			app->editor->selectedGameObject->material->AddMaterial(ilutGLBindTexImage());
+			app->editor->selectedGameObject->material->AddMaterial(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
 		else
 			LOG(LogType::LOG_WARNING, "No materials found");
 	}
