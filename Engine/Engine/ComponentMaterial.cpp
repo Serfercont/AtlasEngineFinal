@@ -1,6 +1,10 @@
 #include "ComponentMaterial.h"
 #include "GameObject.h"
 
+#include <windows.h>
+#include <shellapi.h>
+#include <algorithm> 
+
 ComponentMaterial::ComponentMaterial(GameObject* gameObject) : Component(gameObject, ComponentType::MATERIAL), textureId(-1)
 {
 }
@@ -23,6 +27,33 @@ void ComponentMaterial::OnEditor()
 			ImGui::Text("Path: %s", texturePath);
 			ImGui::Text("Texture Size: %i x %i", textureWidth, textureHeight);
 			ImGui::Image((int*)textureId, ImVec2(200, 200));
+
+			if (ImGui::MenuItem("Show in Explorer"))
+			{
+				char buffer[MAX_PATH];
+				GetModuleFileName(NULL, buffer, MAX_PATH);
+				std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+				std::string exeDir = std::string(buffer).substr(0, pos);
+
+				std::string path = exeDir + "\\..\\..\\Engine\\" + texturePath;
+
+				std::replace(path.begin(), path.end(), '/', '\\');
+
+				std::string command = "/select," + path;
+				ShellExecute(NULL, "open", "explorer.exe", command.c_str(), NULL, SW_SHOWDEFAULT);
+			}
+
+			if (ImGui::MenuItem("Open Image"))
+			{
+				char buffer[MAX_PATH];
+				GetModuleFileName(NULL, buffer, MAX_PATH);
+				std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+				std::string exeDir = std::string(buffer).substr(0, pos);
+
+				std::string path = exeDir + "\\..\\..\\Engine\\" + texturePath;
+
+				ShellExecute(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
+			}
 		}
 	}
 }

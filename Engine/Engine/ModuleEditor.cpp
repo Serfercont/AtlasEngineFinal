@@ -1,6 +1,7 @@
 #include "ModuleEditor.h"
 #include "App.h"
 
+#include <windows.h>
 #include <cstring>
 #include <algorithm> 
 
@@ -345,6 +346,23 @@ void ModuleEditor::Docking()
 void ModuleEditor::MainMenuBar()
 {
     ImGui::BeginMainMenuBar();
+
+    if (ImGui::BeginMenu("Assets"))
+    {
+        if (ImGui::MenuItem("Show in Explorer"))
+        {
+            char buffer[MAX_PATH];
+            GetModuleFileName(NULL, buffer, MAX_PATH);
+            std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+            std::string exeDir = std::string(buffer).substr(0, pos);
+
+            std::string path = exeDir + "\\..\\..\\Engine\\Assets";
+
+            ShellExecute(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
+        }
+        ImGui::EndMenu();
+    }
+    
 
     ImGui::EndMainMenuBar();
 }
