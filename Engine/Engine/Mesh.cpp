@@ -26,9 +26,15 @@ void Mesh::InitMesh()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::DrawMesh(GLuint textureID)
+void Mesh::DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool shadedWireframe)
 {
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	if (!shadedWireframe) 
+		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+	else 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	if (drawTextures && !wireframe) 
+		glBindTexture(GL_TEXTURE_2D, textureID);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, verticesId);
@@ -51,6 +57,26 @@ void Mesh::DrawMesh(GLuint textureID)
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	if (shadedWireframe) 
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		glPushAttrib(GL_CURRENT_BIT);
+		glColor3f(0.0f, 1.0f, 0.0f);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, verticesId);
+		glVertexPointer(3, GL_FLOAT, 0, NULL);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesId);
+		glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, NULL);
+
+		glPopAttrib();
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
 }
 
 void Mesh::CleanUpMesh()

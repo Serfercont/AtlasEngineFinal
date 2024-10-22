@@ -31,6 +31,10 @@ public:
 public:
 	GameObject* selectedGameObject = nullptr;
 
+	bool drawTextures = true;
+	bool wireframe = false;
+	bool shadedWireframe = false;
+
 private:
 	//Inspector
 	char searchInput[256] = "";

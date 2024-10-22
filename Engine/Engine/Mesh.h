@@ -2,13 +2,14 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+
 typedef unsigned int uint;
 
 class Mesh
 {
 public:
 	void InitMesh();
-	void DrawMesh(GLuint textureID);
+	void DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool shadedWireframe);
 	void CleanUpMesh();
 
 public:
