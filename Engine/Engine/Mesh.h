@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <string>
 
 typedef unsigned int uint;
 
@@ -25,4 +26,10 @@ public:
 	uint texCoordsId = 0;
 	uint texCoordsCount = 0;
 	float* texCoords = nullptr;
+
+	// Material properties
+	glm::vec4 diffuseColor = glm::vec4(1.0f);
+	glm::vec4 specularColor = glm::vec4(1.0f);
+	glm::vec4 ambientColor = glm::vec4(1.0f);
+	std::string diffuseTexturePath;
 };

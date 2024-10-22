@@ -20,8 +20,8 @@ public:
 	void EnableDebugger();
 	void DisableDebugger();
 
-	void ImportFBX(const char* path, vector<Mesh*>& meshes, GameObject* gameObject);
+	void ImportFBX(const char* path, GameObject* gameObject);
 	void LoadNode(aiNode* node, vector<Mesh*>& meshes, GameObject* parent, const char* fileName);
-	Mesh* LoadMesh(aiMesh* newMesh);
+	Mesh* LoadMesh(aiMesh* newMesh, const aiScene* scene);
 };
 

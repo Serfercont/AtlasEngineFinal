@@ -110,7 +110,7 @@ bool ModuleInput::PreUpdate(float dt)
 			if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "fbx"
 				|| droppedFileDir.substr(droppedFileDir.find(".") + 1) == "FBX")
 			{
-				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->renderer3D->mesh, app->scene->root);
+				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->scene->root);
 			}
 			else if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "png")
 			{

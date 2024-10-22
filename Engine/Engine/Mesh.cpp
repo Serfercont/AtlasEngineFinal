@@ -28,25 +28,37 @@ void Mesh::InitMesh()
 
 void Mesh::DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool shadedWireframe)
 {
-	if (!shadedWireframe) 
+	if (!shadedWireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
-	else 
+	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	if (drawTextures && !wireframe) 
+	if (drawTextures && !wireframe && textureID != 0)
+	{
 		glBindTexture(GL_TEXTURE_2D, textureID);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, texCoordsId);
+		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+	}
+	else
+	{
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, verticesId);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, texCoordsId);
-	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, normalsId);
-	glNormalPointer(GL_FLOAT, 0, NULL);
+	if (normalsCount > 0)
+	{
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, normalsId);
+		glNormalPointer(GL_FLOAT, 0, NULL);
+	}
+	else
+	{
+		glDisableClientState(GL_NORMAL_ARRAY);
+	}
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesId);
 	glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, NULL);
@@ -58,11 +70,11 @@ void Mesh::DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool sh
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	if (shadedWireframe) 
+	if (shadedWireframe)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-		glPushAttrib(GL_CURRENT_BIT);
+		glPushAttrib(GL_ALL_ATTRIB_BITS);
 		glColor3f(0.0f, 1.0f, 0.0f);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -77,7 +89,10 @@ void Mesh::DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool sh
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
+
 
 void Mesh::CleanUpMesh()
 {

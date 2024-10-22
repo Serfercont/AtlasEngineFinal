@@ -24,7 +24,7 @@ void MeshLoader::DisableDebugger()
 	aiDetachAllLogStreams();
 }
 
-void MeshLoader::ImportFBX(const char* path, vector<Mesh*>& meshes, GameObject* root)
+void MeshLoader::ImportFBX(const char* path, GameObject* root)
 {
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 	string fileName = path;
@@ -33,11 +33,12 @@ void MeshLoader::ImportFBX(const char* path, vector<Mesh*>& meshes, GameObject* 
 
 	if (scene != nullptr && scene->HasMeshes())
 	{
+
 		vector<Mesh*> meshes;
 
 		for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 		{
-			meshes.push_back(LoadMesh(scene->mMeshes[i]));
+			meshes.push_back(LoadMesh(scene->mMeshes[i], scene));
 		}
 
 		LoadNode(scene->mRootNode, meshes, root, fileName.c_str());
@@ -77,7 +78,7 @@ void MeshLoader::LoadNode(aiNode* node, vector<Mesh*>& meshes, GameObject* paren
 	}
 }
 
-Mesh* MeshLoader::LoadMesh(aiMesh* newMesh)
+Mesh* MeshLoader::LoadMesh(aiMesh* newMesh, const aiScene* scene)
 {
 	Mesh* mesh = new Mesh();
 
@@ -128,6 +129,43 @@ Mesh* MeshLoader::LoadMesh(aiMesh* newMesh)
 		}
 
 		LOG(LogType::LOG_INFO, "New mesh with %d texture coords", mesh->texCoordsCount);
+	}
+
+	// Load Material
+	if (newMesh->mMaterialIndex >= 0)
+	{
+		aiMaterial* material = scene->mMaterials[newMesh->mMaterialIndex];
+		aiColor4D color;
+
+		// Diffuse color
+		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
+		{
+			mesh->diffuseColor = glm::vec4(color.r, color.g, color.b, color.a);
+			LOG(LogType::LOG_INFO, "Loaded diffuse color");
+		}
+
+		// Specular color
+		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
+		{
+			mesh->specularColor = glm::vec4(color.r, color.g, color.b, color.a);
+			LOG(LogType::LOG_INFO, "Loaded specular color");
+		}
+
+		// Ambient color
+		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
+		{
+			mesh->ambientColor = glm::vec4(color.r, color.g, color.b, color.a);
+			LOG(LogType::LOG_INFO, "Loaded ambient color");
+		}
+
+		// Diffuse texture
+		aiString texturePath;
+		if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+		{
+			mesh->diffuseTexturePath = texturePath.C_Str();
+			app->renderer3D->LoadTextureImage(texturePath.C_Str());
+			LOG(LogType::LOG_INFO, "Loaded diffuse texture: %s", texturePath.C_Str());
+		}
 	}
 
 	mesh->InitMesh();
