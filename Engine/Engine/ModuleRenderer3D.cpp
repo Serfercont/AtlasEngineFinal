@@ -1,5 +1,6 @@
 #include "ModuleRenderer3D.h"
 #include "App.h"
+#include "Texture.h"
 
 #include <SDL2/SDL_opengl.h>
 
@@ -185,8 +186,9 @@ void ModuleRenderer3D::LoadTextureImage(const char* file)
 
 	if (app->editor->selectedGameObject != nullptr)
 	{
+		Texture* newTexture = new Texture(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
 		if (app->editor->selectedGameObject->material != nullptr)
-			app->editor->selectedGameObject->material->AddMaterial(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
+			app->editor->selectedGameObject->material->AddTexture(newTexture);
 		else
 			LOG(LogType::LOG_WARNING, "No materials found");
 	}

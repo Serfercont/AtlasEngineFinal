@@ -69,6 +69,9 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Sources\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -123,6 +126,9 @@
       <Filter>Sources\Tools</Filter>
     </ClInclude>
     <ClInclude Include="Logger.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
   </ItemGroup>

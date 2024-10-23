@@ -5,7 +5,7 @@
 #include <shellapi.h>
 #include <algorithm> 
 
-ComponentMaterial::ComponentMaterial(GameObject* gameObject) : Component(gameObject, ComponentType::MATERIAL), textureId(-1)
+ComponentMaterial::ComponentMaterial(GameObject* gameObject) : Component(gameObject, ComponentType::MATERIAL), materialTexture(nullptr)
 {
 }
 
@@ -22,11 +22,11 @@ void ComponentMaterial::OnEditor()
 {
 	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		if (textureId != -1)
+		if (materialTexture->textureId != -1)
 		{
-			ImGui::Text("Path: %s", texturePath);
-			ImGui::Text("Texture Size: %i x %i", textureWidth, textureHeight);
-			ImGui::Image((int*)textureId, ImVec2(200, 200));
+			ImGui::Text("Path: %s", materialTexture->texturePath);
+			ImGui::Text("Texture Size: %i x %i", materialTexture->textureWidth, materialTexture->textureHeight);
+			ImGui::Image((int*)materialTexture->textureId, ImVec2(200, 200));
 
 			if (ImGui::MenuItem("Show in Explorer"))
 			{
@@ -35,7 +35,7 @@ void ComponentMaterial::OnEditor()
 				std::string::size_type pos = std::string(buffer).find_last_of("\\/");
 				std::string exeDir = std::string(buffer).substr(0, pos);
 
-				std::string path = exeDir + "\\..\\..\\Engine\\" + texturePath;
+				std::string path = exeDir + "\\..\\..\\Engine\\" + materialTexture->texturePath;
 
 				std::replace(path.begin(), path.end(), '/', '\\');
 
@@ -50,7 +50,7 @@ void ComponentMaterial::OnEditor()
 				std::string::size_type pos = std::string(buffer).find_last_of("\\/");
 				std::string exeDir = std::string(buffer).substr(0, pos);
 
-				std::string path = exeDir + "\\..\\..\\Engine\\" + texturePath;
+				std::string path = exeDir + "\\..\\..\\Engine\\" + materialTexture->texturePath;
 
 				ShellExecute(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 			}
@@ -58,17 +58,14 @@ void ComponentMaterial::OnEditor()
 	}
 }
 
-void ComponentMaterial::AddMaterial(int id, int width, int height, const char* path)
+void ComponentMaterial::AddTexture(Texture* texture)
 {
 	if (gameObject->GetComponent(ComponentType::MESH) != nullptr)
 	{
 		if (gameObject->GetComponent(ComponentType::MATERIAL) == nullptr)
 			gameObject->AddComponent(gameObject->material);	
 		
-		textureId = id;
-		textureWidth = width;
-		textureHeight = height;
-		texturePath = path;
+		materialTexture = texture;
 	}
 
 	if (!gameObject->children.empty())
@@ -78,10 +75,7 @@ void ComponentMaterial::AddMaterial(int id, int width, int height, const char* p
 			if (gameObject->children[i]->GetComponent(ComponentType::MATERIAL) == nullptr)
 				gameObject->children[i]->AddComponent(gameObject->children[i]->material);
 
-			gameObject->children[i]->material->textureId = id;
-			gameObject->children[i]->material->textureWidth = width;
-			gameObject->children[i]->material->textureHeight = height;
-			gameObject->children[i]->material->texturePath = path;
+			gameObject->children[i]->material->materialTexture = texture;
 		}
 	}
 }
