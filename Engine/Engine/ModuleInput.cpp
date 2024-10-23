@@ -114,7 +114,19 @@ bool ModuleInput::PreUpdate(float dt)
 			}
 			else if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "png")
 			{
-				app->renderer3D->LoadTextureImage(e.drop.file);
+				std::string texturePath;
+
+				if (droppedFileDir.find("Assets/") != std::string::npos)
+				{
+					texturePath = droppedFileDir.substr(droppedFileDir.find("Assets/"));
+				}
+				else
+				{
+					texturePath = droppedFileDir;
+				}
+
+				Texture* newTexture = app->renderer3D->LoadTextureImage(texturePath.c_str());
+				app->editor->selectedGameObject->material->AddTexture(newTexture);
 			}
 			else
 			{

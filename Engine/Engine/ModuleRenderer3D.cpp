@@ -118,7 +118,6 @@ bool ModuleRenderer3D::Awake()
 
 	meshLoader.ImportFBX("Assets/BakerHouse.fbx", app->scene->root);
 	app->editor->selectedGameObject = app->scene->root->children[0];
-	LoadTextureImage("Assets/Baker_House.png");
 
 	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -176,24 +175,21 @@ void ModuleRenderer3D::OnResize(int width, int height)
 	glLoadIdentity();
 }
 
-void ModuleRenderer3D::LoadTextureImage(const char* file)
+Texture* ModuleRenderer3D::LoadTextureImage(const char* file)
 {
 	ILuint image;
 	ilGenImages(1, &image);
 	ilBindImage(image);
 
-	if (!ilLoadImage(file)) LOG(LogType::LOG_WARNING, "Image not loaded");
-
-	if (app->editor->selectedGameObject != nullptr)
+	if (!ilLoadImage(file))
 	{
-		Texture* newTexture = new Texture(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
-		if (app->editor->selectedGameObject->material != nullptr)
-			app->editor->selectedGameObject->material->AddTexture(newTexture);
-		else
-			LOG(LogType::LOG_WARNING, "No materials found");
+		LOG(LogType::LOG_WARNING, "Image not loaded");
+		return nullptr;
 	}
-	else 
-		LOG(LogType::LOG_WARNING, "GameObject not found");
+
+	Texture* newTexture = new Texture(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
 
 	ilDeleteImages(1, &image);
+
+	return newTexture;
 }

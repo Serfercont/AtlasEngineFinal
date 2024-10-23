@@ -33,7 +33,6 @@ void MeshLoader::ImportFBX(const char* path, GameObject* root)
 
 	if (scene != nullptr && scene->HasMeshes())
 	{
-
 		vector<Mesh*> meshes;
 
 		for (unsigned int i = 0; i < scene->mNumMeshes; i++)
@@ -63,6 +62,13 @@ void MeshLoader::LoadNode(aiNode* node, vector<Mesh*>& meshes, GameObject* paren
 		ComponentMesh* componentMesh = dynamic_cast<ComponentMesh*>(gameObjectNode->AddComponent(gameObjectNode->mesh));
 
 		componentMesh->mesh = meshPtr;
+
+		if (!meshPtr->diffuseTexturePath.empty())
+		{
+			Texture* newTexture = app->renderer3D->LoadTextureImage(meshPtr->diffuseTexturePath.c_str());
+			gameObjectNode->material->AddTexture(newTexture);
+		}
+
 		parent->children.push_back(gameObjectNode);
 	}
 
@@ -162,8 +168,8 @@ Mesh* MeshLoader::LoadMesh(aiMesh* newMesh, const aiScene* scene)
 		aiString texturePath;
 		if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
 		{
-			mesh->diffuseTexturePath = texturePath.C_Str();
-			app->renderer3D->LoadTextureImage(texturePath.C_Str());
+			std::string basePath = "Assets/";
+			mesh->diffuseTexturePath = basePath + texturePath.C_Str();
 			LOG(LogType::LOG_INFO, "Loaded diffuse texture: %s", texturePath.C_Str());
 		}
 	}

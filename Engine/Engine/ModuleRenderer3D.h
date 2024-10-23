@@ -24,7 +24,7 @@ public:
 
 	void OnResize(int width, int height);
 
-	void LoadTextureImage(const char* file);
+	Texture* LoadTextureImage(const char* file);
 
 public:
 
