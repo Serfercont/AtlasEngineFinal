@@ -1,6 +1,8 @@
 #include "ModuleEditor.h"
 #include "App.h"
 
+#include "GL/glew.h"
+
 #include <cstring>
 #include <algorithm> 
 
@@ -313,6 +315,77 @@ void ModuleEditor::PreferencesWindow()
     ImGui::PushItemWidth(100.f);
     ImGui::SliderFloat("Line Width", &app->renderer3D->grid.lineWidth, 1.f, 5.f, "%1.f");
     ImGui::PopItemWidth();
+
+    if (ImGui::CollapsingHeader("System", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::TreeNode("GPU")) 
+        {
+            static float values[50];
+            static int values_offset = 0;
+
+            GLint memoryTotal = 0;
+            glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &memoryTotal);
+
+            GLint memoryAvailable = 0;
+            glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &memoryAvailable);
+
+            GLint memoryUse = memoryTotal - memoryAvailable;
+            GLfloat memoryUsePercentage = (static_cast<GLfloat>(memoryUse) / static_cast<GLfloat>(memoryTotal)) * 100;
+
+            values[values_offset] = memoryUsePercentage;
+
+            values_offset = (values_offset + 1) % IM_ARRAYSIZE(values);
+
+            ImGui::SeparatorText("Information");
+
+            const GLubyte* vendor = glGetString(GL_VENDOR);
+            ImGui::Text("Vendor:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%s", vendor);
+
+            const GLubyte* renderer = glGetString(GL_RENDERER);
+            ImGui::Text("GPU:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%s", renderer);
+
+            const GLubyte* version = glGetString(GL_VERSION);
+            ImGui::Text("OpenGL version supported:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%s", version);
+
+            const GLubyte* glsl = glGetString(GL_SHADING_LANGUAGE_VERSION);
+            ImGui::Text("GLSL:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%s", glsl);
+
+            ImGui::SeparatorText("VRam");
+
+            ImGui::Text("GPU Memory:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%d MB", memoryTotal / 1024);
+
+            ImGui::Text("Available GPU Memory:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%d MB", memoryAvailable / 1024);
+
+            ImGui::Text("GPU in use:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%d MB", memoryUse / 1024);
+
+                        
+            char overlay[32];
+            sprintf_s(overlay, "Memory Usage %.2f %%", memoryUsePercentage);   
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, dataTextColor);
+            ImGui::PlotHistogram("##MemoryUsage", values, IM_ARRAYSIZE(values), values_offset, overlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
+            ImGui::PopStyleColor();
+
+            ImGui::TreePop();
+        }
+
+        
+
+
+       //GPU / CPU / Memory / 
+    }
 
     ImGui::End();
 }

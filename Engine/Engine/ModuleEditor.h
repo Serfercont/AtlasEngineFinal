@@ -46,4 +46,7 @@ private:
 	ImVec4 infoColor = ImVec4(.25f, .5f, 1, 1);
 	ImVec4 warningColor = ImVec4(1, .5f, 0, 1);
 	ImVec4 errorColor = ImVec4(1, 0, 0, 1);
+
+	//Preferences
+	ImVec4 dataTextColor = ImVec4(1.0f, 0.0f, 1.0f, 1.0f);
 };
