@@ -354,6 +354,29 @@ void ModuleEditor::PreferencesWindow()
         ImGui::PushItemWidth(100.f);
         ImGui::SliderFloat("Line Width", &app->renderer3D->grid.lineWidth, 1.f, 5.f, "%1.f");
         ImGui::PopItemWidth();
+
+        static int selectedGrid = 1;
+        for (int n = 0; n < 3; n++)
+        {
+            const char* names[] = { "X", "Y", "Z" };
+
+            if (ImGui::Selectable(names[n], selectedGrid == n))
+            {
+                selectedGrid = n;
+                if (n == 0)
+                {
+                    app->renderer3D->grid.normal = vec3(1, 0, 0);
+                }
+                else if (n == 1)
+                {
+                    app->renderer3D->grid.normal = vec3(0, 1, 0);
+                }
+                else if (n == 2)
+                {
+                    app->renderer3D->grid.normal = vec3(0, 0, 1);
+                }
+            }
+        }
     }
 
     ImGui::End();
