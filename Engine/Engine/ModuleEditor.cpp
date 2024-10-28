@@ -384,6 +384,27 @@ void ModuleEditor::PreferencesWindow()
             ImGui::TreePop();
         }
 
+        if (ImGui::TreeNode("CPU"))
+        {
+            SYSTEM_INFO sysInfo;
+            GetSystemInfo(&sysInfo);
+
+            LARGE_INTEGER frequency;
+            QueryPerformanceFrequency(&frequency);
+
+            ImGui::Text("Total Number of Procesors:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%d Cores", sysInfo.dwNumberOfProcessors);
+
+            ImGui::Text("CPU Frequency:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%.2f MHz", frequency.QuadPart / 1000000.0);
+
+
+
+            ImGui::TreePop();
+        }
+
         if (ImGui::TreeNode("MEMORY"))
         {
             MEMORYSTATUSEX statex;
