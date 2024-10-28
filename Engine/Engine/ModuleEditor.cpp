@@ -389,8 +389,8 @@ void ModuleEditor::PreferencesWindow()
             SYSTEM_INFO sysInfo;
             GetSystemInfo(&sysInfo);
 
-            LARGE_INTEGER frequency;
-            QueryPerformanceFrequency(&frequency);
+             LARGE_INTEGER frequency;
+        QueryPerformanceFrequency(&frequency);
 
             ImGui::Text("Total Number of Procesors:");
             ImGui::SameLine();
@@ -399,8 +399,6 @@ void ModuleEditor::PreferencesWindow()
             ImGui::Text("CPU Frequency:");
             ImGui::SameLine();
             ImGui::TextColored(dataTextColor, "%.2f MHz", frequency.QuadPart / 1000000.0);
-
-
 
             ImGui::TreePop();
         }
@@ -422,6 +420,8 @@ void ModuleEditor::PreferencesWindow()
             ImGui::Text("Used Memory:");
             ImGui::SameLine();
             ImGui::TextColored(dataTextColor, "%d MB", (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024));
+
+
 
             ImGui::TreePop();
         }
