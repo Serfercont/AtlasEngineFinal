@@ -27,13 +27,13 @@ void MeshLoader::DisableDebugger()
 void MeshLoader::ImportFBX(const char* path, GameObject* root)
 {
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
-	string fileName = path;
+	std::string fileName = path;
 	fileName = fileName.substr(fileName.find_last_of("/\\") + 1);
 	fileName = fileName.substr(0, fileName.find_last_of("."));
 
 	if (scene != nullptr && scene->HasMeshes())
 	{
-		vector<Mesh*> meshes;
+		std::vector<Mesh*> meshes;
 
 		for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 		{
@@ -52,7 +52,7 @@ void MeshLoader::ImportFBX(const char* path, GameObject* root)
 	else LOG(LogType::LOG_ERROR, "Error loading scene % s", path);
 }
 
-void MeshLoader::LoadNode(aiNode* node, vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
+void MeshLoader::LoadNode(aiNode* node, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{

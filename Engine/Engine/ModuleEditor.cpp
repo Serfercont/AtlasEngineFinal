@@ -246,7 +246,7 @@ void ModuleEditor::ConsoleWindow()
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(15, 10));
 
-	string logType;
+	std::string logType;
 	ImVec4 logColor;
 
     for (const auto& log : logger.GetLogs())
@@ -365,15 +365,15 @@ void ModuleEditor::PreferencesWindow()
                 selectedGrid = n;
                 if (n == 0)
                 {
-                    app->renderer3D->grid.normal = vec3(1, 0, 0);
+                    app->renderer3D->grid.normal = glm::vec3(1, 0, 0);
                 }
                 else if (n == 1)
                 {
-                    app->renderer3D->grid.normal = vec3(0, 1, 0);
+                    app->renderer3D->grid.normal = glm::vec3(0, 1, 0);
                 }
                 else if (n == 2)
                 {
-                    app->renderer3D->grid.normal = vec3(0, 0, 1);
+                    app->renderer3D->grid.normal = glm::vec3(0, 0, 1);
                 }
             }
         }

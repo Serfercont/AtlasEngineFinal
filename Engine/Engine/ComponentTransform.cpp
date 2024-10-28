@@ -3,8 +3,8 @@
 
 ComponentTransform::ComponentTransform(GameObject* gameObject) : Component(gameObject, ComponentType::TRANSFORM)
 {
-    localTransform = float4x4(1.0f);
-    globalTransform = float4x4(1.0f);
+    localTransform = glm::float4x4(1.0f);
+    globalTransform = glm::float4x4(1.0f);
 
     Decompose(globalTransform, position, rotation, scale);
 
@@ -131,9 +131,9 @@ void ComponentTransform::OnEditor()
         // Reset
         if (ImGui::Button("Reset"))
         {
-            position = float3(0.f);
-            eulerRotation = float3(0.f);
-            scale = float3(1.f);
+            position = glm::float3(0.f);
+            eulerRotation = glm::float3(0.f);
+            scale = glm::float3(1.f);
             updateTransform = true;
         }
     }
@@ -141,7 +141,7 @@ void ComponentTransform::OnEditor()
     if (updateTransform) UpdateTransform();
 }
 
-void ComponentTransform::SetTransformMatrix(float3 position, quat rotation, float3 scale, ComponentTransform* parent)
+void ComponentTransform::SetTransformMatrix(glm::float3 position, glm::quat rotation, glm::float3 scale, ComponentTransform* parent)
 {
     this->position = position;
     this->rotation = rotation;
@@ -149,7 +149,7 @@ void ComponentTransform::SetTransformMatrix(float3 position, quat rotation, floa
 
     eulerRotation = degrees(glm::eulerAngles(rotation));
 
-    localTransform = float4x4(1.0f);
+    localTransform = glm::float4x4(1.0f);
     localTransform = glm::translate(localTransform, position);
     localTransform *= glm::mat4_cast(rotation);
     localTransform = glm::scale(localTransform, scale);
@@ -162,9 +162,9 @@ void ComponentTransform::SetTransformMatrix(float3 position, quat rotation, floa
 
 void ComponentTransform::UpdateTransform()
 {
-    rotation = quat(vec3(radians(eulerRotation.x), radians(eulerRotation.y), radians(eulerRotation.z)));
+    rotation = glm::quat(glm::vec3(glm::radians(eulerRotation.x), glm::radians(eulerRotation.y), glm::radians(eulerRotation.z)));
 
-    localTransform = float4x4(1.0f);
+    localTransform = glm::float4x4(1.0f);
     localTransform = glm::translate(localTransform, position);
     localTransform *= glm::mat4_cast(rotation);
     localTransform = glm::scale(localTransform, scale);
@@ -187,9 +187,9 @@ void ComponentTransform::UpdateTransform()
     updateTransform = false;
 }
 
-bool ComponentTransform::Decompose(const float4x4& transform, glm::vec3& translation, glm::quat& rotation, glm::vec3& scale)
+bool ComponentTransform::Decompose(const glm::float4x4& transform, glm::vec3& translation, glm::quat& rotation, glm::vec3& scale)
 {
-    float4x4 localMatrix(transform);
+    glm::float4x4 localMatrix(transform);
 
     translation = glm::vec3(localMatrix[3]);
 
