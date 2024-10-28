@@ -3,6 +3,9 @@
 
 #include "GL/glew.h"
 
+#include <iostream>
+#include <windows.h>
+
 #include <cstring>
 #include <algorithm> 
 
@@ -381,6 +384,26 @@ void ModuleEditor::PreferencesWindow()
             ImGui::TreePop();
         }
 
+        if (ImGui::TreeNode("MEMORY"))
+        {
+            MEMORYSTATUSEX statex;
+            statex.dwLength = sizeof(statex);
+            GlobalMemoryStatusEx(&statex);
+
+            ImGui::Text("Total Memory:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%d MB", statex.ullTotalPhys / (1024 * 1024));
+
+            ImGui::Text("Free Memory:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%d MB", statex.ullAvailPhys / (1024 * 1024));
+
+            ImGui::Text("Used Memory:");
+            ImGui::SameLine();
+            ImGui::TextColored(dataTextColor, "%d MB", (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024));
+
+            ImGui::TreePop();
+        }
         
 
 
