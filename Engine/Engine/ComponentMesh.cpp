@@ -49,6 +49,13 @@ void ComponentMesh::OnEditor()
 {
 	if (ImGui::CollapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		ImGui::Text("Vertices: %d", mesh->verticesCount);
+		ImGui::Text("Indices: %d", mesh->indicesCount);
+		ImGui::Text("Normals: %d", mesh->normalsCount);
+		ImGui::Text("Texture Coords: %d", mesh->texCoordsCount);
+
+		ImGui::Spacing();
+
 		ImGui::Checkbox("Vertex Normals", &showVertexNormals);
 		ImGui::Checkbox("Face Normals", &showFaceNormals);
 	}
