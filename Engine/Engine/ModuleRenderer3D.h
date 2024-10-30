@@ -24,7 +24,7 @@ public:
 
 	void OnResize(int width, int height);
 
-	void LoadTextureImage(const char* file);
+	Texture* LoadTextureImage(const char* file);
 
 public:
 
@@ -34,7 +34,7 @@ public:
 	MeshLoader meshLoader;
 
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
-	unsigned int textureId;
+	unsigned int checkerTextureId;
 
 	Grid grid;
 };

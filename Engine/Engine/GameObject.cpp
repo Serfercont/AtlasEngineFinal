@@ -3,6 +3,9 @@
 GameObject::GameObject(const char* name, GameObject* parent) : parent(parent), name(name)
 {
 	transform = new ComponentTransform(this);
+	mesh = new ComponentMesh(this);
+	material = new ComponentMaterial(this);
+
 	AddComponent(transform);
 }
 

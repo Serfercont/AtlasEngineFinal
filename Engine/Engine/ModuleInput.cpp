@@ -1,6 +1,9 @@
 #include "ModuleInput.h"
 #include "App.h"
 
+#include <filesystem>
+#include <fstream>
+
 #include <string>
 
 ModuleInput::ModuleInput(App* app) : Module(app)
@@ -106,15 +109,26 @@ bool ModuleInput::PreUpdate(float dt)
 		case (SDL_DROPFILE):
 		{
 			std::string droppedFileDir(e.drop.file);
+			std::string assetsDir = "Assets/";
 
 			if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "fbx"
 				|| droppedFileDir.substr(droppedFileDir.find(".") + 1) == "FBX")
 			{
-				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->renderer3D->mesh, app->scene->root);
+				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->scene->root);
 			}
 			else if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "png")
 			{
-				app->renderer3D->LoadTextureImage(e.drop.file);
+				std::string assetFilePath = assetsDir + std::filesystem::path(droppedFileDir).filename().string();
+
+				if (!std::filesystem::exists(assetFilePath))
+				{
+					std::ifstream src(droppedFileDir, std::ios::binary);
+					std::ofstream dst(assetFilePath, std::ios::binary);
+					dst << src.rdbuf();
+				}
+
+				Texture* newTexture = app->renderer3D->LoadTextureImage(assetFilePath.c_str());
+				app->editor->selectedGameObject->material->AddTexture(newTexture);
 			}
 			else
 			{

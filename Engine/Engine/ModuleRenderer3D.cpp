@@ -1,5 +1,6 @@
 #include "ModuleRenderer3D.h"
 #include "App.h"
+#include "Texture.h"
 
 #include <SDL2/SDL_opengl.h>
 
@@ -107,16 +108,16 @@ bool ModuleRenderer3D::Awake()
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_2D, textureId);
+	glGenTextures(1, &checkerTextureId);
+	glBindTexture(GL_TEXTURE_2D, checkerTextureId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
-	meshLoader.ImportFBX("Assets/BakerHouse.fbx", mesh, app->scene->root);
-	LoadTextureImage("Assets/Baker_House.png");
+	meshLoader.ImportFBX("Assets/BakerHouse.fbx", app->scene->root);
+	app->editor->selectedGameObject = app->scene->root->children[0];
 
 	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -130,12 +131,6 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(app->camera->GetViewMatrix());
-
-	//for (unsigned int i = 0; i < mesh.size(); i++)
-	//{
-	//	//glScaled(0.05f, 0.05f, 0.05f);
-	//	mesh[i]->DrawMesh();
-	//}
 
 	return true;
 }
@@ -167,7 +162,6 @@ bool ModuleRenderer3D::CleanUp()
 	return true;
 }
 
-
 void ModuleRenderer3D::OnResize(int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -181,18 +175,21 @@ void ModuleRenderer3D::OnResize(int width, int height)
 	glLoadIdentity();
 }
 
-void ModuleRenderer3D::LoadTextureImage(const char* file)
+Texture* ModuleRenderer3D::LoadTextureImage(const char* file)
 {
 	ILuint image;
 	ilGenImages(1, &image);
 	ilBindImage(image);
 
-	if (!ilLoadImage((wchar_t*)file)) LOG(LogType::LOG_WARNING, "Image not loaded");
-
-	for (unsigned int i = 0; i < mesh.size(); i++)
+	if (!ilLoadImage(file))
 	{
-		mesh[i]->textureID = ilutGLBindTexImage();
+		LOG(LogType::LOG_WARNING, "Image not loaded");
+		return nullptr;
 	}
 
+	Texture* newTexture = new Texture(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
+
 	ilDeleteImages(1, &image);
+
+	return newTexture;
 }

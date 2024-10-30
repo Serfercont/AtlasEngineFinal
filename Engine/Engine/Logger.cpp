@@ -25,7 +25,7 @@ void Logger::Log(const char file[], int line, LogType type, const char* format, 
     logger.AddLog(type, tmpString2);
 }
 
-void Logger::AddLog(LogType type, string message)
+void Logger::AddLog(LogType type, std::string message)
 {
 	logs.push_back({ type, message });
 }

@@ -5,12 +5,12 @@ ModuleCamera::ModuleCamera(App* app) : Module(app)
 {
 	CalculateViewMatrix();
 
-	X = vec3(1.0f, 0.0f, 0.0f);
-	Y = vec3(0.0f, 1.0f, 0.0f);
-	Z = vec3(0.0f, 0.0f, 1.0f);
+	X = glm::vec3(1.0f, 0.0f, 0.0f);
+	Y = glm::vec3(0.0f, 1.0f, 0.0f);
+	Z = glm::vec3(0.0f, 0.0f, 1.0f);
 
-	Position = vec3(0.0f, 5.0f, 5.0f);
-	Reference = vec3(0.0f, 0.0f, 0.0f);
+	Position = glm::vec3(0.0f, 5.0f, 5.0f);
+	Reference = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 ModuleCamera::~ModuleCamera()
@@ -34,7 +34,7 @@ bool ModuleCamera::CleanUp()
 
 bool ModuleCamera::Update(float dt)
 {
-	vec3 newPos(0, 0, 0);
+	glm::vec3 newPos(0, 0, 0);
 	float speed = 10.0f * dt;
 	float zoomSpeed = 30.0f * dt;
 	float fastSpeed = 20.0f * dt;
@@ -65,9 +65,9 @@ bool ModuleCamera::Update(float dt)
 		{
 			float DeltaX = (float)dx * Sensitivity;
 
-			X = rotateVector(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Y = rotateVector(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Z = rotateVector(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+			X = rotateVector(X, DeltaX, glm::vec3(0.0f, 1.0f, 0.0f));
+			Y = rotateVector(Y, DeltaX, glm::vec3(0.0f, 1.0f, 0.0f));
+			Z = rotateVector(Z, DeltaX, glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 
 		if (dy != 0)
@@ -79,8 +79,8 @@ bool ModuleCamera::Update(float dt)
 
 			if (Y.y < 0.0f)
 			{
-				Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-				Y = cross(Z, X);
+				Z = glm::vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+				Y = glm::cross(Z, X);
 			}
 		}
 	}
@@ -100,9 +100,9 @@ bool ModuleCamera::Update(float dt)
 		{
 			float DeltaX = (float)dx * Sensitivity;
 
-			X = rotateVector(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Y = rotateVector(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Z = rotateVector(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+			X = rotateVector(X, DeltaX, glm::vec3(0.0f, 1.0f, 0.0f));
+			Y = rotateVector(Y, DeltaX, glm::vec3(0.0f, 1.0f, 0.0f));
+			Z = rotateVector(Z, DeltaX, glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 
 		if (dy != 0)
@@ -114,8 +114,8 @@ bool ModuleCamera::Update(float dt)
 
 			if (Y.y < 0.0f)
 			{
-				Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-				Y = cross(Z, X);
+				Z = glm::vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+				Y = glm::cross(Z, X);
 			}
 		}
 
@@ -133,7 +133,7 @@ bool ModuleCamera::Update(float dt)
 		if (dy != 0)
 		{
 			float zoomDelta = (float)dy * Sensitivity;
-			vec3 direction = normalize(Position - Reference);
+			glm::vec3 direction = glm::normalize(Position - Reference);
 			Position -= direction * zoomDelta;
 		}
 	}
@@ -153,19 +153,19 @@ bool ModuleCamera::Update(float dt)
 
 void ModuleCamera::FrameSelected()
 {
-	Position = vec3(0.0f, 5.0f, 5.0f);
-	Reference = vec3(0.0f, 0.0f, 0.0f);
+	Position = glm::vec3(0.0f, 5.0f, 5.0f);
+	Reference = glm::vec3(0.0f, 0.0f, 0.0f);
 	LookAt(Reference);
 }
 
-void ModuleCamera::Look(const vec3& Position, const vec3& Reference, bool RotateAroundReference)
+void ModuleCamera::Look(const glm::vec3& Position, const glm::vec3& Reference, bool RotateAroundReference)
 {
 	this->Position = Position;
 	this->Reference = Reference;
 
-	Z = normalize(Position - Reference);
-	X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), Z));
-	Y = cross(Z, X);
+	Z = glm::normalize(Position - Reference);
+	X = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), Z));
+	Y = glm::cross(Z, X);
 
 	if (!RotateAroundReference)
 	{
@@ -176,18 +176,18 @@ void ModuleCamera::Look(const vec3& Position, const vec3& Reference, bool Rotate
 	CalculateViewMatrix();
 }
 
-void ModuleCamera::LookAt(const vec3& Spot)
+void ModuleCamera::LookAt(const glm::vec3& Spot)
 {
 	Reference = Spot;
 
-	Z = normalize(Position - Reference);
-	X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), Z));
-	Y = cross(Z, X);
+	Z = glm::normalize(Position - Reference);
+	X = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), Z));
+	Y = glm::cross(Z, X);
 
 	CalculateViewMatrix();
 }
 
-void ModuleCamera::Move(const vec3& Movement)
+void ModuleCamera::Move(const glm::vec3& Movement)
 {
 	Position += Movement;
 	Reference += Movement;
@@ -202,16 +202,16 @@ float* ModuleCamera::GetViewMatrix()
 
 void ModuleCamera::CalculateViewMatrix()
 {
-	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
+	ViewMatrix = glm::mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
 	ViewMatrixInverse = inverse(ViewMatrix);
 }
 
-vec3 ModuleCamera::rotateVector(vec3 const& vector, float angle, vec3 const& axis) {
-	mat4 rotationMatrix = rotate(mat4(1.0f), angle, axis);
+glm::vec3 ModuleCamera::rotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis) {
+	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, axis);
 
-	vec4 vector4 = vec4(vector, 1.0f);
+	glm::vec4 vector4 = glm::vec4(vector, 1.0f);
 
-	vec4 rotatedVector = rotationMatrix * vector4;
+	glm::vec4 rotatedVector = rotationMatrix * vector4;
 
-	return vec3(rotatedVector);
+	return glm::vec3(rotatedVector);
 }
