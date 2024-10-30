@@ -16,4 +16,8 @@ public:
 
 public:
 	Mesh* mesh;
+
+private:
+	bool showVertexNormals = false;
+	bool showFaceNormals = false;
 };

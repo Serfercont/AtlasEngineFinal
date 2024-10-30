@@ -328,6 +328,22 @@ void ModuleEditor::PreferencesWindow()
                 }
             }
         }
+
+		ImGui::Spacing();
+		ImGui::Separator();
+
+        ImGui::PushItemWidth(200.f);
+        ImGui::SliderFloat("Vertex Normals Length", &vertexNormalLength, 0.05f, 0.25f, "%.2f", ImGuiSliderFlags_NoInput);
+		ImGui::SliderFloat("Face Normals Length", &faceNormalLength, 0.05f, 0.25f, "%.2f", ImGuiSliderFlags_NoInput);
+		ImGui::PopItemWidth();
+
+        ImGui::ColorEdit3("Vertex Color", (float*)&vertexNormalColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+        ImGui::SameLine();
+        ImGui::Text("Vertex Normal Color");
+
+        ImGui::ColorEdit3("Face Color", (float*)&faceNormalColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+        ImGui::SameLine();
+        ImGui::Text("Face Normal Color");
     }
 
     ImGui::Spacing();

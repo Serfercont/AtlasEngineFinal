@@ -93,6 +93,55 @@ void Mesh::DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool sh
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
+void Mesh::DrawNormals(bool vertexNormals, bool faceNormals, float vertexNormalLength, float faceNormalLength, glm::vec3 vertexNormalColor, glm::vec3 faceNormalColor)
+{
+	if (vertexNormals && verticesCount > 0 && normalsCount > 0)
+	{
+		glColor3f(vertexNormalColor.x, vertexNormalColor.y, vertexNormalColor.z);
+		glBegin(GL_LINES);
+		for (size_t i = 0; i < verticesCount; i++)
+		{
+			glVertex3f(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+			glVertex3f(vertices[i * 3] + normals[i * 3] * vertexNormalLength,
+				vertices[i * 3 + 1] + normals[i * 3 + 1] * vertexNormalLength,
+				vertices[i * 3 + 2] + normals[i * 3 + 2] * vertexNormalLength
+			);
+		}
+		glEnd();
+	}
+
+	if (faceNormals && indicesCount > 0)
+	{
+		glColor3f(faceNormalColor.x, faceNormalColor.y, faceNormalColor.z);
+
+		glBegin(GL_LINES);
+		for (size_t i = 0; i < indicesCount; i += 3)
+		{
+			uint index0 = indices[i];
+			uint index1 = indices[i + 1];
+			uint index2 = indices[i + 2];
+
+			glm::vec3 v0(vertices[index0 * 3], vertices[index0 * 3 + 1], vertices[index0 * 3 + 2]);
+			glm::vec3 v1(vertices[index1 * 3], vertices[index1 * 3 + 1], vertices[index1 * 3 + 2]);
+			glm::vec3 v2(vertices[index2 * 3], vertices[index2 * 3 + 1], vertices[index2 * 3 + 2]);
+
+			glm::vec3 edge1 = v1 - v0;
+			glm::vec3 edge2 = v2 - v0;
+			glm::vec3 normal = glm::normalize(glm::cross(edge1, edge2));
+
+			glm::vec3 faceCenter = (v0 + v1 + v2) / 3.0f;
+
+			glVertex3f(faceCenter.x, faceCenter.y, faceCenter.z);
+			glVertex3f(faceCenter.x + normal.x * faceNormalLength,
+				faceCenter.y + normal.y * faceNormalLength,
+				faceCenter.z + normal.z * faceNormalLength
+			);
+		}
+		glEnd();
+	}
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+}
 
 void Mesh::CleanUpMesh()
 {

@@ -79,12 +79,10 @@ void ComponentTransform::OnEditor()
         ImGui::Text("Scale  ");
         ImGui::SameLine();
 
-        if (ImGui::Button("##Constrained", ImVec2(20, 20))) {
-            constrainedProportions = !constrainedProportions;
-            if (constrainedProportions) {
-                for (int i = 0; i < 3; ++i) {
-                    initialScale[i] = scale[i];
-                }
+        ImGui::Checkbox("##Constrained", &constrainedProportions);
+        if (constrainedProportions) {
+            for (int i = 0; i < 3; ++i) {
+                initialScale[i] = scale[i];
             }
         }
 

@@ -23,7 +23,24 @@ void ComponentMesh::Update()
 
 	ComponentMaterial* material = gameObject->material; 
 
-	mesh->DrawMesh(material->textureId, app->editor->drawTextures, app->editor->wireframe, app->editor->shadedWireframe);
+	mesh->DrawMesh(
+		material->textureId, 
+		app->editor->drawTextures, 
+		app->editor->wireframe, 
+		app->editor->shadedWireframe
+	);
+
+	if (showVertexNormals || showFaceNormals)
+	{
+		mesh->DrawNormals(
+			showVertexNormals, 
+			showFaceNormals, 
+			app->editor->vertexNormalLength,
+			app->editor->faceNormalLength,
+			app->editor->vertexNormalColor, 
+			app->editor->faceNormalColor
+		);
+	}
 
 	if (transform != nullptr) glPopMatrix();
 }
@@ -32,5 +49,7 @@ void ComponentMesh::OnEditor()
 {
 	if (ImGui::CollapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		ImGui::Checkbox("Vertex Normals", &showVertexNormals);
+		ImGui::Checkbox("Face Normals", &showFaceNormals);
 	}
 }
