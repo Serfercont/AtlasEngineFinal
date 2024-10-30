@@ -1,5 +1,7 @@
 #include "ComponentMaterial.h"
 #include "GameObject.h"
+#include "App.h"
+#include "ModuleRenderer3D.h"
 
 #include <windows.h>
 #include <shellapi.h>
@@ -54,28 +56,36 @@ void ComponentMaterial::OnEditor()
 
 				ShellExecute(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 			}
+
+			if (ImGui::Checkbox("Show Checkers Texture", &showCheckersTexture))
+			{
+				textureId = showCheckersTexture ? app->renderer3D->checkerTextureId : materialTexture->textureId;
+			}
 		}
 	}
 }
 
 void ComponentMaterial::AddTexture(Texture* texture)
 {
-	if (gameObject->GetComponent(ComponentType::MESH) != nullptr)
+	if (gameObject->GetComponent(ComponentType::MESH))
 	{
-		if (gameObject->GetComponent(ComponentType::MATERIAL) == nullptr)
-			gameObject->AddComponent(gameObject->material);	
-		
+		if (!gameObject->GetComponent(ComponentType::MATERIAL))
+		{
+			gameObject->AddComponent(gameObject->material);
+		}
+
 		materialTexture = texture;
+		textureId = materialTexture->textureId;
 	}
 
-	if (!gameObject->children.empty())
+	for (auto& child : gameObject->children)
 	{
-		for (unsigned int i = 0; i < gameObject->children.size(); i++)
+		if (!child->GetComponent(ComponentType::MATERIAL))
 		{
-			if (gameObject->children[i]->GetComponent(ComponentType::MATERIAL) == nullptr)
-				gameObject->children[i]->AddComponent(gameObject->children[i]->material);
-
-			gameObject->children[i]->material->materialTexture = texture;
+			child->AddComponent(child->material);
 		}
+
+		child->material->materialTexture = texture;
+		child->material->textureId = texture->textureId;
 	}
 }

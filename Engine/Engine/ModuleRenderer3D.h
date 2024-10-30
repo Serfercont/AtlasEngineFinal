@@ -34,7 +34,7 @@ public:
 	MeshLoader meshLoader;
 
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
-	unsigned int textureId;
+	unsigned int checkerTextureId;
 
 	Grid grid;
 };

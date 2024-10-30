@@ -16,4 +16,8 @@ public:
 
 public:
 	Texture* materialTexture;
+	GLuint textureId;
+
+private:
+	bool showCheckersTexture = false;
 };
