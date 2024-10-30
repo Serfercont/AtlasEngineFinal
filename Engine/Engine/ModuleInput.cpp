@@ -1,6 +1,9 @@
 #include "ModuleInput.h"
 #include "App.h"
 
+#include <filesystem>
+#include <fstream>
+
 #include <string>
 
 ModuleInput::ModuleInput(App* app) : Module(app)
@@ -106,6 +109,7 @@ bool ModuleInput::PreUpdate(float dt)
 		case (SDL_DROPFILE):
 		{
 			std::string droppedFileDir(e.drop.file);
+			std::string assetsDir = "Assets/";
 
 			if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "fbx"
 				|| droppedFileDir.substr(droppedFileDir.find(".") + 1) == "FBX")
@@ -114,18 +118,16 @@ bool ModuleInput::PreUpdate(float dt)
 			}
 			else if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "png")
 			{
-				std::string texturePath;
+				std::string assetFilePath = assetsDir + std::filesystem::path(droppedFileDir).filename().string();
 
-				if (droppedFileDir.find("Assets/") != std::string::npos)
+				if (!std::filesystem::exists(assetFilePath))
 				{
-					texturePath = droppedFileDir.substr(droppedFileDir.find("Assets/"));
-				}
-				else
-				{
-					texturePath = droppedFileDir;
+					std::ifstream src(droppedFileDir, std::ios::binary);
+					std::ofstream dst(assetFilePath, std::ios::binary);
+					dst << src.rdbuf();
 				}
 
-				Texture* newTexture = app->renderer3D->LoadTextureImage(texturePath.c_str());
+				Texture* newTexture = app->renderer3D->LoadTextureImage(assetFilePath.c_str());
 				app->editor->selectedGameObject->material->AddTexture(newTexture);
 			}
 			else

@@ -14,5 +14,5 @@ public:
 	int textureWidth;
 	int textureHeight;	
 		
-	const char* texturePath;
+	char* texturePath;
 };
