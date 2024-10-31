@@ -21,8 +21,11 @@ public:
     virtual void DrawWindow() = 0;
 	WindowType GetType() const { return type; }
     std::string GetName() const { return name; }
+	virtual bool IsEnabled() const { return enabled; }
+	virtual void SetEnabled(bool enabled) { this->enabled = enabled; }
 
 protected:
 	WindowType type;
     std::string name;
+	bool enabled = true;
 };

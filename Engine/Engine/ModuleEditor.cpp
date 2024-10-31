@@ -72,9 +72,11 @@ void ModuleEditor::DrawEditor()
     // Docking    
     Docking();
 
+	// Draw windows
     for (const auto& editorWindow : editorWindows)
     {
-        editorWindow->DrawWindow();
+        if (editorWindow->IsEnabled())
+            editorWindow->DrawWindow();
     }
 
 	// Preferences
@@ -234,7 +236,18 @@ void ModuleEditor::MainMenuBar()
         }
         ImGui::EndMenu();
     }
-    
+    if (ImGui::BeginMenu("Windows"))
+    {
+        for (auto& editorWindow : editorWindows)
+        {
+            bool isEnabled = editorWindow->IsEnabled();
+            if (ImGui::MenuItem(editorWindow->GetName().c_str(), NULL, &isEnabled))
+            {
+                editorWindow->SetEnabled(isEnabled);
+            }
+        }
+        ImGui::EndMenu();
+    }
 
     ImGui::EndMainMenuBar();
 }
