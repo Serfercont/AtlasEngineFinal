@@ -109,25 +109,31 @@ bool ModuleInput::PreUpdate(float dt)
 		case (SDL_DROPFILE):
 		{
 			std::string droppedFileDir(e.drop.file);
-			std::string assetsDir = "Assets/";
+			std::string modelsDir = "Assets/Models/";
+			std::string texturesDir = "Assets/Textures/";
+			std::string extension = droppedFileDir.substr(droppedFileDir.find(".") + 1);
 
-			if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "fbx"
-				|| droppedFileDir.substr(droppedFileDir.find(".") + 1) == "FBX")
-			{
-				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->scene->root);
-			}
-			else if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "png")
-			{
-				std::string assetFilePath = assetsDir + std::filesystem::path(droppedFileDir).filename().string();
+			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-				if (!std::filesystem::exists(assetFilePath))
-				{
-					std::ifstream src(droppedFileDir, std::ios::binary);
-					std::ofstream dst(assetFilePath, std::ios::binary);
+			auto copyFileIfNotExists = [](const std::string& source, const std::string& destination) {
+				if (!std::filesystem::exists(destination)) {
+					std::ifstream src(source, std::ios::binary);
+					std::ofstream dst(destination, std::ios::binary);
 					dst << src.rdbuf();
 				}
+			};
 
-				Texture* newTexture = app->renderer3D->LoadTextureImage(assetFilePath.c_str());
+			if (extension == "fbx")
+			{
+				std::string modelFilePath = modelsDir + std::filesystem::path(droppedFileDir).filename().string();
+				copyFileIfNotExists(droppedFileDir, modelFilePath);
+				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->scene->root);
+			}
+			else if (extension == "png")
+			{
+				std::string textureFilePath = texturesDir + std::filesystem::path(droppedFileDir).filename().string();
+				copyFileIfNotExists(droppedFileDir, textureFilePath);
+				Texture* newTexture = app->renderer3D->LoadTextureImage(textureFilePath.c_str());
 				app->editor->selectedGameObject->material->AddTexture(newTexture);
 			}
 			else

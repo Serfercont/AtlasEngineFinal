@@ -28,7 +28,7 @@ void ComponentMaterial::OnEditor()
 		{
 			ImGui::Text("Path: %s", materialTexture->texturePath);
 			ImGui::Text("Texture Size: %i x %i", materialTexture->textureWidth, materialTexture->textureHeight);
-			ImGui::Image((int*)materialTexture->textureId, ImVec2(200, 200));
+			ImGui::Image((int*)materialTexture->textureId, ImVec2(200, 200), ImVec2(0, 1), ImVec2(1, 0));
 
 			if (ImGui::MenuItem("Show in Explorer"))
 			{

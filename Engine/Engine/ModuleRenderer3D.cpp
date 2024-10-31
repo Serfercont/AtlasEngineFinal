@@ -116,7 +116,7 @@ bool ModuleRenderer3D::Awake()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
-	meshLoader.ImportFBX("Assets/BakerHouse.fbx", app->scene->root);
+	meshLoader.ImportFBX("Assets/Models/BakerHouse.fbx", app->scene->root);
 	app->editor->selectedGameObject = app->scene->root->children[0];
 
 	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
