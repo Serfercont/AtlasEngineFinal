@@ -236,6 +236,33 @@ void ModuleEditor::MainMenuBar()
         }
         ImGui::EndMenu();
     }
+    if (ImGui::BeginMenu("GameObject"))
+    {
+	    if (ImGui::MenuItem("Create Empty"))
+	    {
+		    app->scene->CreateGameObject("GameObject", app->scene->root);
+	    }
+        if (ImGui::BeginMenu("3D Object"))
+        {
+            const char* objectNames[] = { "Cube", "Sphere", "Capsule", "Cylinder" };
+            const char* basePath = "Assets/Models/Primitives/";
+            const char* extension = ".fbx";
+
+            for (const char* name : objectNames)
+            {
+                std::string fullPath = std::string(basePath) + name + extension;
+
+                if (ImGui::MenuItem(name))
+                {
+                    app->renderer3D->meshLoader.ImportFBX(fullPath.c_str(), app->scene->root);
+                    selectedGameObject = app->scene->root->children.back();
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Windows"))
     {
         for (auto& editorWindow : editorWindows)
