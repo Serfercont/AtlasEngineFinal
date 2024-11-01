@@ -21,16 +21,132 @@ void ProjectWindow::DrawWindow()
 
     ImGui::Columns(2, "ProjectColumns");
 
-    ImGui::BeginChild("Folders", ImVec2(0, 0), ImGuiChildFlags_None);
-
     DrawFoldersTree("Assets");
-
-    ImGui::EndChild();
 
     ImGui::NextColumn();
 
-    ImGui::BeginChild("Assets", ImVec2(0,0), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
+    DrawDirectoryContents();
 
+    DrawSelectionBar();
+
+    ImGui::Columns(1);
+
+    ImGui::End();
+}
+
+void ProjectWindow::UpdateDirectoryContent()
+{
+    directoryContents.clear();
+    for (const auto& entry : std::filesystem::directory_iterator(currentPath))
+    {
+        directoryContents.push_back(entry);
+    }
+}
+
+std::vector<std::string> ProjectWindow::GetPathParts() const
+{
+    std::vector<std::string> parts;
+    for (const auto& part : currentPath)
+    {
+        parts.push_back(part.string());
+    }
+    return parts;
+}
+
+void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
+{
+    ImGui::BeginChild("Folders", ImVec2(0, 0), ImGuiChildFlags_None);
+
+    ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+    bool hasSubfolders = false;
+
+    for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
+    {
+        if (entry.is_directory())
+        {
+            hasSubfolders = true;
+            break;
+        }
+    }
+
+    if (!hasSubfolders)
+    {
+        nodeFlags |= ImGuiTreeNodeFlags_Leaf;
+    }
+
+    bool open = ImGui::TreeNodeEx(("##" + directoryPath.string()).c_str(), nodeFlags);
+
+    void* icon = hasSubfolders && open ? (void*)(intptr_t)openFolderIcon : (void*)(intptr_t)folderIcon;
+
+    ImGui::SameLine();
+    ImGui::Image(icon, ImVec2(16, 16));
+
+    ImGui::SameLine();
+    ImGui::TextUnformatted(directoryPath.filename().string().c_str());
+
+    if (open)
+    {
+        for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
+        {
+            if (entry.is_directory())
+            {
+                DrawFoldersTree(entry.path());
+            }
+        }
+        ImGui::TreePop();
+    }
+
+	ImGui::EndChild();
+}
+
+void ProjectWindow::DrawDirectoryContents()
+{
+    ImGui::BeginChild("Assets", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
+
+    DrawMenuBar();
+
+    bool isItemSelected = false;
+
+    for (const auto& entry : directoryContents)
+    {
+        if (entry.is_directory() && !entry.path().filename().empty())
+        {
+			bool verifyIfSelected = true;
+
+            ImGui::Image((void*)(intptr_t)folderIcon, ImVec2(16, 16));
+            ImGui::SameLine();
+
+            if (ImGui::Selectable(entry.path().filename().string().c_str(), false))
+            {
+                currentPath = entry.path();
+                UpdateDirectoryContent();
+				verifyIfSelected = false;
+            }
+            if (verifyIfSelected && ImGui::IsItemHovered())
+            {
+                selectedPath = entry.path();
+                isItemSelected = true;
+                showPathBar = true;
+            }
+        }
+        else
+        {
+            ImGui::Image((void*)(intptr_t)fileIcon, ImVec2(16, 16));
+            ImGui::SameLine();
+            ImGui::Text(entry.path().filename().string().c_str());
+        }
+    }
+
+    if (!isItemSelected)
+    {
+        showPathBar = false;
+    }
+
+    ImGui::EndChild();
+}
+
+void ProjectWindow::DrawMenuBar()
+{
     if (ImGui::BeginMenuBar())
     {
         std::vector<std::string> pathParts = GetPathParts();
@@ -71,92 +187,24 @@ void ProjectWindow::DrawWindow()
 
         ImGui::EndMenuBar();
     }
+}
 
-    for (const auto& entry : directoryContents)
+void ProjectWindow::DrawSelectionBar()
+{
+    ImGui::BeginChild("MenuBar", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
+
+    if (showPathBar && !selectedPath.empty())
     {
-        if (entry.is_directory() && !entry.path().filename().empty())
+        if (ImGui::BeginMenuBar())
         {
             ImGui::Image((void*)(intptr_t)folderIcon, ImVec2(16, 16));
             ImGui::SameLine();
-            if (ImGui::Selectable(entry.path().filename().string().c_str(), false))
-            {
-                currentPath = entry.path();
-                UpdateDirectoryContent();
-            }
-        }
-        else
-        {
-            ImGui::Image((void*)(intptr_t)fileIcon, ImVec2(16, 16));
-            ImGui::SameLine();
-            ImGui::Text(entry.path().filename().string().c_str());
+            ImGui::Text("%s", selectedPath.string().c_str());
+
+            ImGui::EndMenuBar();
         }
     }
     ImGui::EndChild();
-
-    ImGui::Columns(1);
-
-    ImGui::End();
-}
-
-void ProjectWindow::UpdateDirectoryContent()
-{
-    directoryContents.clear();
-    for (const auto& entry : std::filesystem::directory_iterator(currentPath))
-    {
-        directoryContents.push_back(entry);
-    }
-}
-
-std::vector<std::string> ProjectWindow::GetPathParts() const
-{
-    std::vector<std::string> parts;
-    for (const auto& part : currentPath)
-    {
-        parts.push_back(part.string());
-    }
-    return parts;
-}
-
-void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
-{
-    ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-    bool hasSubfolders = false;
-
-    for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
-    {
-        if (entry.is_directory())
-        {
-            hasSubfolders = true;
-            break;
-        }
-    }
-
-    if (!hasSubfolders)
-    {
-        nodeFlags |= ImGuiTreeNodeFlags_Leaf;
-    }
-
-    bool open = ImGui::TreeNodeEx(("##" + directoryPath.string()).c_str(), nodeFlags);
-
-    void* icon = hasSubfolders && open ? (void*)(intptr_t)openFolderIcon : (void*)(intptr_t)folderIcon;
-
-    ImGui::SameLine();
-    ImGui::Image(icon, ImVec2(16, 16));
-
-    ImGui::SameLine();
-    ImGui::TextUnformatted(directoryPath.filename().string().c_str());
-
-    if (open)
-    {
-        for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
-        {
-            if (entry.is_directory())
-            {
-                DrawFoldersTree(entry.path());
-            }
-        }
-        ImGui::TreePop();
-    }
 }
 
 GLuint ProjectWindow::LoadTexture(const std::string& filePath)
