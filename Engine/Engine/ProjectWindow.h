@@ -18,6 +18,8 @@ public:
 
     void UpdateDirectoryContent();
     std::vector<std::string> GetPathParts() const;
+    
+    void DrawFoldersTree(const std::filesystem::path& directoryPath);
 
     GLuint LoadTexture(const std::string& filePath);
 
@@ -26,5 +28,6 @@ private:
     std::vector<std::filesystem::directory_entry> directoryContents;
 
     GLuint folderIcon;
+	GLuint openFolderIcon;
     GLuint fileIcon;
 };
