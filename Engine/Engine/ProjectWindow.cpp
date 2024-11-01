@@ -21,13 +21,19 @@ void ProjectWindow::DrawWindow()
 
     ImGui::Columns(2, "ProjectColumns");
 
+    ImGui::BeginChild("Folders", ImVec2(0, 0), ImGuiChildFlags_None);
     DrawFoldersTree("Assets");
+	ImGui::EndChild();
 
     ImGui::NextColumn();
 
+    ImGui::BeginChild("Assets", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
     DrawDirectoryContents();
+    ImGui::EndChild();
 
+    ImGui::BeginChild("SelectionBar", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
     DrawSelectionBar();
+    ImGui::EndChild();
 
     ImGui::Columns(1);
 
@@ -55,8 +61,6 @@ std::vector<std::string> ProjectWindow::GetPathParts() const
 
 void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
 {
-    ImGui::BeginChild("Folders", ImVec2(0, 0), ImGuiChildFlags_None);
-
     ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
     bool hasSubfolders = false;
 
@@ -76,10 +80,22 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
 
     bool open = ImGui::TreeNodeEx(("##" + directoryPath.string()).c_str(), nodeFlags);
 
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    {
+        currentPath = directoryPath;
+        UpdateDirectoryContent();
+    }
+
     void* icon = hasSubfolders && open ? (void*)(intptr_t)openFolderIcon : (void*)(intptr_t)folderIcon;
 
     ImGui::SameLine();
     ImGui::Image(icon, ImVec2(16, 16));
+
+    if (ImGui::IsItemClicked())
+    {
+        currentPath = directoryPath;
+        UpdateDirectoryContent();
+    }
 
     ImGui::SameLine();
     ImGui::TextUnformatted(directoryPath.filename().string().c_str());
@@ -95,23 +111,21 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
         }
         ImGui::TreePop();
     }
-
-	ImGui::EndChild();
 }
 
 void ProjectWindow::DrawDirectoryContents()
 {
-    ImGui::BeginChild("Assets", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
-
     DrawMenuBar();
 
     bool isItemSelected = false;
 
     for (const auto& entry : directoryContents)
     {
+        bool verifyIfSelected = true;
+
         if (entry.is_directory() && !entry.path().filename().empty())
         {
-			bool verifyIfSelected = true;
+            
 
             ImGui::Image((void*)(intptr_t)folderIcon, ImVec2(16, 16));
             ImGui::SameLine();
@@ -120,7 +134,7 @@ void ProjectWindow::DrawDirectoryContents()
             {
                 currentPath = entry.path();
                 UpdateDirectoryContent();
-				verifyIfSelected = false;
+                verifyIfSelected = false;
             }
             if (verifyIfSelected && ImGui::IsItemHovered())
             {
@@ -129,11 +143,21 @@ void ProjectWindow::DrawDirectoryContents()
                 showPathBar = true;
             }
         }
-        else
+		else if (entry.is_regular_file())
         {
             ImGui::Image((void*)(intptr_t)fileIcon, ImVec2(16, 16));
             ImGui::SameLine();
-            ImGui::Text(entry.path().filename().string().c_str());
+            if (ImGui::Selectable(entry.path().filename().string().c_str()))
+            {
+                verifyIfSelected = false;
+            }
+
+            if (ImGui::IsItemHovered())
+            {
+                selectedPath = entry.path();
+                isItemSelected = true;
+                showPathBar = true;
+            }
         }
     }
 
@@ -141,8 +165,6 @@ void ProjectWindow::DrawDirectoryContents()
     {
         showPathBar = false;
     }
-
-    ImGui::EndChild();
 }
 
 void ProjectWindow::DrawMenuBar()
@@ -191,8 +213,6 @@ void ProjectWindow::DrawMenuBar()
 
 void ProjectWindow::DrawSelectionBar()
 {
-    ImGui::BeginChild("MenuBar", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
-
     if (showPathBar && !selectedPath.empty())
     {
         if (ImGui::BeginMenuBar())
@@ -204,7 +224,6 @@ void ProjectWindow::DrawSelectionBar()
             ImGui::EndMenuBar();
         }
     }
-    ImGui::EndChild();
 }
 
 GLuint ProjectWindow::LoadTexture(const std::string& filePath)
