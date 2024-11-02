@@ -1,5 +1,5 @@
 #include "ConsoleWindow.h"
-
+#include "App.h"
 #include "Logger.h"
 
 ConsoleWindow::ConsoleWindow(const WindowType type, const std::string& name) : EditorWindow(type, name)
@@ -15,23 +15,23 @@ void ConsoleWindow::DrawWindow()
     ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar);
 
     ImGui::PushStyleColor(ImGuiCol_CheckMark, infoColor);
-    ImGui::PushStyleColor(ImGuiCol_Text, infoColor);
-    ImGui::Checkbox("Info", &showLogInfo);
-    ImGui::PopStyleColor();
+    ImGui::Checkbox("##Info", &showLogInfo);
+    ImGui::SameLine();
+	ImGui::Image((ImTextureID)app->importer->icons.infoIcon, ImVec2(20, 20));
     ImGui::PopStyleColor();
 
     ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_CheckMark, warningColor);
-    ImGui::PushStyleColor(ImGuiCol_Text, warningColor);
-    ImGui::Checkbox("Warning", &showLogWarnings);
-    ImGui::PopStyleColor();
+    ImGui::Checkbox("##Warning", &showLogWarnings);
+    ImGui::SameLine();
+	ImGui::Image((ImTextureID)app->importer->icons.warningIcon, ImVec2(20, 20));
     ImGui::PopStyleColor();
 
     ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_CheckMark, errorColor);
-    ImGui::PushStyleColor(ImGuiCol_Text, errorColor);
-    ImGui::Checkbox("Error", &showLogErrors);
-    ImGui::PopStyleColor();
+    ImGui::Checkbox("##Error", &showLogErrors);
+    ImGui::SameLine();
+	ImGui::Image((ImTextureID)app->importer->icons.errorIcon, ImVec2(20, 20));
     ImGui::PopStyleColor();
 
     ImGui::SameLine();

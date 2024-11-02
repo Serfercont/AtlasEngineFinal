@@ -10,6 +10,7 @@ App::App(int argc, char* argv[])
 	camera = new ModuleCamera(this);
 	input = new ModuleInput(this);
 	scene = new ModuleScene(this);
+	importer = new ModuleImporter(this);
 	renderer3D = new ModuleRenderer3D(this);	
 	editor = new ModuleEditor(this);
 
@@ -17,7 +18,8 @@ App::App(int argc, char* argv[])
 	AddModule(camera);
 	AddModule(input);
 	AddModule(scene);
-	AddModule(renderer3D);	
+	AddModule(renderer3D);		
+	AddModule(importer);
 	AddModule(editor);
 }
 

@@ -87,6 +87,9 @@
     <ClCompile Include="ProjectWindow.cpp">
       <Filter>Sources\Modules\EditorWindows</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleImporter.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="ProjectWindow.h">
       <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleImporter.h">
+      <Filter>Sources\Modules</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

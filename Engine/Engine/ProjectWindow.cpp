@@ -1,14 +1,9 @@
 #include "ProjectWindow.h"
-
-#include "IL/il.h"
+#include "App.h"
 
 ProjectWindow::ProjectWindow(const WindowType type, const std::string& name) : EditorWindow(type, name), currentPath("Assets")
 {
     UpdateDirectoryContent();
-
-    folderIcon = LoadTexture("Assets/Icons/folder.png");
-    openFolderIcon = LoadTexture("Assets/Icons/open_folder.png");
-    fileIcon = LoadTexture("Assets/Icons/file.png");
 }
 
 ProjectWindow::~ProjectWindow()
@@ -86,7 +81,7 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
         UpdateDirectoryContent();
     }
 
-    void* icon = hasSubfolders && open ? (void*)(intptr_t)openFolderIcon : (void*)(intptr_t)folderIcon;
+    void* icon = hasSubfolders && open ? (ImTextureID)app->importer->icons.openFolderIcon : (ImTextureID)app->importer->icons.folderIcon;
 
     ImGui::SameLine();
     ImGui::Image(icon, ImVec2(16, 16));
@@ -127,7 +122,7 @@ void ProjectWindow::DrawDirectoryContents()
         {
             
 
-            ImGui::Image((void*)(intptr_t)folderIcon, ImVec2(16, 16));
+            ImGui::Image((ImTextureID)app->importer->icons.folderIcon, ImVec2(16, 16));
             ImGui::SameLine();
 
             if (ImGui::Selectable(entry.path().filename().string().c_str(), false))
@@ -145,7 +140,7 @@ void ProjectWindow::DrawDirectoryContents()
         }
 		else if (entry.is_regular_file())
         {
-            ImGui::Image((void*)(intptr_t)fileIcon, ImVec2(16, 16));
+            ImGui::Image((ImTextureID)app->importer->icons.fileIcon, ImVec2(16, 16));
             ImGui::SameLine();
             if (ImGui::Selectable(entry.path().filename().string().c_str()))
             {
@@ -217,44 +212,11 @@ void ProjectWindow::DrawSelectionBar()
     {
         if (ImGui::BeginMenuBar())
         {
-            ImGui::Image((void*)(intptr_t)folderIcon, ImVec2(16, 16));
+            ImGui::Image((ImTextureID)app->importer->icons.folderIcon, ImVec2(16, 16));
             ImGui::SameLine();
             ImGui::Text("%s", selectedPath.string().c_str());
 
             ImGui::EndMenuBar();
         }
     }
-}
-
-GLuint ProjectWindow::LoadTexture(const std::string& filePath)
-{
-    ilClearColour(255, 255, 255, 255);
-
-    ILuint imageID;
-    ilGenImages(1, &imageID);
-    ilBindImage(imageID);
-
-    if (ilLoadImage(filePath.c_str()) == IL_FALSE) 
-    {
-        ilDeleteImages(1, &imageID);
-        return 0;
-    }
-
-    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH), 
-        ilGetInteger(IL_IMAGE_HEIGHT), 0, GL_RGBA, GL_UNSIGNED_BYTE, ilGetData());
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    ilDeleteImages(1, &imageID);
-
-    return textureID;
 }

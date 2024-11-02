@@ -6,8 +6,6 @@
 #include <vector>
 #include <string>
 
-#include <GL/glew.h>
-
 class ProjectWindow : public EditorWindow
 {
 public:
@@ -24,16 +22,10 @@ public:
     void DrawMenuBar();
     void DrawSelectionBar();
 
-    GLuint LoadTexture(const std::string& filePath);
-
 private:
     std::filesystem::path currentPath;
 	std::filesystem::path selectedPath;
     std::vector<std::filesystem::directory_entry> directoryContents;
-
-    GLuint folderIcon;
-	GLuint openFolderIcon;
-    GLuint fileIcon;
 
     bool showPathBar = false;
 };

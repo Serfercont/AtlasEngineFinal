@@ -7,6 +7,7 @@
 #include "ModuleScene.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleEditor.h"
+#include "ModuleImporter.h"
 
 #include "Timer.h"
 
@@ -33,10 +34,11 @@ public:
 	ModuleWindow* window = nullptr;
 	ModuleCamera* camera = nullptr;
 	ModuleInput* input = nullptr;
-	ModuleScene* scene = nullptr;
+	ModuleScene* scene = nullptr;	
+	ModuleImporter* importer = nullptr;
 	ModuleRenderer3D* renderer3D = nullptr;
 	ModuleEditor* editor = nullptr;
-	
+
 private:
 	Timer	ms_timer;
 	float	dt;
