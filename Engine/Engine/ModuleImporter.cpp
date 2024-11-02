@@ -1,6 +1,12 @@
 #include "ModuleImporter.h"
+#include "App.h"
+#include "Logger.h"
 
 #include "IL/il.h"
+#include <Windows.h>
+
+#include <filesystem>
+#include <fstream>
 
 ModuleImporter::ModuleImporter(App* app) : Module(app)
 {
@@ -70,4 +76,75 @@ GLuint ModuleImporter::LoadTexture(const std::string& filePath)
     ilDeleteImages(1, &imageID);
 
     return textureID;
+}
+
+std::string ModuleImporter::OpenFileDialog(const char* filter)
+{
+    OPENFILENAMEA ofn; 
+    CHAR sizeFile[260] = { 0 };
+
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = NULL;
+
+    ofn.lpstrFilter = filter;
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFile = sizeFile;
+    ofn.nMaxFile = sizeof(sizeFile);
+    ofn.lpstrTitle = "Open File";
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+    if (GetOpenFileNameA(&ofn) == TRUE)
+    {
+        return std::string(ofn.lpstrFile);
+    }
+    return "";
+}
+
+void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
+{
+    const std::string modelsDir = "Assets/Models/";
+    const std::string texturesDir = "Assets/Textures/";
+
+    std::string extension = fileDir.substr(fileDir.find(".") + 1);
+    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+    auto copyFileIfNotExists = [](const std::string& source, const std::string& destination) 
+    {
+        if (!std::filesystem::exists(destination)) 
+        {
+            std::ifstream src(source, std::ios::binary);
+            std::ofstream dst(destination, std::ios::binary);
+            dst << src.rdbuf();
+        }
+    };
+
+    if (extension == "fbx") 
+    {
+        std::string modelFilePath = modelsDir + std::filesystem::path(fileDir).filename().string();
+        copyFileIfNotExists(fileDir, modelFilePath);
+
+        if (!addToScene)
+			return;
+
+        app->renderer3D->meshLoader.ImportFBX(fileDir.c_str(), app->scene->root);
+    }
+    else if (extension == "png" || extension == "dds")
+    {
+        std::string textureFilePath = texturesDir + std::filesystem::path(fileDir).filename().string();
+        copyFileIfNotExists(fileDir, textureFilePath);
+
+        if (! addToScene)
+			return;
+
+        Texture* newTexture = app->renderer3D->LoadTextureImage(textureFilePath.c_str());
+        if (newTexture && app->editor->selectedGameObject) 
+        {
+            app->editor->selectedGameObject->material->AddTexture(newTexture);
+        }
+    }
+    else 
+    {
+        LOG(LogType::LOG_WARNING, "File format not supported");
+    }
 }

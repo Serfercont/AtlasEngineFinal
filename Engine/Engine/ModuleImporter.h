@@ -27,6 +27,10 @@ public:
 
 	GLuint LoadTexture(const std::string& filePath);
 
+	std::string OpenFileDialog(const char* filter);
+
+	void ImportFile(const std::string& fileDir, bool addToScene = false);
+
 public:
 	Icons icons;
 };

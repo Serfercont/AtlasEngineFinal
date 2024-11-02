@@ -95,16 +95,16 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
         UpdateDirectoryContent();
     }
 
+    if (ImGui::IsItemHovered() && !isItemSelected)
+    {
+        selectedPath = directoryPath;
+        showPathBar = true;
+    }
+
     void* icon = hasSubfolders && open ? (ImTextureID)app->importer->icons.openFolderIcon : (ImTextureID)app->importer->icons.folderIcon;
 
     ImGui::SameLine();
     ImGui::Image(icon, ImVec2(smallIconSize, smallIconSize));
-
-    if (ImGui::IsItemClicked())
-    {
-        currentPath = directoryPath;
-        UpdateDirectoryContent();
-    }
 
     ImGui::SameLine();
     ImGui::TextUnformatted(directoryPath.filename().string().c_str());
@@ -181,11 +181,14 @@ void ProjectWindow::DrawTile(const std::filesystem::directory_entry& entry, bool
     float cellWidth = ImGui::GetColumnWidth();
     float cellHeight = columnHeight;
 
+    std::string uniqueID = "##SelectableTile_" + entry.path().string();
     bool isSelected = (selectedPath == entry.path() && isItemSelected);
 
-    ImGui::Selectable("##SelectableTile", isSelected, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(cellWidth, cellHeight));
+    ImGui::Selectable(uniqueID.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(cellWidth, cellHeight));
 
     HandleItemClick(entry, shouldBreakLoop);
+
+    HandleDragDrop(entry);
 
 	if (shouldBreakLoop) return;
 
@@ -208,7 +211,6 @@ void ProjectWindow::DrawTile(const std::filesystem::directory_entry& entry, bool
     ImGui::NextColumn();
 }
 
-
 void ProjectWindow::DrawListItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
 {
     ImGui::Image((ImTextureID)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
@@ -218,6 +220,8 @@ void ProjectWindow::DrawListItem(const std::filesystem::directory_entry& entry, 
     ImGui::Selectable(entry.path().filename().string().c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick);
 
     HandleItemClick(entry, shouldBreakLoop);
+
+    HandleDragDrop(entry);
 }
 
 void ProjectWindow::DrawColumnItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
@@ -229,6 +233,8 @@ void ProjectWindow::DrawColumnItem(const std::filesystem::directory_entry& entry
     ImGui::Selectable(entry.path().filename().string().c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick);
 
     HandleItemClick(entry, shouldBreakLoop);
+
+    HandleDragDrop(entry);
 
     ImGui::NextColumn();
     ImGui::Text(entry.is_directory() ? "Folder" : "File");
@@ -280,9 +286,30 @@ void ProjectWindow::HandleItemClick(const std::filesystem::directory_entry& entr
         {
             currentPath = entry.path();
             UpdateDirectoryContent();
-            isItemSelected = true;
+            isItemSelected = false;
             shouldBreakLoop = true;
         }
+    }
+}
+
+void ProjectWindow::HandleDragDrop(const std::filesystem::directory_entry& entry)
+{
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+    {
+        const std::string filePath = entry.path().string();
+
+        ImTextureID iconTexture = entry.is_directory() ? (ImTextureID)app->importer->icons.folderIcon : (ImTextureID)app->importer->icons.fileIcon;
+
+        ImGui::Image(iconTexture, ImVec2(mediumIconSize, mediumIconSize));
+
+        ImGui::SameLine();
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (mediumIconSize / 4.0f));
+
+        ImGui::Text("Dragging %s", entry.path().filename().string().c_str());
+
+        ImGui::SetDragDropPayload("ASSET_FILE_PATH", filePath.c_str(), filePath.size() + 1);
+
+        ImGui::EndDragDropSource();
     }
 }
 
@@ -290,6 +317,23 @@ void ProjectWindow::DrawMenuBar()
 {
     if (ImGui::BeginMenuBar())
     {
+        if (ImGui::Button("Import"))
+        {
+            const char* filter =
+                "All Files (*.fbx;*.png;*.dds)\0*.fbx;*.png;*.dds\0"
+                "FBX Files (*.fbx)\0*.fbx\0"
+                "PNG Files (*.png)\0*.png\0"
+                "DDS Files (*.dds)\0*.dds\0"
+                "\0";
+
+            std::string selectedFile = app->importer->OpenFileDialog(filter);
+            if (!selectedFile.empty())
+            {
+				app->importer->ImportFile(selectedFile);
+				UpdateDirectoryContent();
+            }
+        }
+
         std::vector<std::string> pathParts = GetPathParts();
 
         for (size_t i = 0; i < pathParts.size(); ++i)

@@ -1,9 +1,6 @@
 #include "ModuleInput.h"
 #include "App.h"
 
-#include <filesystem>
-#include <fstream>
-
 #include <string>
 
 ModuleInput::ModuleInput(App* app) : Module(app)
@@ -109,37 +106,8 @@ bool ModuleInput::PreUpdate(float dt)
 		case (SDL_DROPFILE):
 		{
 			std::string droppedFileDir(e.drop.file);
-			std::string modelsDir = "Assets/Models/";
-			std::string texturesDir = "Assets/Textures/";
-			std::string extension = droppedFileDir.substr(droppedFileDir.find(".") + 1);
 
-			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-
-			auto copyFileIfNotExists = [](const std::string& source, const std::string& destination) {
-				if (!std::filesystem::exists(destination)) {
-					std::ifstream src(source, std::ios::binary);
-					std::ofstream dst(destination, std::ios::binary);
-					dst << src.rdbuf();
-				}
-			};
-
-			if (extension == "fbx")
-			{
-				std::string modelFilePath = modelsDir + std::filesystem::path(droppedFileDir).filename().string();
-				copyFileIfNotExists(droppedFileDir, modelFilePath);
-				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->scene->root);
-			}
-			else if (extension == "png")
-			{
-				std::string textureFilePath = texturesDir + std::filesystem::path(droppedFileDir).filename().string();
-				copyFileIfNotExists(droppedFileDir, textureFilePath);
-				Texture* newTexture = app->renderer3D->LoadTextureImage(textureFilePath.c_str());
-				app->editor->selectedGameObject->material->AddTexture(newTexture);
-			}
-			else
-			{
-				LOG(LogType::LOG_WARNING, "File format not supported");
-			}
+			app->importer->ImportFile(droppedFileDir, true);
 
 			SDL_free(e.drop.file);
 			break;

@@ -21,13 +21,17 @@ public:
     void DrawDirectoryContents();
     void DrawMenuBar();
     void DrawSelectionBar();
+
 	void ConfigureColumns();
+
 	void DrawTile(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
 	void DrawListItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
 	void DrawColumnItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
-    std::string GetTruncatedFilename(const std::string& filename, float maxTextWidth);
-    void HandleItemClick(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
 
+    std::string GetTruncatedFilename(const std::string& filename, float maxTextWidth);
+
+    void HandleItemClick(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
+    void HandleDragDrop(const std::filesystem::directory_entry& entry);
 private:
     std::filesystem::path currentPath;
 	std::filesystem::path selectedPath;
@@ -48,5 +52,6 @@ private:
 	float columnHeight = 95.0f;
 	float maxTextWidth = 80.0f;
     float smallIconSize = 16.0f;
+	float mediumIconSize = 32.0f;
 	float largeIconSize = 64.0f;
 };
