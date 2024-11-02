@@ -48,5 +48,5 @@ private:
 	ImVec4 errorColor = ImVec4(1, 0, 0, 1);
 
 	//Preferences
-	ImVec4 dataTextColor = ImVec4(1.0f, 0.0f, 1.0f, 1.0f);
+	ImVec4 dataTextColor = ImVec4(0.0f, 1.0f, 1.0f, 1.0f);
 };

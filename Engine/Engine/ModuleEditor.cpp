@@ -323,7 +323,7 @@ void ModuleEditor::PreferencesWindow()
     if (ImGui::CollapsingHeader("System", ImGuiTreeNodeFlags_DefaultOpen)) {
         if (ImGui::TreeNode("GPU")) 
         {
-            static float values[50];
+            static float values[100];
             static int values_offset = 0;
 
             GLint memoryTotal = 0;
@@ -370,23 +370,17 @@ void ModuleEditor::PreferencesWindow()
             ImGui::Text("Available GPU Memory:");
             ImGui::SameLine();
             ImGui::TextColored(dataTextColor, "%d MB", memoryAvailable / 1024);
-
-            ImGui::Text("GPU in use:");
-            ImGui::SameLine();
-            ImGui::TextColored(dataTextColor, "%d MB", memoryUse / 1024);
-
-                        
+      
             char overlay[32];
-            sprintf_s(overlay, "Memory Usage %.2f %%", memoryUsePercentage);   
-            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, dataTextColor);
-            ImGui::PlotHistogram("##MemoryUsage", values, IM_ARRAYSIZE(values), values_offset, overlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
-            ImGui::PopStyleColor();
+            sprintf_s(overlay, "Memory Usage %.2f %% (%d MB)", memoryUsePercentage, memoryUse / 1024);
+            ImGui::PlotLines("##MemoryUsage", values, IM_ARRAYSIZE(values), values_offset, overlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
 
             ImGui::TreePop();
         }
 
         if (ImGui::TreeNode("CPU"))
         {
+            ImGui::SeparatorText("Information");
             std::string cpuName;
 
             WCHAR buffer[256];
@@ -396,19 +390,14 @@ void ModuleEditor::PreferencesWindow()
             SYSTEM_INFO sysInfo;
             GetSystemInfo(&sysInfo);
 
-            LARGE_INTEGER frequency;
-            QueryPerformanceFrequency(&frequency);
-
-            // Obtener el nombre del CPU del registro
             if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &key) == ERROR_SUCCESS) {
                 if (RegQueryValueExW(key, L"ProcessorNameString", NULL, NULL, reinterpret_cast<LPBYTE>(buffer), &bufferSize) == ERROR_SUCCESS) {
                     int size_needed = WideCharToMultiByte(CP_UTF8, 0, buffer, -1, nullptr, 0, nullptr, nullptr);
-                    cpuName.resize(size_needed - 1); // Ajuste de tamaño, sin incluir el carácter nulo final
+                    cpuName.resize(size_needed);
                     WideCharToMultiByte(CP_UTF8, 0, buffer, -1, &cpuName[0], size_needed, nullptr, nullptr);
                 }
                 RegCloseKey(key);
             }
-            // Mostrar el nombre de la CPU
             ImGui::Text("CPU Name:");
             ImGui::SameLine();
             ImGui::TextColored(dataTextColor, "%s", cpuName.c_str());
@@ -417,13 +406,13 @@ void ModuleEditor::PreferencesWindow()
             ImGui::SameLine();
             ImGui::TextColored(dataTextColor, "%d Cores", sysInfo.dwNumberOfProcessors);
 
-
             ImGui::TreePop();
         }
 
         if (ImGui::TreeNode("MEMORY"))
         {
-            // Obtener el estado de la memoria del sistema
+
+            ImGui::SeparatorText("Information");
             MEMORYSTATUSEX statex;
             statex.dwLength = sizeof(statex);
             GlobalMemoryStatusEx(&statex);
@@ -436,28 +425,24 @@ void ModuleEditor::PreferencesWindow()
             ImGui::SameLine();
             ImGui::TextColored(dataTextColor, "%d MB", statex.ullAvailPhys / (1024 * 1024));
 
+            int memoryusage = (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024);
             ImGui::Text("Used Memory:");
             ImGui::SameLine();
             ImGui::TextColored(dataTextColor, "%d MB", (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024));
 
-            // Calcular el porcentaje de memoria usada
             float memoryUsePercentage = ((float)(statex.ullTotalPhys - statex.ullAvailPhys) / statex.ullTotalPhys) * 100.0f;
 
-            // Histograma de uso de memoria total
-            static float totalMemoryValues[100] = { 0 }; // Array circular para almacenar valores
+            static float totalMemoryValues[100] = { 0 };
             static int totalValuesOffset = 0;
 
             totalMemoryValues[totalValuesOffset] = memoryUsePercentage;
             totalValuesOffset = (totalValuesOffset + 1) % IM_ARRAYSIZE(totalMemoryValues);
 
             char totalOverlay[32];
-            sprintf_s(totalOverlay, "Total Memory Usage %.2f %%", memoryUsePercentage);
+            sprintf_s(totalOverlay, "Memory Usage %.2f %% (%d MB)", memoryUsePercentage, memoryusage);
 
-            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, dataTextColor);
-            ImGui::PlotHistogram("##TotalMemoryUsage", totalMemoryValues, IM_ARRAYSIZE(totalMemoryValues), totalValuesOffset, totalOverlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
-            ImGui::PopStyleColor();
+            ImGui::PlotLines("##MemoryUsage", totalMemoryValues, IM_ARRAYSIZE(totalMemoryValues), totalValuesOffset, totalOverlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
 
-            // Obtener el uso de memoria privada del proceso actual
             PROCESS_MEMORY_COUNTERS_EX pmc;
             if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
                 SIZE_T privateMemoryUsage = pmc.PrivateUsage;
@@ -467,8 +452,7 @@ void ModuleEditor::PreferencesWindow()
                 ImGui::SameLine();
                 ImGui::TextColored(dataTextColor, "%.2f MB", privateMemoryUsageMB);
 
-                // Histograma de uso de memoria privada
-                static float privateMemoryValues[100] = { 0 }; // Array circular para almacenar valores
+                static float privateMemoryValues[100] = { 0 }; 
                 static int privateValuesOffset = 0;
 
                 privateMemoryValues[privateValuesOffset] = privateMemoryUsageMB;
@@ -478,12 +462,6 @@ void ModuleEditor::PreferencesWindow()
 
             ImGui::TreePop();
         }
-
-
-        
-
-
-       //GPU / CPU / Memory / 
     }
 
     ImGui::End();
