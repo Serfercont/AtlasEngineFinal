@@ -16,9 +16,16 @@ void ProjectWindow::DrawWindow()
 
     ImGui::Columns(2, "ProjectColumns");
 
+	static bool isFirstTime = true;
+    if (isFirstTime)
+    {
+		ImGui::SetColumnWidth(0, 300);
+        isFirstTime = false;
+    }
+
     ImGui::BeginChild("Folders", ImVec2(0, 0), ImGuiChildFlags_None);
     DrawFoldersTree("Assets");
-	ImGui::EndChild();
+    ImGui::EndChild();
 
     ImGui::NextColumn();
 
@@ -84,7 +91,7 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
     void* icon = hasSubfolders && open ? (ImTextureID)app->importer->icons.openFolderIcon : (ImTextureID)app->importer->icons.folderIcon;
 
     ImGui::SameLine();
-    ImGui::Image(icon, ImVec2(16, 16));
+    ImGui::Image(icon, ImVec2(smallIconSize, smallIconSize));
 
     if (ImGui::IsItemClicked())
     {
@@ -112,39 +119,78 @@ void ProjectWindow::DrawDirectoryContents()
 {
     DrawMenuBar();
 
+    if (!smallSelected)
+    {
+        int columns = static_cast<int>(ImGui::GetContentRegionAvail().x / columnWidth);
+        ImGui::Columns(columns, nullptr, false);
+
+        for (int i = 0; i < columns; i++)
+        {
+            ImGui::SetColumnWidth(i, columnWidth);
+        }
+    }
+
     bool isItemSelected = false;
 
     for (const auto& entry : directoryContents)
     {
-        bool verifyIfSelected = true;
+        bool isDirectory = entry.is_directory();
+        bool isFile = entry.is_regular_file();
+        if (!isDirectory && !isFile) continue;
 
-        if (entry.is_directory() && !entry.path().filename().empty())
+        if (!smallSelected)
         {
-            
+            ImGui::BeginGroup();
 
-            ImGui::Image((ImTextureID)app->importer->icons.folderIcon, ImVec2(16, 16));
-            ImGui::SameLine();
+            float cellWidth = ImGui::GetColumnWidth();
 
-            if (ImGui::Selectable(entry.path().filename().string().c_str(), false))
+            ImGui::SetCursorPosX(((cellWidth - largeIconSize) * 0.5f) + (cellWidth * (ImGui::GetColumnIndex())));
+
+            ImGui::Image((ImTextureID)(isDirectory ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(largeIconSize, largeIconSize));
+
+            std::string filename = entry.path().filename().stem().string();
+            ImVec2 textSize;
+
+            textSize = ImGui::CalcTextSize(filename.c_str());
+            std::string displayedName = filename;
+
+            if (textSize.x > maxTextWidth)
             {
-                currentPath = entry.path();
-                UpdateDirectoryContent();
-                verifyIfSelected = false;
+                std::string ellipsis = "...";
+                ImVec2 ellipsisSize = ImGui::CalcTextSize(ellipsis.c_str());
+
+                size_t maxLength = filename.length();
+                while (textSize.x > (maxTextWidth - ellipsisSize.x) && maxLength > 0)
+                {
+                    displayedName = filename.substr(0, maxLength - 1);
+                    textSize = ImGui::CalcTextSize(displayedName.c_str());
+                    maxLength--;
+                }
+
+                if (displayedName != filename)
+                    displayedName += ellipsis;
             }
-            if (verifyIfSelected && ImGui::IsItemHovered())
+
+			textSize = ImGui::CalcTextSize(displayedName.c_str());
+
+            ImGui::SetCursorPosX(((cellWidth - textSize.x) * 0.5f) + (cellWidth * ImGui::GetColumnIndex()));
+
+            ImGui::Text("%s", displayedName.c_str());
+            ImGui::EndGroup();
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            if (ImGui::IsItemClicked())
             {
-                selectedPath = entry.path();
-                isItemSelected = true;
-                showPathBar = true;
-            }
-        }
-		else if (entry.is_regular_file())
-        {
-            ImGui::Image((ImTextureID)app->importer->icons.fileIcon, ImVec2(16, 16));
-            ImGui::SameLine();
-            if (ImGui::Selectable(entry.path().filename().string().c_str()))
-            {
-                verifyIfSelected = false;
+                if (isDirectory)
+                {
+                    currentPath = entry.path();
+                    UpdateDirectoryContent();
+                    isItemSelected = true;
+                    break;
+                }
             }
 
             if (ImGui::IsItemHovered())
@@ -153,8 +199,35 @@ void ProjectWindow::DrawDirectoryContents()
                 isItemSelected = true;
                 showPathBar = true;
             }
+
+            ImGui::NextColumn();
         }
+        else
+        {
+            ImGui::Image((ImTextureID)(isDirectory ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
+            ImGui::SameLine();
+
+            if (ImGui::Selectable(entry.path().filename().string().c_str()))
+            {
+                if (isDirectory)
+                {
+                    currentPath = entry.path();
+                    UpdateDirectoryContent();
+                    isItemSelected = true;
+                    break;
+                }
+            }
+
+            if (ImGui::IsItemHovered())
+            {
+                selectedPath = entry.path();
+                isItemSelected = true;
+                showPathBar = true;
+            }
+        }       
     }
+        
+    ImGui::Columns(1);
 
     if (!isItemSelected)
     {
@@ -202,6 +275,29 @@ void ProjectWindow::DrawMenuBar()
             }
         }
 
+        ImGui::SameLine(ImGui::GetWindowWidth() - 20);
+
+        if (ImGui::ImageButton((ImTextureID)app->importer->icons.dotsIcon, ImVec2(12, 12)))
+        {
+            ImGui::OpenPopup("OptionsPopup");
+        }
+
+        if (ImGui::BeginPopup("OptionsPopup"))
+        {
+            if (ImGui::MenuItem("Small", nullptr, smallSelected))
+            {
+                smallSelected = true;
+                largeSelected = false;
+            }
+            if (ImGui::MenuItem("Large", nullptr, largeSelected))
+            {
+                smallSelected = false;
+                largeSelected = true;
+            }
+
+            ImGui::EndPopup();
+        }
+
         ImGui::EndMenuBar();
     }
 }
@@ -212,7 +308,7 @@ void ProjectWindow::DrawSelectionBar()
     {
         if (ImGui::BeginMenuBar())
         {
-            ImGui::Image((ImTextureID)app->importer->icons.folderIcon, ImVec2(16, 16));
+            ImGui::Image((ImTextureID)app->importer->icons.folderIcon, ImVec2(smallIconSize, smallIconSize));
             ImGui::SameLine();
             ImGui::Text("%s", selectedPath.string().c_str());
 

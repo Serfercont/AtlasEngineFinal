@@ -10,6 +10,7 @@ struct Icons
 	GLuint folderIcon;
 	GLuint openFolderIcon;
 	GLuint fileIcon;
+	GLuint dotsIcon;
 	GLuint infoIcon;
 	GLuint warningIcon;
 	GLuint errorIcon;

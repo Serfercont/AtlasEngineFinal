@@ -12,9 +12,13 @@ ModuleImporter::~ModuleImporter()
 
 bool ModuleImporter::Awake()
 {
+    // Project
 	icons.folderIcon = LoadTexture("Assets/Icons/folder.png");
 	icons.openFolderIcon = LoadTexture("Assets/Icons/open_folder.png");
 	icons.fileIcon = LoadTexture("Assets/Icons/file.png");
+    icons.dotsIcon = LoadTexture("Assets/Icons/dots.png");
+
+    // Console
 	icons.infoIcon = LoadTexture("Assets/Icons/info.png");
 	icons.warningIcon = LoadTexture("Assets/Icons/warning.png");
 	icons.errorIcon = LoadTexture("Assets/Icons/error.png");
@@ -27,6 +31,7 @@ bool ModuleImporter::CleanUp()
 	glDeleteTextures(1, &icons.folderIcon);
 	glDeleteTextures(1, &icons.openFolderIcon);
 	glDeleteTextures(1, &icons.fileIcon);
+	glDeleteTextures(1, &icons.dotsIcon);
 	glDeleteTextures(1, &icons.infoIcon);
 	glDeleteTextures(1, &icons.warningIcon);
 	glDeleteTextures(1, &icons.errorIcon);

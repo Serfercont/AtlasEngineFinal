@@ -28,4 +28,12 @@ private:
     std::vector<std::filesystem::directory_entry> directoryContents;
 
     bool showPathBar = false;
+
+    bool smallSelected = false;
+    bool largeSelected = true;
+
+	float columnWidth = 100.0f;
+	float maxTextWidth = 80.0f;
+    float smallIconSize = 16.0f;
+	float largeIconSize = 64.0f;
 };
