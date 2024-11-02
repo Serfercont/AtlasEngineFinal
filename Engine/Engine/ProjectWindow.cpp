@@ -12,9 +12,13 @@ ProjectWindow::~ProjectWindow()
 
 void ProjectWindow::DrawWindow()
 {
-    ImGui::Begin(name.c_str());
+    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_MenuBar);
 
-    ImGui::Columns(2, "ProjectColumns");
+    DrawMenuBar();
+
+	int columns = oneColumnSelected ? 1 : 2;
+
+    ImGui::Columns(columns, "ProjectColumns");
 
 	static bool isFirstTime = true;
     if (isFirstTime)
@@ -23,15 +27,18 @@ void ProjectWindow::DrawWindow()
         isFirstTime = false;
     }
 
-    ImGui::BeginChild("Folders", ImVec2(0, 0), ImGuiChildFlags_None);
+    ImGui::BeginChild("Folders", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None);
     DrawFoldersTree("Assets");
     ImGui::EndChild();
 
-    ImGui::NextColumn();
+    if (twoColumnsSelected)
+    {
+        ImGui::NextColumn();
 
-    ImGui::BeginChild("Assets", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
-    DrawDirectoryContents();
-    ImGui::EndChild();
+        ImGui::BeginChild("Assets", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None);
+        DrawDirectoryContents();
+        ImGui::EndChild();
+    }
 
     ImGui::BeginChild("SelectionBar", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_MenuBar);
     DrawSelectionBar();
@@ -117,121 +124,165 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
 
 void ProjectWindow::DrawDirectoryContents()
 {
-    DrawMenuBar();
+    ConfigureColumns();
 
-    if (!smallSelected)
-    {
-        int columns = static_cast<int>(ImGui::GetContentRegionAvail().x / columnWidth);
-        ImGui::Columns(columns, nullptr, false);
-
-        for (int i = 0; i < columns; i++)
-        {
-            ImGui::SetColumnWidth(i, columnWidth);
-        }
-    }
-
-    bool isItemSelected = false;
+    bool shouldBreakLoop = false;
 
     for (const auto& entry : directoryContents)
     {
         bool isDirectory = entry.is_directory();
         bool isFile = entry.is_regular_file();
-        if (!isDirectory && !isFile) continue;
+		if (!isDirectory && !isFile) continue;
 
-        if (!smallSelected)
-        {
-            ImGui::BeginGroup();
-
-            float cellWidth = ImGui::GetColumnWidth();
-
-            ImGui::SetCursorPosX(((cellWidth - largeIconSize) * 0.5f) + (cellWidth * (ImGui::GetColumnIndex())));
-
-            ImGui::Image((ImTextureID)(isDirectory ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(largeIconSize, largeIconSize));
-
-            std::string filename = entry.path().filename().stem().string();
-            ImVec2 textSize;
-
-            textSize = ImGui::CalcTextSize(filename.c_str());
-            std::string displayedName = filename;
-
-            if (textSize.x > maxTextWidth)
-            {
-                std::string ellipsis = "...";
-                ImVec2 ellipsisSize = ImGui::CalcTextSize(ellipsis.c_str());
-
-                size_t maxLength = filename.length();
-                while (textSize.x > (maxTextWidth - ellipsisSize.x) && maxLength > 0)
-                {
-                    displayedName = filename.substr(0, maxLength - 1);
-                    textSize = ImGui::CalcTextSize(displayedName.c_str());
-                    maxLength--;
-                }
-
-                if (displayedName != filename)
-                    displayedName += ellipsis;
-            }
-
-			textSize = ImGui::CalcTextSize(displayedName.c_str());
-
-            ImGui::SetCursorPosX(((cellWidth - textSize.x) * 0.5f) + (cellWidth * ImGui::GetColumnIndex()));
-
-            ImGui::Text("%s", displayedName.c_str());
-            ImGui::EndGroup();
-
-            ImGui::Spacing();
-            ImGui::Spacing();
-            ImGui::Spacing();
-
-            if (ImGui::IsItemClicked())
-            {
-                if (isDirectory)
-                {
-                    currentPath = entry.path();
-                    UpdateDirectoryContent();
-                    isItemSelected = true;
-                    break;
-                }
-            }
-
-            if (ImGui::IsItemHovered())
-            {
-                selectedPath = entry.path();
-                isItemSelected = true;
-                showPathBar = true;
-            }
-
-            ImGui::NextColumn();
-        }
-        else
-        {
-            ImGui::Image((ImTextureID)(isDirectory ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
-            ImGui::SameLine();
-
-            if (ImGui::Selectable(entry.path().filename().string().c_str()))
-            {
-                if (isDirectory)
-                {
-                    currentPath = entry.path();
-                    UpdateDirectoryContent();
-                    isItemSelected = true;
-                    break;
-                }
-            }
-
-            if (ImGui::IsItemHovered())
-            {
-                selectedPath = entry.path();
-                isItemSelected = true;
-                showPathBar = true;
-            }
-        }       
-    }
+        if (tilesSelected)
+            DrawTile(entry, shouldBreakLoop);
+        else if (listSelected)
+            DrawListItem(entry, shouldBreakLoop);
+        else if (columnSelected)
+            DrawColumnItem(entry, shouldBreakLoop);
         
+        if (shouldBreakLoop)
+            break;
+    }
+
     ImGui::Columns(1);
 
-    if (!isItemSelected)
+    if ((!isItemSelected || (isItemSelected && ImGui::IsMouseClicked(0))) && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyItemActive())
     {
+        isItemSelected = false;
         showPathBar = false;
+    }
+}
+
+void ProjectWindow::ConfigureColumns()
+{
+    if (tilesSelected)
+    {
+        int columns = static_cast<int>(ImGui::GetContentRegionAvail().x / columnWidth);
+
+        if (columns > 1)
+        {
+            ImGui::Columns(columns, nullptr, false);
+
+            for (int i = 0; i < columns; i++)
+            {
+                ImGui::SetColumnWidth(i, columnWidth);
+            }
+        }
+    }
+    else if (columnSelected)
+    {
+        ImGui::Columns(2, nullptr, true);
+    }
+}
+
+void ProjectWindow::DrawTile(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
+{
+    float cellWidth = ImGui::GetColumnWidth();
+    float cellHeight = columnHeight;
+
+    bool isSelected = (selectedPath == entry.path() && isItemSelected);
+
+    ImGui::Selectable("##SelectableTile", isSelected, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(cellWidth, cellHeight));
+
+    HandleItemClick(entry, shouldBreakLoop);
+
+	if (shouldBreakLoop) return;
+
+    ImGui::SetCursorPosX((cellWidth * ImGui::GetColumnIndex()));
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - cellHeight);
+
+    ImGui::BeginGroup();
+
+    ImGui::SetCursorPosX(((cellWidth - largeIconSize) * 0.5f) + (cellWidth * ImGui::GetColumnIndex()));
+    ImGui::Image((ImTextureID)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(largeIconSize, largeIconSize));
+
+    std::string displayedName = GetTruncatedFilename(entry.path().filename().stem().string(), maxTextWidth);
+    ImVec2 textSize = ImGui::CalcTextSize(displayedName.c_str());
+
+    ImGui::SetCursorPosX(((cellWidth - textSize.x) * 0.5f) + (cellWidth * ImGui::GetColumnIndex()));
+    ImGui::Text("%s", displayedName.c_str());
+    ImGui::EndGroup();    
+    
+    ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+    ImGui::NextColumn();
+}
+
+
+void ProjectWindow::DrawListItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
+{
+    ImGui::Image((ImTextureID)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
+    ImGui::SameLine();
+
+    bool isSelected = (selectedPath == entry.path() && isItemSelected);
+    ImGui::Selectable(entry.path().filename().string().c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick);
+
+    HandleItemClick(entry, shouldBreakLoop);
+}
+
+void ProjectWindow::DrawColumnItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
+{
+    ImGui::Image((ImTextureID)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
+    ImGui::SameLine();
+
+    bool isSelected = (selectedPath == entry.path() && isItemSelected);
+    ImGui::Selectable(entry.path().filename().string().c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick);
+
+    HandleItemClick(entry, shouldBreakLoop);
+
+    ImGui::NextColumn();
+    ImGui::Text(entry.is_directory() ? "Folder" : "File");
+    ImGui::NextColumn();
+}
+
+std::string ProjectWindow::GetTruncatedFilename(const std::string& filename, float maxTextWidth)
+{
+    std::string displayedName = filename;
+    ImVec2 textSize = ImGui::CalcTextSize(filename.c_str());
+
+    if (textSize.x > maxTextWidth)
+    {
+        std::string ellipsis = "...";
+        ImVec2 ellipsisSize = ImGui::CalcTextSize(ellipsis.c_str());
+        size_t maxLength = filename.length();
+
+        while (textSize.x > (maxTextWidth - ellipsisSize.x) && maxLength > 0)
+        {
+            displayedName = filename.substr(0, maxLength - 1);
+            textSize = ImGui::CalcTextSize(displayedName.c_str());
+            maxLength--;
+        }
+
+        if (displayedName != filename)
+            displayedName += ellipsis;
+    }
+    return displayedName;
+}
+
+void ProjectWindow::HandleItemClick(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
+{
+    if (ImGui::IsItemHovered())
+    {
+        if (!isItemSelected)
+        {
+            selectedPath = entry.path();
+            showPathBar = true;
+        }
+
+        if (ImGui::IsItemClicked())
+        {
+            selectedPath = entry.path();
+            showPathBar = true;
+            isItemSelected = true;
+        }
+
+        if (entry.is_directory() && ImGui::IsMouseDoubleClicked(0))
+        {
+            currentPath = entry.path();
+            UpdateDirectoryContent();
+            isItemSelected = true;
+            shouldBreakLoop = true;
+        }
     }
 }
 
@@ -275,7 +326,7 @@ void ProjectWindow::DrawMenuBar()
             }
         }
 
-        ImGui::SameLine(ImGui::GetWindowWidth() - 20);
+        ImGui::SameLine(ImGui::GetWindowWidth() - 30);
 
         if (ImGui::ImageButton((ImTextureID)app->importer->icons.dotsIcon, ImVec2(12, 12)))
         {
@@ -283,16 +334,37 @@ void ProjectWindow::DrawMenuBar()
         }
 
         if (ImGui::BeginPopup("OptionsPopup"))
-        {
-            if (ImGui::MenuItem("Small", nullptr, smallSelected))
+        {   
+            if (ImGui::MenuItem("Tiles", nullptr, tilesSelected))
             {
-                smallSelected = true;
-                largeSelected = false;
+                listSelected = false;
+                tilesSelected = true;
+				columnSelected = false;
             }
-            if (ImGui::MenuItem("Large", nullptr, largeSelected))
+            if (ImGui::MenuItem("List", nullptr, listSelected))
             {
-                smallSelected = false;
-                largeSelected = true;
+                listSelected = true;
+                tilesSelected = false;
+				columnSelected = false;
+            }
+            if (ImGui::MenuItem("Column", nullptr, columnSelected))
+            {
+                listSelected = false;
+                tilesSelected = false;
+				columnSelected = true;
+            }
+
+            ImGui::Separator();
+
+			if (ImGui::MenuItem("One Column", nullptr, oneColumnSelected))
+			{
+				oneColumnSelected = true;
+				twoColumnsSelected = false;
+			}
+            if (ImGui::MenuItem("Two Columns", nullptr, twoColumnsSelected))
+            {
+				oneColumnSelected = false;
+				twoColumnsSelected = true;
             }
 
             ImGui::EndPopup();
