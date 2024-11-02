@@ -43,7 +43,7 @@ void ConsoleWindow::DrawWindow()
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(15, 10));
 
-    std::string logType;
+	ImTextureID logType = 0;
     ImVec4 logColor;
 
     for (const auto& log : logger.GetLogs())
@@ -51,27 +51,22 @@ void ConsoleWindow::DrawWindow()
         switch (log.type)
         {
         case LogType::LOG_INFO:
-            logType = "[INFO]";
-            logColor = infoColor;
+            logType = (ImTextureID)app->importer->icons.infoIcon;
             if (!showLogInfo) continue;
             break;
 
         case LogType::LOG_WARNING:
-            logType = "[WARNING]";
-            logColor = warningColor;
+            logType = (ImTextureID)app->importer->icons.warningIcon;
             if (!showLogWarnings) continue;
             break;
 
         case LogType::LOG_ERROR:
-            logType = "[ERROR]";
-            logColor = errorColor;
+            logType = (ImTextureID)app->importer->icons.errorIcon;
             if (!showLogErrors) continue;
             break;
         }
 
-        ImGui::PushStyleColor(ImGuiCol_Text, logColor);
-        ImGui::Text(logType.c_str());
-        ImGui::PopStyleColor();
+        ImGui::Image(logType, ImVec2(16,16));
 
         ImGui::SameLine();
         ImGui::Text(log.message.c_str());
