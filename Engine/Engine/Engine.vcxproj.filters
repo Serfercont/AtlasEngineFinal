@@ -90,6 +90,12 @@
     <ClCompile Include="ModuleImporter.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
+    <ClCompile Include="PerformanceWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="PreferencesWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -166,6 +172,12 @@
     </ClInclude>
     <ClInclude Include="ModuleImporter.h">
       <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="PerformanceWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="PreferencesWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

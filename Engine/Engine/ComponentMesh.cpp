@@ -25,9 +25,9 @@ void ComponentMesh::Update()
 
 	mesh->DrawMesh(
 		material->textureId, 
-		app->editor->drawTextures, 
-		app->editor->wireframe, 
-		app->editor->shadedWireframe
+		app->editor->preferencesWindow->drawTextures, 
+		app->editor->preferencesWindow->wireframe,
+		app->editor->preferencesWindow->shadedWireframe
 	);
 
 	if (showVertexNormals || showFaceNormals)
@@ -35,10 +35,10 @@ void ComponentMesh::Update()
 		mesh->DrawNormals(
 			showVertexNormals, 
 			showFaceNormals, 
-			app->editor->vertexNormalLength,
-			app->editor->faceNormalLength,
-			app->editor->vertexNormalColor, 
-			app->editor->faceNormalColor
+			app->editor->preferencesWindow->vertexNormalLength,
+			app->editor->preferencesWindow->faceNormalLength,
+			app->editor->preferencesWindow->vertexNormalColor,
+			app->editor->preferencesWindow->faceNormalColor
 		);
 	}
 

@@ -9,7 +9,9 @@ enum class WindowType
 	HIERARCHY,	
 	INSPECTOR,
 	CONSOLE,
-	PROJECT
+	PROJECT,
+	PERFORMANCE,
+	PREFERENCES
 };
 
 class EditorWindow 
