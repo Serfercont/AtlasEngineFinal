@@ -17,21 +17,21 @@ void ConsoleWindow::DrawWindow()
     ImGui::PushStyleColor(ImGuiCol_CheckMark, infoColor);
     ImGui::Checkbox("##Info", &showLogInfo);
     ImGui::SameLine();
-	ImGui::Image((ImTextureID)app->importer->icons.infoIcon, ImVec2(20, 20));
+	ImGui::Image((ImTextureID)(uintptr_t)app->importer->icons.infoIcon, ImVec2(20, 20));
     ImGui::PopStyleColor();
 
     ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_CheckMark, warningColor);
     ImGui::Checkbox("##Warning", &showLogWarnings);
     ImGui::SameLine();
-	ImGui::Image((ImTextureID)app->importer->icons.warningIcon, ImVec2(20, 20));
+	ImGui::Image((ImTextureID)(uintptr_t)app->importer->icons.warningIcon, ImVec2(20, 20));
     ImGui::PopStyleColor();
 
     ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_CheckMark, errorColor);
     ImGui::Checkbox("##Error", &showLogErrors);
     ImGui::SameLine();
-	ImGui::Image((ImTextureID)app->importer->icons.errorIcon, ImVec2(20, 20));
+	ImGui::Image((ImTextureID)(uintptr_t)app->importer->icons.errorIcon, ImVec2(20, 20));
     ImGui::PopStyleColor();
 
     ImGui::SameLine();
@@ -51,17 +51,17 @@ void ConsoleWindow::DrawWindow()
         switch (log.type)
         {
         case LogType::LOG_INFO:
-            logType = (ImTextureID)app->importer->icons.infoIcon;
+            logType = (ImTextureID)(uintptr_t)app->importer->icons.infoIcon;
             if (!showLogInfo) continue;
             break;
 
         case LogType::LOG_WARNING:
-            logType = (ImTextureID)app->importer->icons.warningIcon;
+            logType = (ImTextureID)(uintptr_t)app->importer->icons.warningIcon;
             if (!showLogWarnings) continue;
             break;
 
         case LogType::LOG_ERROR:
-            logType = (ImTextureID)app->importer->icons.errorIcon;
+            logType = (ImTextureID)(uintptr_t)app->importer->icons.errorIcon;
             if (!showLogErrors) continue;
             break;
         }

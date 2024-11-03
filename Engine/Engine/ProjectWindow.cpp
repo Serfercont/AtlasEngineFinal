@@ -101,7 +101,7 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
         showPathBar = true;
     }
 
-    void* icon = hasSubfolders && open ? (ImTextureID)app->importer->icons.openFolderIcon : (ImTextureID)app->importer->icons.folderIcon;
+    ImTextureID icon = hasSubfolders && open ? (ImTextureID)(uintptr_t)app->importer->icons.openFolderIcon : (ImTextureID)(uintptr_t)app->importer->icons.folderIcon;
 
     ImGui::SameLine();
     ImGui::Image(icon, ImVec2(smallIconSize, smallIconSize));
@@ -198,7 +198,7 @@ void ProjectWindow::DrawTile(const std::filesystem::directory_entry& entry, bool
     ImGui::BeginGroup();
 
     ImGui::SetCursorPosX(((cellWidth - largeIconSize) * 0.5f) + (cellWidth * ImGui::GetColumnIndex()));
-    ImGui::Image((ImTextureID)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(largeIconSize, largeIconSize));
+    ImGui::Image((ImTextureID)(uintptr_t)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(largeIconSize, largeIconSize));
 
     std::string displayedName = GetTruncatedFilename(entry.path().filename().stem().string(), maxTextWidth);
     ImVec2 textSize = ImGui::CalcTextSize(displayedName.c_str());
@@ -213,7 +213,7 @@ void ProjectWindow::DrawTile(const std::filesystem::directory_entry& entry, bool
 
 void ProjectWindow::DrawListItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
 {
-    ImGui::Image((ImTextureID)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
+    ImGui::Image((ImTextureID)(uintptr_t)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
     ImGui::SameLine();
 
     bool isSelected = (selectedPath == entry.path() && isItemSelected);
@@ -226,7 +226,7 @@ void ProjectWindow::DrawListItem(const std::filesystem::directory_entry& entry, 
 
 void ProjectWindow::DrawColumnItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop)
 {
-    ImGui::Image((ImTextureID)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
+    ImGui::Image((ImTextureID)(uintptr_t)(entry.is_directory() ? app->importer->icons.folderIcon : app->importer->icons.fileIcon), ImVec2(smallIconSize, smallIconSize));
     ImGui::SameLine();
 
     bool isSelected = (selectedPath == entry.path() && isItemSelected);
@@ -298,7 +298,7 @@ void ProjectWindow::HandleDragDrop(const std::filesystem::directory_entry& entry
     {
         const std::string filePath = entry.path().string();
 
-        ImTextureID iconTexture = entry.is_directory() ? (ImTextureID)app->importer->icons.folderIcon : (ImTextureID)app->importer->icons.fileIcon;
+        ImTextureID iconTexture = entry.is_directory() ? (ImTextureID)(uintptr_t)app->importer->icons.folderIcon : (ImTextureID)(uintptr_t)app->importer->icons.fileIcon;
 
         ImGui::Image(iconTexture, ImVec2(mediumIconSize, mediumIconSize));
 
@@ -372,7 +372,7 @@ void ProjectWindow::DrawMenuBar()
 
         ImGui::SameLine(ImGui::GetWindowWidth() - 30);
 
-        if (ImGui::ImageButton((ImTextureID)app->importer->icons.dotsIcon, ImVec2(12, 12)))
+        if (ImGui::ImageButton((ImTextureID)(uintptr_t)app->importer->icons.dotsIcon, ImVec2(12, 12)))
         {
             ImGui::OpenPopup("OptionsPopup");
         }
@@ -424,7 +424,7 @@ void ProjectWindow::DrawSelectionBar()
     {
         if (ImGui::BeginMenuBar())
         {
-            ImGui::Image((ImTextureID)app->importer->icons.folderIcon, ImVec2(smallIconSize, smallIconSize));
+            ImGui::Image((ImTextureID)(uintptr_t)app->importer->icons.folderIcon, ImVec2(smallIconSize, smallIconSize));
             ImGui::SameLine();
             ImGui::Text("%s", selectedPath.string().c_str());
 

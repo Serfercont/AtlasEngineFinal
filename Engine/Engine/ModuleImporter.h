@@ -7,13 +7,13 @@
 
 struct Icons
 {
-	GLuint folderIcon;
-	GLuint openFolderIcon;
-	GLuint fileIcon;
-	GLuint dotsIcon;
-	GLuint infoIcon;
-	GLuint warningIcon;
-	GLuint errorIcon;
+	GLuint folderIcon = 0;
+	GLuint openFolderIcon = 0;
+	GLuint fileIcon = 0;
+	GLuint dotsIcon = 0;
+	GLuint infoIcon = 0;
+	GLuint warningIcon = 0;
+	GLuint errorIcon = 0;
 };
 
 class ModuleImporter : public Module
