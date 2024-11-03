@@ -61,6 +61,8 @@ bool ModuleWindow::Awake()
 		{
 			screenSurface = SDL_GetWindowSurface(window);
 		}
+
+		context = SDL_GL_CreateContext(window);
 	}
 
 	return ret;
@@ -69,6 +71,11 @@ bool ModuleWindow::Awake()
 bool ModuleWindow::CleanUp()
 {
 	LOG(LogType::LOG_INFO, "Destroying SDL window and quitting all SDL systems");
+
+	if (context != NULL)
+	{
+		SDL_GL_DeleteContext(context);
+	}
 
 	if (window != NULL)
 	{

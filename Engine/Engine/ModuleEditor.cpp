@@ -29,7 +29,7 @@ bool ModuleEditor::Awake()
 
     ImGui::StyleColorsDark();
 
-    ImGui_ImplSDL2_InitForOpenGL(app->window->window, app->renderer3D->context);
+    ImGui_ImplSDL2_InitForOpenGL(app->window->window, app->window->context);
     ImGui_ImplOpenGL3_Init();
 
 	hierarchyWindow = new HierarchyWindow(WindowType::HIERARCHY, "Hierarchy");
@@ -40,6 +40,8 @@ bool ModuleEditor::Awake()
 	editorWindows.push_back(consoleWindow);
 	projectWindow = new ProjectWindow(WindowType::PROJECT, "Project");
 	editorWindows.push_back(projectWindow);
+	sceneWindow = new SceneWindow(WindowType::SCENE, "Scene");
+	editorWindows.push_back(sceneWindow);
 	performanceWindow = new PerformanceWindow(WindowType::PERFORMANCE, "Performance");
 	editorWindows.push_back(performanceWindow);
 	preferencesWindow = new PreferencesWindow(WindowType::PREFERENCES, "Preferences");

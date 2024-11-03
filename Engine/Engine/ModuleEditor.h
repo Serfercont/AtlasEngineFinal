@@ -8,6 +8,7 @@
 #include "HierarchyWindow.h"
 #include "InspectorWindow.h"
 #include "ProjectWindow.h"
+#include "SceneWindow.h"
 #include "PerformanceWindow.h"
 #include "PreferencesWindow.h"
 #include "AboutWindow.h"
@@ -38,6 +39,7 @@ public:
 	HierarchyWindow* hierarchyWindow = nullptr;
 	InspectorWindow* inspectorWindow = nullptr;
 	ProjectWindow* projectWindow = nullptr;
+	SceneWindow* sceneWindow = nullptr;
 	PerformanceWindow* performanceWindow = nullptr;
 	PreferencesWindow* preferencesWindow = nullptr;
 	AboutWindow* aboutWindow = nullptr;

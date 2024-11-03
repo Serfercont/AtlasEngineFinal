@@ -23,13 +23,11 @@ public:
 	bool CleanUp();
 
 	void OnResize(int width, int height);
+	void CreateFramebuffer();
 
 	Texture* LoadTextureImage(const char* file);
 
 public:
-
-	SDL_GLContext context;
-
 	std::vector<Mesh*> mesh;
 	MeshLoader meshLoader;
 
@@ -37,4 +35,8 @@ public:
 	unsigned int checkerTextureId;
 
 	Grid grid;
+
+	GLuint fbo;
+	GLuint fboTexture;
+	GLuint rbo;
 };

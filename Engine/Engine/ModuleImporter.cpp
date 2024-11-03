@@ -3,6 +3,8 @@
 #include "Logger.h"
 
 #include "IL/il.h"
+#include "IL/ilu.h"
+#include "IL/ilut.h"
 #include <Windows.h>
 
 #include <filesystem>
@@ -10,6 +12,10 @@
 
 ModuleImporter::ModuleImporter(App* app) : Module(app)
 {
+
+    ilInit();
+    iluInit();
+    ilutInit();
 }
 
 ModuleImporter::~ModuleImporter()

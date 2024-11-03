@@ -16,11 +16,11 @@ App::App(int argc, char* argv[])
 
 	AddModule(window);
 	AddModule(camera);
-	AddModule(input);
-	AddModule(scene);
-	AddModule(renderer3D);		
+	AddModule(input);	
 	AddModule(importer);
-	AddModule(editor);
+	AddModule(scene);
+	AddModule(editor);	
+	AddModule(renderer3D);	
 }
 
 App::~App()
