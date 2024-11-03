@@ -18,6 +18,8 @@ public:
     std::vector<std::string> GetPathParts() const;
     
     void DrawFoldersTree(const std::filesystem::path& directoryPath);
+    void DrawFileItem(const std::filesystem::directory_entry& entry);
+
     void DrawDirectoryContents();
     void DrawMenuBar();
     void DrawSelectionBar();
