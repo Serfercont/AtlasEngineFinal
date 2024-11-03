@@ -5,8 +5,6 @@
 
 #include <vector>
 
-using namespace std;
-
 class aiMesh;
 class aiNode;
 class aiScene;
@@ -20,8 +18,8 @@ public:
 	void EnableDebugger();
 	void DisableDebugger();
 
-	void ImportFBX(const char* path, vector<Mesh*>& meshes, GameObject* gameObject);
-	void LoadNode(aiNode* node, vector<Mesh*>& meshes, GameObject* parent, const char* fileName);
-	Mesh* LoadMesh(aiMesh* newMesh);
+	void ImportFBX(const char* path, GameObject* gameObject);
+	void LoadNode(aiNode* node, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName);
+	Mesh* LoadMesh(aiMesh* newMesh, const aiScene* scene);
 };
 

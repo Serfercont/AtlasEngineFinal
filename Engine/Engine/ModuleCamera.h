@@ -5,8 +5,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/transform.hpp"
 
-using namespace glm;
-
 class ModuleCamera : public Module
 {
 public:
@@ -18,17 +16,17 @@ public:
 	void FrameSelected();
 	bool CleanUp();
 
-	void Look(const vec3& Position, const vec3& Reference, bool RotateAroundReference = false);
-	void LookAt(const vec3& Spot);
-	void Move(const vec3& Movement);
+	void Look(const glm::vec3& Position, const glm::vec3& Reference, bool RotateAroundReference = false);
+	void LookAt(const glm::vec3& Spot);
+	void Move(const glm::vec3& Movement);
 	float* GetViewMatrix();
 
 private:
 	void CalculateViewMatrix();
-	vec3 rotateVector(vec3 const& vector, float angle, vec3 const& axis);
+	glm::vec3 rotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
 public:
-	vec3 X, Y, Z, Position, Reference;
+	glm::vec3 X, Y, Z, Position, Reference;
 
 private:
-	mat4x4 ViewMatrix, ViewMatrixInverse;
+	glm::mat4x4 ViewMatrix, ViewMatrixInverse;
 };

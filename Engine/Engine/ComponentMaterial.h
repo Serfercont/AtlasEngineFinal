@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "Texture.h"
 
 class ComponentMaterial : public Component
 {
@@ -11,6 +12,12 @@ public:
 	void Update() override;
 	void OnEditor() override;
 
+	void AddTexture(Texture* texture);
+
 public:
-	int textureId;
+	Texture* materialTexture;
+	GLuint textureId;
+
+private:
+	bool showCheckersTexture = false;
 };

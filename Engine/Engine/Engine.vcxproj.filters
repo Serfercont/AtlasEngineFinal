@@ -13,6 +13,9 @@
     <Filter Include="Sources\Components">
       <UniqueIdentifier>{9473a9b9-6caa-4a9a-b954-29b851a5b12c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Modules\EditorWindows">
+      <UniqueIdentifier>{aad46190-fc9b-4c9e-b349-ed6b1ff4d58f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -69,6 +72,24 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Sources\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="HierarchyWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="InspectorWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleImporter.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -124,6 +145,27 @@
     </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="HierarchyWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="InspectorWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleImporter.h">
+      <Filter>Sources\Modules</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
