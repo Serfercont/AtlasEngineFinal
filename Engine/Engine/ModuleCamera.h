@@ -16,17 +16,18 @@ public:
 	void FrameSelected();
 	bool CleanUp();
 
-	void Look(const glm::vec3& Position, const glm::vec3& Reference, bool RotateAroundReference = false);
-	void LookAt(const glm::vec3& Spot);
-	void Move(const glm::vec3& Movement);
+	void LookAt(const glm::vec3& spot);
 	float* GetViewMatrix();
 
 private:
+	void HandleMovement(glm::vec3& newPos, float speed, float fastSpeed);
+	void HandleZoom(float zoomSpeed);
+	void HandleRotation();
+	void RotateCamera(int dx, int dy);
 	void CalculateViewMatrix();
-	glm::vec3 rotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
-public:
-	glm::vec3 X, Y, Z, Position, Reference;
+	glm::vec3 RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
 
 private:
-	glm::mat4x4 ViewMatrix, ViewMatrixInverse;
+	glm::vec3 X, Y, Z, Position, Reference;
+	glm::mat4x4 ViewMatrix;
 };
