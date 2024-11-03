@@ -63,10 +63,6 @@ void PreferencesWindow::DrawWindow()
         ImGui::Text("Face Normal Color");
     }
 
-    ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::Spacing();
-
     if (ImGui::CollapsingHeader("Grid", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit4("Grid Color", app->renderer3D->grid.lineColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar);
@@ -111,6 +107,21 @@ void PreferencesWindow::DrawWindow()
             }
         }
     }
+
+	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+        ImGui::Text("Fov ");
+        ImGui::SameLine();
+		ImGui::SliderFloat("##Fov", &app->camera->fov, 4.0f, 120.0f);
+
+        ImGui::Text("Near");
+        ImGui::SameLine();
+        ImGui::InputFloat("##Near", &app->camera->nearPlane);
+
+        ImGui::Text("Far ");
+        ImGui::SameLine();
+        ImGui::InputFloat("##Far", &app->camera->farPlane);
+	}
 
     ImGui::End();
 }

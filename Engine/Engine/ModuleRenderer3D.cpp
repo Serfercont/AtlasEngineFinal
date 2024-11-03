@@ -128,6 +128,15 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
+	glLoadMatrixf(glm::value_ptr(projectionMatrix));
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	glm::mat4 viewMatrix = app->camera->GetViewMatrix();
 	glLoadMatrixf(glm::value_ptr(viewMatrix));
 
