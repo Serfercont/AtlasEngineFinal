@@ -14,6 +14,8 @@ public:
 
     void DrawWindow() override;
 
+    void SetupInitialColumnWidth();
+
     void UpdateDirectoryContent();
     std::vector<std::string> GetPathParts() const;
     

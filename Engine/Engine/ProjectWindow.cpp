@@ -17,15 +17,9 @@ void ProjectWindow::DrawWindow()
     DrawMenuBar();
 
 	int columns = oneColumnSelected ? 1 : 2;
-
     ImGui::Columns(columns, "ProjectColumns");
 
-	static bool isFirstTime = true;
-    if (isFirstTime)
-    {
-		ImGui::SetColumnWidth(0, 300);
-        isFirstTime = false;
-    }
+	SetupInitialColumnWidth();
 
     ImGui::BeginChild("Folders", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None);
     DrawFoldersTree("Assets");
@@ -47,6 +41,16 @@ void ProjectWindow::DrawWindow()
     ImGui::Columns(1);
 
     ImGui::End();
+}
+
+void ProjectWindow::SetupInitialColumnWidth()
+{
+    static bool isFirstTime = true;
+    if (isFirstTime)
+    {
+        ImGui::SetColumnWidth(0, 300);
+        isFirstTime = false;
+    }
 }
 
 void ProjectWindow::UpdateDirectoryContent()
@@ -400,8 +404,30 @@ void ProjectWindow::DrawMenuBar()
 
             if (i < pathParts.size() - 1)
             {
-                ImGui::Text(">");
+                if (ImGui::MenuItem(">"))
+                {
+                    ImGui::OpenPopup("NextFoldersPopup");
+                }
+
+            }                
+            
+        }
+        if (ImGui::BeginPopup("NextFoldersPopup"))
+        {
+            std::filesystem::path parentDir = currentPath.parent_path();
+            for (const auto& entry : std::filesystem::directory_iterator(parentDir))
+            {
+                if (entry.is_directory())
+                {
+                    if (ImGui::MenuItem(entry.path().filename().string().c_str()))
+                    {
+                        currentPath = entry.path();
+                        UpdateDirectoryContent();
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
             }
+            ImGui::EndPopup();
         }
 
         ImGui::SameLine(ImGui::GetWindowWidth() - 30);
