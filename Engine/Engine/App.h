@@ -39,6 +39,8 @@ public:
 	ModuleRenderer3D* renderer3D = nullptr;
 	ModuleEditor* editor = nullptr;
 
+	bool exit = false;
+
 private:
 	Timer	ms_timer;
 	float	dt;

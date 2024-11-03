@@ -113,6 +113,15 @@ void ModuleEditor::MainMenuBar()
 {
     ImGui::BeginMainMenuBar();
 
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("Exit", "Alt+F4"))
+        {
+			app->exit = true;
+        }
+		ImGui::EndMenu();
+    }
+
     if (ImGui::BeginMenu("Assets"))
     {
         if (ImGui::MenuItem("Show in Explorer"))

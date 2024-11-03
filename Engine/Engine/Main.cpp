@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 			break;
 
 		case MAIN_UPDATE:
-			if (app->Update() == false)
+			if (app->Update() == false || app->exit)
 				state = MAIN_CLEAN;
 
 			break;

@@ -82,7 +82,7 @@ void PerformanceWindow::DrawWindow()
         ImGui::TextColored(dataTextColor, "%d MB", memoryAvailable / 1024);
 
         char overlay[32];
-        sprintf_s(overlay, "Memory Usage %.2f %% (%d MB)", memoryUsePercentage, memoryUse / 1024);
+        sprintf_s(overlay, "Memory Usage %.2f%% (%d MB)", memoryUsePercentage, memoryUse / 1024);
         ImGui::PlotLines("##MemoryUsage", values, IM_ARRAYSIZE(values), values_offset, overlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
 
         ImGui::TreePop();
@@ -120,9 +120,6 @@ void PerformanceWindow::DrawWindow()
         ImGui::TextColored(dataTextColor, "%d MB", statex.ullAvailPhys / (1024 * 1024));
 
         int memoryusage = (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024);
-        ImGui::Text("Used Memory:");
-        ImGui::SameLine();
-        ImGui::TextColored(dataTextColor, "%d MB", (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024));
 
         float memoryUsePercentage = ((float)(statex.ullTotalPhys - statex.ullAvailPhys) / statex.ullTotalPhys) * 100.0f;
 
@@ -133,7 +130,7 @@ void PerformanceWindow::DrawWindow()
         totalValuesOffset = (totalValuesOffset + 1) % IM_ARRAYSIZE(totalMemoryValues);
 
         char totalOverlay[32];
-        sprintf_s(totalOverlay, "Memory Usage %.2f %% (%d MB)", memoryUsePercentage, memoryusage);
+        sprintf_s(totalOverlay, "Memory Usage %.2f%% (%d MB)", memoryUsePercentage, memoryusage);
 
         ImGui::PlotLines("##MemoryUsage", totalMemoryValues, IM_ARRAYSIZE(totalMemoryValues), totalValuesOffset, totalOverlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
 

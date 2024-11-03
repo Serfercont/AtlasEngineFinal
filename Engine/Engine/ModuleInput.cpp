@@ -34,8 +34,6 @@ bool ModuleInput::Awake()
 
 bool ModuleInput::PreUpdate(float dt)
 {
-	bool ret = true;
-
 	SDL_PumpEvents();
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
@@ -118,12 +116,12 @@ bool ModuleInput::PreUpdate(float dt)
 			break;
 
 		case SDL_QUIT:
-			ret = false;
+			app->exit = true;
 			break;
 		}
 	}
 
-	return ret;
+	return true;
 }
 
 bool ModuleInput::CleanUp()
