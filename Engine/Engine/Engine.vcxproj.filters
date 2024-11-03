@@ -96,6 +96,7 @@
     <ClCompile Include="PreferencesWindow.cpp">
       <Filter>Sources\Modules\EditorWindows</Filter>
     </ClCompile>
+    <ClCompile Include="AboutWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -179,5 +180,6 @@
     <ClInclude Include="PreferencesWindow.h">
       <Filter>Sources\Modules\EditorWindows</Filter>
     </ClInclude>
+    <ClInclude Include="AboutWindow.h" />
   </ItemGroup>
 </Project>

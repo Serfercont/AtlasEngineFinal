@@ -44,6 +44,8 @@ bool ModuleEditor::Awake()
 	editorWindows.push_back(performanceWindow);
 	preferencesWindow = new PreferencesWindow(WindowType::PREFERENCES, "Preferences");
 	editorWindows.push_back(preferencesWindow);
+	aboutWindow = new AboutWindow(WindowType::ABOUT, "About");
+	editorWindows.push_back(aboutWindow);
 
     return ret;
 }

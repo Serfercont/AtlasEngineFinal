@@ -11,7 +11,8 @@ enum class WindowType
 	CONSOLE,
 	PROJECT,
 	PERFORMANCE,
-	PREFERENCES
+	PREFERENCES,
+	ABOUT
 };
 
 class EditorWindow 
