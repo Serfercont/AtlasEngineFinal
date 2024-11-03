@@ -3,13 +3,13 @@
 #include "Texture.h"
 
 #include <SDL2/SDL_opengl.h>
-
 #include <gl/GL.h>
 #include <gl/GLU.h>
-
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app)
@@ -127,10 +127,9 @@ bool ModuleRenderer3D::Awake()
 bool ModuleRenderer3D::PreUpdate(float dt)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(app->camera->GetViewMatrix());
+	glm::mat4 viewMatrix = app->camera->GetViewMatrix();
+	glLoadMatrixf(glm::value_ptr(viewMatrix));
 
 	return true;
 }
@@ -166,10 +165,17 @@ void ModuleRenderer3D::OnResize(int width, int height)
 {
 	glViewport(0, 0, width, height);
 
+	app->camera->screenWidth = width;
+	app->camera->screenHeight = height;
+
+	app->window->width = width;
+	app->window->height = height;
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(60.0, (double)width / (double)height, 0.125, 512.0);
+    glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
+    glLoadMatrixf(glm::value_ptr(projectionMatrix));
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
