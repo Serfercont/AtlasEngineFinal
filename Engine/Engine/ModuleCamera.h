@@ -17,7 +17,8 @@ public:
 	bool CleanUp();
 
 	void LookAt(const glm::vec3& spot);
-	float* GetViewMatrix();
+	const glm::mat4& GetViewMatrix() const;
+	glm::mat4 GetProjectionMatrix() const;
 
 private:
 	void HandleMovement(glm::vec3& newPos, float speed, float fastSpeed);
@@ -27,7 +28,14 @@ private:
 	void CalculateViewMatrix();
 	glm::vec3 RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
 
+public:
+	float fov = 60.0f;
+	float nearPlane = 0.125f;
+	float farPlane = 512.0f;
+	int screenWidth, screenHeight;
+
 private:
-	glm::vec3 X, Y, Z, Position, Reference;
-	glm::mat4x4 ViewMatrix;
+	glm::vec3 X, Y, Z;
+	glm::vec3 pos, ref;
+	glm::mat4 viewMatrix;
 };

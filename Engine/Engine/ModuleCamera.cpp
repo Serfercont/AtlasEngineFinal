@@ -3,14 +3,17 @@
 
 ModuleCamera::ModuleCamera(App* app) : Module(app)
 {
+	screenWidth = app->window->width;
+	screenHeight = app->window->height;
+
 	CalculateViewMatrix();
 
 	X = glm::vec3(1.0f, 0.0f, 0.0f);
 	Y = glm::vec3(0.0f, 1.0f, 0.0f);
 	Z = glm::vec3(0.0f, 0.0f, 1.0f);
 
-	Position = glm::vec3(0.0f, 5.0f, 5.0f);
-	Reference = glm::vec3(0.0f, 0.0f, 0.0f);
+	pos = glm::vec3(0.0f, 5.0f, 5.0f);
+	ref = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 ModuleCamera::~ModuleCamera()
@@ -20,7 +23,7 @@ bool ModuleCamera::Start()
 {
 	LOG(LogType::LOG_INFO, "Setting up the camera");
 
-	LookAt(Reference);
+	LookAt(ref);
 
 	return true;
 }
@@ -50,8 +53,8 @@ bool ModuleCamera::Update(float dt)
 		FrameSelected();
 	}
 
-	Position += newPos;
-	Reference += newPos;
+	pos += newPos;
+	ref += newPos;
 
 	CalculateViewMatrix();
 
@@ -77,7 +80,7 @@ void ModuleCamera::HandleZoom(float zoomSpeed)
 	int mouseZ = app->input->GetMouseZ();
 
 	if (mouseZ != 0)
-		Position -= Z * zoomSpeed * (mouseZ > 0 ? 1.0f : -1.0f);
+		pos -= Z * zoomSpeed * (mouseZ > 0 ? 1.0f : -1.0f);
 }
 
 void ModuleCamera::HandleRotation()
@@ -94,18 +97,18 @@ void ModuleCamera::HandleRotation()
 	if ((app->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT) ||
 		app->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KEY_REPEAT)
 	{
-		Position -= Reference;
+		pos -= ref;
 		RotateCamera(dx, dy);
-		Position = Reference + Z * glm::length(Position);
-		LookAt(Reference);
+		pos = ref + Z * glm::length(pos);
+		LookAt(ref);
 	}
 
 	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT && app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
 	{
 		float sensitivity = 0.01f;
 		float zoomDelta = dy * sensitivity;
-		glm::vec3 direction = glm::normalize(Position - Reference);
-		Position -= direction * zoomDelta;
+		glm::vec3 direction = glm::normalize(pos - ref);
+		pos += direction * zoomDelta;
 	}
 }
 
@@ -141,46 +144,52 @@ void ModuleCamera::FrameSelected()
 {
 	if (app->editor->selectedGameObject)
     {
-        Position = glm::vec3(
+        pos = glm::vec3(
             app->editor->selectedGameObject->transform->position.x,
             app->editor->selectedGameObject->transform->position.y + 5.0f,
             app->editor->selectedGameObject->transform->position.z + 5.0f
         );
-        Reference = app->editor->selectedGameObject->transform->position;
-        LookAt(Reference);
+        ref = app->editor->selectedGameObject->transform->position;
+        LookAt(ref);
     }
 	else
 	{
-		Position = glm::vec3(0.0f, 5.0f, 5.0f);
-		Reference = glm::vec3(0.0f, 0.0f, 0.0f);
-		LookAt(Reference);
+		pos = glm::vec3(0.0f, 5.0f, 5.0f);
+		ref = glm::vec3(0.0f, 0.0f, 0.0f);
+		LookAt(ref);
 	}
 }
 
 void ModuleCamera::LookAt(const glm::vec3& spot)
 {
-	Reference = spot;
+	ref = spot;
 
-	Z = glm::normalize(Position - Reference);
+	Z = glm::normalize(pos - ref);
 	X = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), Z));
 	Y = glm::cross(Z, X);
 
 	CalculateViewMatrix();
 }
 
-float* ModuleCamera::GetViewMatrix()
+const glm::mat4& ModuleCamera::GetViewMatrix() const
 {
-	return (float*)&ViewMatrix;
+	return viewMatrix;
 }
 
 void ModuleCamera::CalculateViewMatrix() 
 {
-	ViewMatrix = glm::mat4(
+	viewMatrix = glm::mat4(
 		X.x, Y.x, Z.x, 0.0f,
 		X.y, Y.y, Z.y, 0.0f,
 		X.z, Y.z, Z.z, 0.0f,
-		-glm::dot(X, Position), -glm::dot(Y, Position), -glm::dot(Z, Position), 1.0f
+		-glm::dot(X, pos), -glm::dot(Y, pos), -glm::dot(Z, pos), 1.0f
 	);
+}
+
+glm::mat4 ModuleCamera::GetProjectionMatrix() const
+{
+	float aspectRatio = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
+	return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
 }
 
 glm::vec3 ModuleCamera::RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis) 
