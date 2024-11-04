@@ -32,6 +32,7 @@ bool ModuleEditor::Awake()
     ImGui_ImplSDL2_InitForOpenGL(app->window->window, app->window->context);
     ImGui_ImplOpenGL3_Init();
 
+
 	hierarchyWindow = new HierarchyWindow(WindowType::HIERARCHY, "Hierarchy");
 	editorWindows.push_back(hierarchyWindow);
 	inspectorWindow = new InspectorWindow(WindowType::INSPECTOR, "Inspector");
@@ -64,7 +65,7 @@ bool ModuleEditor::CleanUp()
 }
 
 void ModuleEditor::DrawEditor()
-{
+{	
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
@@ -83,6 +84,7 @@ void ModuleEditor::DrawEditor()
     }
 
     ImGui::Render();
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
@@ -168,13 +170,15 @@ void ModuleEditor::MainMenuBar()
     }
     if (ImGui::BeginMenu("Windows"))
     {
+        int index = 1;
         for (auto& editorWindow : editorWindows)
         {
             bool isEnabled = editorWindow->IsEnabled();
-            if (ImGui::MenuItem(editorWindow->GetName().c_str(), NULL, &isEnabled))
+            if (ImGui::MenuItem(editorWindow->GetName().c_str(), ("Ctrl+" + std::to_string(index)).c_str(), &isEnabled))
             {
                 editorWindow->SetEnabled(isEnabled);
             }
+            ++index;
         }
         ImGui::EndMenu();
     }

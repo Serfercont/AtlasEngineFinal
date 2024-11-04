@@ -5,6 +5,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/transform.hpp"
 
+#include "ModuleInput.h"
+
 class ModuleCamera : public Module
 {
 public:
@@ -13,6 +15,7 @@ public:
 
 	bool Start();
 	bool Update(float dt);
+	void HandleInput();
 	void FrameSelected();
 	bool CleanUp();
 
@@ -28,14 +31,24 @@ private:
 	void CalculateViewMatrix();
 	glm::vec3 RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
 
+	void SetCursor(CursorType cursorType);
+
 public:
 	float fov = 60.0f;
 	float nearPlane = 0.125f;
 	float farPlane = 512.0f;
 	int screenWidth, screenHeight;
 
+	bool isMouseInside = false;
+
 private:
 	glm::vec3 X, Y, Z;
 	glm::vec3 pos, ref;
 	glm::mat4 viewMatrix;
+
+	bool isZooming = false;
+	bool isOrbiting = false;
+	bool isFreeLook = false;
+	bool isDragging = false;
+	bool isDefaultCursor = true;
 };

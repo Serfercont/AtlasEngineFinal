@@ -29,6 +29,8 @@ bool ModuleInput::Awake()
 
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 
+	CreateCursors();
+
 	return ret;
 }
 
@@ -127,6 +129,93 @@ bool ModuleInput::PreUpdate(float dt)
 bool ModuleInput::CleanUp()
 {
 	LOG(LogType::LOG_INFO, "Quitting SDL input event subsystem");
+
+	zoomCursor.reset();
+	freeLookCursor.reset();
+	dragCursor.reset();
+	orbitCursor.reset();
+
+	zoomSurface.reset();
+	freeLookSurface.reset();
+	dragSurface.reset();
+	orbitSurface.reset();
+
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
+
 	return true;
+}
+
+void ModuleInput::ChangeCursor(CursorType newCursor)
+{
+	if (cursor != newCursor)
+	{
+		cursor = newCursor;
+		SetCursor();
+	}
+}
+
+void ModuleInput::SetCursor()
+{
+	SDL_Cursor* sdlCursor = nullptr;
+
+	switch (cursor)
+	{
+	case CursorType::DEFAULT:
+		sdlCursor = SDL_GetDefaultCursor();
+		break;
+	case CursorType::ZOOM:
+		sdlCursor = zoomCursor.get();
+		break;
+	case CursorType::FREELOOK:
+		sdlCursor = freeLookCursor.get();
+		break;
+	case CursorType::DRAG:
+		sdlCursor = dragCursor.get();
+		break;
+	case CursorType::ORBIT:
+		sdlCursor = orbitCursor.get();
+		break;
+	}
+
+	if (sdlCursor != SDL_GetCursor())
+		SDL_SetCursor(sdlCursor);
+}  
+
+void ModuleInput::CreateCursors()
+{
+	zoomSurface.reset(SDL_LoadBMP(BMP_ZOOM));
+	freeLookSurface.reset(SDL_LoadBMP(BMP_FREELOOK));
+	dragSurface.reset(SDL_LoadBMP(BMP_DRAG));
+	orbitSurface.reset(SDL_LoadBMP(BMP_ORBIT));
+
+	MakeCursorTransparent(zoomSurface.get());
+	MakeCursorTransparent(freeLookSurface.get());
+	MakeCursorTransparent(dragSurface.get());
+	MakeCursorTransparent(orbitSurface.get());
+
+	zoomCursor.reset(SDL_CreateColorCursor(zoomSurface.get(), 5, 0));
+	freeLookCursor.reset(SDL_CreateColorCursor(freeLookSurface.get(), 5, 0));
+	dragCursor.reset(SDL_CreateColorCursor(dragSurface.get(), 5, 0));
+	orbitCursor.reset(SDL_CreateColorCursor(orbitSurface.get(), 5, 0));
+}
+
+void ModuleInput::MakeCursorTransparent(SDL_Surface* surface) 
+{
+	if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
+
+	Uint32* pixels = (Uint32*)surface->pixels;
+	int pixelCount = (surface->w) * (surface->h);
+
+	for (int i = 0; i < pixelCount; i++) 
+	{
+		Uint8 r, g, b, a;
+		SDL_GetRGBA(pixels[i], surface->format, &r, &g, &b, &a);
+
+		if (r == 255 && g == 0 && b == 0) 
+		{
+			pixels[i] = SDL_MapRGBA(surface->format, r, g, b, 0);
+		}
+	}
+
+	if (SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
 }

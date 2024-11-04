@@ -24,6 +24,8 @@ public:
 	bool Update();
 	bool CleanUp();
 
+	float GetDT() { return dt; }
+
 private:
 	void AddModule(Module* module, bool enable = true);
 

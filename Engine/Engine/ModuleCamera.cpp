@@ -37,7 +37,24 @@ bool ModuleCamera::CleanUp()
 
 bool ModuleCamera::Update(float dt)
 {
+	if (((!isMouseInside) || (!isZooming && !isFreeLook && !isOrbiting && !isDragging)) && !isDefaultCursor)
+	{
+		SetCursor(CursorType::DEFAULT);
+	}
+
+	if (isMouseInside)
+		HandleInput();
+
+	CalculateViewMatrix();
+
+	return true;
+}
+
+void ModuleCamera::HandleInput()
+{
 	glm::vec3 newPos(0, 0, 0);
+
+	float dt = app->GetDT();
 	float speed = 10.0f * dt;
 	float zoomSpeed = 30.0f * dt;
 	float fastSpeed = 20.0f * dt;
@@ -55,15 +72,12 @@ bool ModuleCamera::Update(float dt)
 
 	pos += newPos;
 	ref += newPos;
-
-	CalculateViewMatrix();
-
-	return true;
 }
 
 void ModuleCamera::HandleMovement(glm::vec3& newPos, float speed, float fastSpeed)
 {
-    if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+    if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT 
+		&& app->input->GetKey(SDL_SCANCODE_LALT) == KEY_IDLE)
     {
         if (app->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) speed = fastSpeed;
 
@@ -72,7 +86,25 @@ void ModuleCamera::HandleMovement(glm::vec3& newPos, float speed, float fastSpee
 
         if (app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
         if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
+
+		SetCursor(CursorType::FREELOOK);
     }
+	else if (isFreeLook)
+		isFreeLook = false;
+
+	if (app->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KEY_REPEAT)
+	{
+		int dx = app->input->GetMouseXMotion();
+		int dy = app->input->GetMouseYMotion();
+
+		float panSpeed = 0.01f;
+		newPos -= X * static_cast<float>(dx) * panSpeed;
+		newPos += Y * static_cast<float>(dy) * panSpeed;
+
+		SetCursor(CursorType::DRAG);
+	}
+	else if (isDragging)
+		isDragging = false;
 }
 
 void ModuleCamera::HandleZoom(float zoomSpeed)
@@ -94,22 +126,31 @@ void ModuleCamera::HandleRotation()
 		RotateCamera(dx, dy);
 	}
 
-	if ((app->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT) ||
-		app->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KEY_REPEAT)
+	if (app->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT 
+		&& app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
 	{
 		pos -= ref;
 		RotateCamera(dx, dy);
 		pos = ref + Z * glm::length(pos);
 		LookAt(ref);
-	}
 
-	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT && app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
+		SetCursor(CursorType::ORBIT);
+	}
+	else if (isOrbiting)
+		isOrbiting = false;
+
+	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT 
+		&& app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
 	{
 		float sensitivity = 0.01f;
 		float zoomDelta = dy * sensitivity;
 		glm::vec3 direction = glm::normalize(pos - ref);
 		pos += direction * zoomDelta;
-	}
+		
+		SetCursor(CursorType::ZOOM);
+	}						
+	else if (isZooming)
+		isZooming = false;
 }
 
 void ModuleCamera::RotateCamera(int dx, int dy)
@@ -201,4 +242,18 @@ glm::vec3 ModuleCamera::RotateVector(glm::vec3 const& vector, float angle, glm::
 	glm::vec4 rotatedVector = rotationMatrix * vector4;
 
 	return glm::vec3(rotatedVector);
+}
+
+void ModuleCamera::SetCursor(CursorType cursorType)
+{
+	if (app->input->GetCursor() != cursorType)
+	{
+		app->input->ChangeCursor(cursorType);
+
+		isDefaultCursor = (cursorType == CursorType::DEFAULT);
+		isFreeLook = (cursorType == CursorType::FREELOOK);
+		isZooming = (cursorType == CursorType::ZOOM);
+		isOrbiting = (cursorType == CursorType::ORBIT);
+		isDragging = (cursorType == CursorType::DRAG);
+	}
 }
