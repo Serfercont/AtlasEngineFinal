@@ -7,6 +7,7 @@
 #include "ModuleScene.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleEditor.h"
+#include "ModuleImporter.h"
 
 #include "Timer.h"
 
@@ -23,6 +24,8 @@ public:
 	bool Update();
 	bool CleanUp();
 
+	float GetDT() { return dt; }
+
 private:
 	void AddModule(Module* module, bool enable = true);
 
@@ -33,10 +36,13 @@ public:
 	ModuleWindow* window = nullptr;
 	ModuleCamera* camera = nullptr;
 	ModuleInput* input = nullptr;
-	ModuleScene* scene = nullptr;
+	ModuleScene* scene = nullptr;	
+	ModuleImporter* importer = nullptr;
 	ModuleRenderer3D* renderer3D = nullptr;
 	ModuleEditor* editor = nullptr;
-	
+
+	bool exit = false;
+
 private:
 	Timer	ms_timer;
 	float	dt;

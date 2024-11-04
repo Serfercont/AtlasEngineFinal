@@ -23,6 +23,9 @@ public:
 
 public:
 	SDL_Window* window;
-
+	SDL_GLContext context;
 	SDL_Surface* screenSurface;
+
+	int width;
+	int height;
 };

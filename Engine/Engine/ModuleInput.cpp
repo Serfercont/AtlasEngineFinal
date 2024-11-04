@@ -1,9 +1,6 @@
 #include "ModuleInput.h"
 #include "App.h"
 
-#include <filesystem>
-#include <fstream>
-
 #include <string>
 
 ModuleInput::ModuleInput(App* app) : Module(app)
@@ -32,13 +29,13 @@ bool ModuleInput::Awake()
 
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 
+	CreateCursors();
+
 	return ret;
 }
 
 bool ModuleInput::PreUpdate(float dt)
 {
-	bool ret = true;
-
 	SDL_PumpEvents();
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
@@ -109,31 +106,8 @@ bool ModuleInput::PreUpdate(float dt)
 		case (SDL_DROPFILE):
 		{
 			std::string droppedFileDir(e.drop.file);
-			std::string assetsDir = "Assets/";
 
-			if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "fbx"
-				|| droppedFileDir.substr(droppedFileDir.find(".") + 1) == "FBX")
-			{
-				app->renderer3D->meshLoader.ImportFBX(e.drop.file, app->scene->root);
-			}
-			else if (droppedFileDir.substr(droppedFileDir.find(".") + 1) == "png")
-			{
-				std::string assetFilePath = assetsDir + std::filesystem::path(droppedFileDir).filename().string();
-
-				if (!std::filesystem::exists(assetFilePath))
-				{
-					std::ifstream src(droppedFileDir, std::ios::binary);
-					std::ofstream dst(assetFilePath, std::ios::binary);
-					dst << src.rdbuf();
-				}
-
-				Texture* newTexture = app->renderer3D->LoadTextureImage(assetFilePath.c_str());
-				app->editor->selectedGameObject->material->AddTexture(newTexture);
-			}
-			else
-			{
-				LOG(LogType::LOG_WARNING, "File format not supported");
-			}
+			app->importer->ImportFile(droppedFileDir, true);
 
 			SDL_free(e.drop.file);
 			break;
@@ -144,17 +118,104 @@ bool ModuleInput::PreUpdate(float dt)
 			break;
 
 		case SDL_QUIT:
-			ret = false;
+			app->exit = true;
 			break;
 		}
 	}
 
-	return ret;
+	return true;
 }
 
 bool ModuleInput::CleanUp()
 {
 	LOG(LogType::LOG_INFO, "Quitting SDL input event subsystem");
+
+	zoomCursor.reset();
+	freeLookCursor.reset();
+	dragCursor.reset();
+	orbitCursor.reset();
+
+	zoomSurface.reset();
+	freeLookSurface.reset();
+	dragSurface.reset();
+	orbitSurface.reset();
+
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
+
 	return true;
+}
+
+void ModuleInput::ChangeCursor(CursorType newCursor)
+{
+	if (cursor != newCursor)
+	{
+		cursor = newCursor;
+		SetCursor();
+	}
+}
+
+void ModuleInput::SetCursor()
+{
+	SDL_Cursor* sdlCursor = nullptr;
+
+	switch (cursor)
+	{
+	case CursorType::DEFAULT:
+		sdlCursor = SDL_GetDefaultCursor();
+		break;
+	case CursorType::ZOOM:
+		sdlCursor = zoomCursor.get();
+		break;
+	case CursorType::FREELOOK:
+		sdlCursor = freeLookCursor.get();
+		break;
+	case CursorType::DRAG:
+		sdlCursor = dragCursor.get();
+		break;
+	case CursorType::ORBIT:
+		sdlCursor = orbitCursor.get();
+		break;
+	}
+
+	if (sdlCursor != SDL_GetCursor())
+		SDL_SetCursor(sdlCursor);
+}  
+
+void ModuleInput::CreateCursors()
+{
+	zoomSurface.reset(SDL_LoadBMP(BMP_ZOOM));
+	freeLookSurface.reset(SDL_LoadBMP(BMP_FREELOOK));
+	dragSurface.reset(SDL_LoadBMP(BMP_DRAG));
+	orbitSurface.reset(SDL_LoadBMP(BMP_ORBIT));
+
+	MakeCursorTransparent(zoomSurface.get());
+	MakeCursorTransparent(freeLookSurface.get());
+	MakeCursorTransparent(dragSurface.get());
+	MakeCursorTransparent(orbitSurface.get());
+
+	zoomCursor.reset(SDL_CreateColorCursor(zoomSurface.get(), 5, 0));
+	freeLookCursor.reset(SDL_CreateColorCursor(freeLookSurface.get(), 5, 0));
+	dragCursor.reset(SDL_CreateColorCursor(dragSurface.get(), 5, 0));
+	orbitCursor.reset(SDL_CreateColorCursor(orbitSurface.get(), 5, 0));
+}
+
+void ModuleInput::MakeCursorTransparent(SDL_Surface* surface) 
+{
+	if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
+
+	Uint32* pixels = (Uint32*)surface->pixels;
+	int pixelCount = (surface->w) * (surface->h);
+
+	for (int i = 0; i < pixelCount; i++) 
+	{
+		Uint8 r, g, b, a;
+		SDL_GetRGBA(pixels[i], surface->format, &r, &g, &b, &a);
+
+		if (r == 255 && g == 0 && b == 0) 
+		{
+			pixels[i] = SDL_MapRGBA(surface->format, r, g, b, 0);
+		}
+	}
+
+	if (SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
 }

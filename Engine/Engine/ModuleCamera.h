@@ -5,6 +5,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/transform.hpp"
 
+#include "ModuleInput.h"
+
 class ModuleCamera : public Module
 {
 public:
@@ -13,20 +15,40 @@ public:
 
 	bool Start();
 	bool Update(float dt);
+	void HandleInput();
 	void FrameSelected();
 	bool CleanUp();
 
-	void Look(const glm::vec3& Position, const glm::vec3& Reference, bool RotateAroundReference = false);
-	void LookAt(const glm::vec3& Spot);
-	void Move(const glm::vec3& Movement);
-	float* GetViewMatrix();
+	void LookAt(const glm::vec3& spot);
+	const glm::mat4& GetViewMatrix() const;
+	glm::mat4 GetProjectionMatrix() const;
 
 private:
+	void HandleMovement(glm::vec3& newPos, float speed, float fastSpeed);
+	void HandleZoom(float zoomSpeed);
+	void HandleRotation();
+	void RotateCamera(int dx, int dy);
 	void CalculateViewMatrix();
-	glm::vec3 rotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
+	glm::vec3 RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
+
+	void SetCursor(CursorType cursorType);
+
 public:
-	glm::vec3 X, Y, Z, Position, Reference;
+	float fov = 60.0f;
+	float nearPlane = 0.125f;
+	float farPlane = 512.0f;
+	int screenWidth, screenHeight;
+
+	bool isMouseInside = false;
 
 private:
-	glm::mat4x4 ViewMatrix, ViewMatrixInverse;
+	glm::vec3 X, Y, Z;
+	glm::vec3 pos, ref;
+	glm::mat4 viewMatrix;
+
+	bool isZooming = false;
+	bool isOrbiting = false;
+	bool isFreeLook = false;
+	bool isDragging = false;
+	bool isDefaultCursor = true;
 };

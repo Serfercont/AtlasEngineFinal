@@ -3,13 +3,13 @@
 #include "Texture.h"
 
 #include <SDL2/SDL_opengl.h>
-
 #include <gl/GL.h>
 #include <gl/GLU.h>
-
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app)
@@ -24,17 +24,9 @@ ModuleRenderer3D::~ModuleRenderer3D()
 
 bool ModuleRenderer3D::Awake()
 {
-	LOG(LogType::LOG_INFO, "Creating 3D Renderer context");
 	bool ret = true;
 
 	meshLoader.EnableDebugger();
-
-	context = SDL_GL_CreateContext(app->window->window);
-	if (context == NULL)
-	{
-		LOG(LogType::LOG_ERROR, "OpenGL context could not be created! SDL_Error: %s\n", SDL_GetError());
-		ret = false;
-	}
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
@@ -91,9 +83,6 @@ bool ModuleRenderer3D::Awake()
 		glEnable(GL_COLOR_MATERIAL);
 		glEnable(GL_TEXTURE_2D);
 
-		ilInit();
-		iluInit();
-		ilutInit();
 		ilutRenderer(ILUT_OPENGL);
 	}
 
@@ -116,8 +105,10 @@ bool ModuleRenderer3D::Awake()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
-	meshLoader.ImportFBX("Assets/BakerHouse.fbx", app->scene->root);
+	meshLoader.ImportFBX("Assets/Models/BakerHouse.fbx", app->scene->root);
 	app->editor->selectedGameObject = app->scene->root->children[0];
+
+	CreateFramebuffer();
 
 	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -126,11 +117,20 @@ bool ModuleRenderer3D::Awake()
 
 bool ModuleRenderer3D::PreUpdate(float dt)
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
+	glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
+	glLoadMatrixf(glm::value_ptr(projectionMatrix));
+
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(app->camera->GetViewMatrix());
+	glLoadIdentity();
+
+	glm::mat4 viewMatrix = app->camera->GetViewMatrix();
+	glLoadMatrixf(glm::value_ptr(viewMatrix));
 
 	return true;
 }
@@ -138,6 +138,9 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 bool ModuleRenderer3D::PostUpdate(float dt)
 {
 	grid.Render();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	app->editor->DrawEditor();
 
@@ -150,14 +153,16 @@ bool ModuleRenderer3D::CleanUp()
 {
 	LOG(LogType::LOG_INFO, "Destroying 3D Renderer");
 
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteTextures(1, &fboTexture);
+	glDeleteRenderbuffers(1, &rbo);
+
 	meshLoader.DisableDebugger();
 
 	for (unsigned int i = 0; i < mesh.size(); i++)
 	{
 		mesh[i]->CleanUpMesh();
 	}
-
-	SDL_GL_DeleteContext(context);
 
 	return true;
 }
@@ -166,13 +171,58 @@ void ModuleRenderer3D::OnResize(int width, int height)
 {
 	glViewport(0, 0, width, height);
 
+	app->camera->screenWidth = width;
+	app->camera->screenHeight = height;
+
+	app->window->width = width;
+	app->window->height = height;
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(60.0, (double)width / (double)height, 0.125, 512.0);
+    glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
+    glLoadMatrixf(glm::value_ptr(projectionMatrix));
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	if (fbo > 0)
+		glDeleteFramebuffers(1, &fbo);
+
+	if (fboTexture > 0)
+		glDeleteTextures(1, &fboTexture);
+
+	if (rbo > 0)
+		glDeleteRenderbuffers(1, &rbo);
+
+	CreateFramebuffer();
+}
+
+void ModuleRenderer3D::CreateFramebuffer()
+{
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	glGenTextures(1, &fboTexture);
+	glBindTexture(GL_TEXTURE_2D, fboTexture);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, app->window->width, app->window->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTexture, 0);
+
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, app->window->width, app->window->height);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		LOG(LogType::LOG_ERROR, "Framebuffer is not complete!");
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 Texture* ModuleRenderer3D::LoadTextureImage(const char* file)
