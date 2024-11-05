@@ -13,8 +13,6 @@ public:
 	void DrawWindow() override;
 
 private:
-	ImVec4 dataTextColor = ImVec4(0.0f, 1.0f, 1.0f, 1.0f);
-
 	// CPU
 	std::string cpuName;
 	SYSTEM_INFO sysInfo;

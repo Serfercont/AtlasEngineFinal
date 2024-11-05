@@ -378,7 +378,8 @@ void ProjectWindow::DrawMenuBar()
         {
             if (i == pathParts.size() - 1)
             {
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_Text, app->editor->dataTextColor);
+
             }
 
             if (ImGui::MenuItem(pathParts[i].c_str()))

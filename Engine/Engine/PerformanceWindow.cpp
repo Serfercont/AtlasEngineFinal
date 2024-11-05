@@ -1,4 +1,5 @@
 #include "PerformanceWindow.h"
+#include "App.h"
 
 #include <psapi.h> 
 
@@ -33,6 +34,8 @@ PerformanceWindow::~PerformanceWindow()
 
 void PerformanceWindow::DrawWindow()
 {
+    ImVec4 dataTextColor = app->editor->dataTextColor;
+
 	ImGui::Begin(name.c_str());
 
     if (ImGui::TreeNode("GPU"))
