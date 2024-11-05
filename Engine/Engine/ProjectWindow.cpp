@@ -509,9 +509,17 @@ void ProjectWindow::DrawSelectionBar()
     {
         if (ImGui::BeginMenuBar())
         {
-            ImGui::Image((ImTextureID)(uintptr_t)app->importer->icons.folderIcon, ImVec2(smallIconSize, smallIconSize));
+            ImTextureID icon = (std::filesystem::is_directory(selectedPath)) 
+                ? (ImTextureID)(uintptr_t)app->importer->icons.folderIcon 
+                : (ImTextureID)(uintptr_t)app->importer->icons.fileIcon;
+
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (smallIconSize / 8.f));
+            ImGui::Image(icon, ImVec2(smallIconSize, smallIconSize));
+
             ImGui::SameLine();
-            ImGui::Text("%s", selectedPath.string().c_str());
+
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (smallIconSize / 8.f));
+            ImGui::TextUnformatted(selectedPath.string().c_str());
 
             ImGui::EndMenuBar();
         }
