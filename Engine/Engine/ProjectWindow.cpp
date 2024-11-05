@@ -1,7 +1,7 @@
 #include "ProjectWindow.h"
 #include "App.h"
 
-ProjectWindow::ProjectWindow(const WindowType type, const std::string& name) : EditorWindow(type, name), currentPath("Assets")
+ProjectWindow::ProjectWindow(const WindowType type, const std::string& name) : EditorWindow(type, name), currentPath(".")
 {
     UpdateDirectoryContent();
 }
@@ -12,7 +12,7 @@ ProjectWindow::~ProjectWindow()
 
 void ProjectWindow::DrawWindow()
 {
-    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_MenuBar);
+    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     DrawMenuBar();
 
@@ -22,7 +22,7 @@ void ProjectWindow::DrawWindow()
 	SetupInitialColumnWidth();
 
     ImGui::BeginChild("Folders", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None);
-    DrawFoldersTree("Assets");
+    DrawFoldersTree(".");
     ImGui::EndChild();
 
     if (twoColumnsSelected)
@@ -56,9 +56,15 @@ void ProjectWindow::SetupInitialColumnWidth()
 void ProjectWindow::UpdateDirectoryContent()
 {
     directoryContents.clear();
+
+    bool isRootDir = (currentPath == ".");
+
     for (const auto& entry : std::filesystem::directory_iterator(currentPath))
     {
-        directoryContents.push_back(entry);
+        if (!isRootDir || (entry.is_directory() && (entry.path().filename() == "Assets" || (entry.path().filename() == "Engine" && showEngineContent))))
+        {
+            directoryContents.push_back(entry);
+        }
     }
 }
 
@@ -95,7 +101,10 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
         nodeFlags |= ImGuiTreeNodeFlags_Leaf;
     }
 
-    bool open = ImGui::TreeNodeEx(("##" + directoryPath.string()).c_str(), nodeFlags);
+    std::string filename = directoryPath.filename().string();
+    std::string displayPath = (directoryPath == ".") ? "All" : filename;
+
+    bool open = ImGui::TreeNodeEx(("##" + displayPath).c_str(), nodeFlags);
 
     if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
     {
@@ -116,29 +125,22 @@ void ProjectWindow::DrawFoldersTree(const std::filesystem::path& directoryPath)
     ImGui::Image(icon, ImVec2(smallIconSize, smallIconSize));
 
     ImGui::SameLine();
-    ImGui::TextUnformatted(directoryPath.filename().string().c_str());
+    ImGui::TextUnformatted(displayPath.c_str());
 
     if (open)
     {
-        for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
+        bool isRootDir = (directoryPath == ".");
+        auto entries = std::filesystem::directory_iterator(directoryPath);
+
+        for (const auto& entry : entries)
         {
-            if (entry.is_directory())
-            {
+            bool isValid = (!isRootDir || (entry.path().filename() == "Assets" || (entry.path().filename() == "Engine" && showEngineContent)));
+
+            if (entry.is_directory() && isValid)
                 DrawFoldersTree(entry.path());
-            }
+            else if (oneColumnSelected && entry.is_regular_file() && isValid)
+                DrawFileItem(entry);
         }
-
-        if (oneColumnSelected)
-        {
-            for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
-            {
-                if (entry.is_regular_file())
-                {
-                    DrawFileItem(entry);
-                }
-            }
-        }
-
 
         ImGui::TreePop();
     }
@@ -373,62 +375,71 @@ void ProjectWindow::DrawMenuBar()
         }
 
         std::vector<std::string> pathParts = GetPathParts();
+        std::vector<std::filesystem::path> fullPaths;
+
+        for (auto& part : pathParts) {
+            if (part == ".") {
+                part = "All";
+            }
+        }
 
         for (size_t i = 0; i < pathParts.size(); ++i)
         {
+            std::filesystem::path newPath = std::filesystem::path(".");
+            for (size_t j = 1; j <= i; ++j)
+            {
+                newPath /= pathParts[j];
+            }
+            fullPaths.push_back(newPath);
+
             if (i == pathParts.size() - 1)
             {
                 ImGui::PushStyleColor(ImGuiCol_Text, app->editor->dataTextColor);
-
             }
 
             if (ImGui::MenuItem(pathParts[i].c_str()))
             {
-                std::filesystem::path newPath = std::filesystem::path("Assets");
-                for (size_t j = 1; j <= i; ++j)
+                if (std::filesystem::exists(fullPaths[i]) && std::filesystem::is_directory(fullPaths[i]))
                 {
-                    newPath /= pathParts[j];
-                }
-
-                if (std::filesystem::exists(newPath) && std::filesystem::is_directory(newPath))
-                {
-                    currentPath = newPath;
+                    currentPath = fullPaths[i];
                     UpdateDirectoryContent();
                 }
             }
 
             if (i == pathParts.size() - 1)
             {
-
                 ImGui::PopStyleColor();
             }
 
             if (i < pathParts.size() - 1)
             {
+                std::string popupName = "NextFoldersPopup_" + std::to_string(i);
                 if (ImGui::MenuItem(">"))
                 {
-                    ImGui::OpenPopup("NextFoldersPopup");
+                    ImGui::OpenPopup(popupName.c_str());
                 }
 
-            }                
-            
-        }
-        if (ImGui::BeginPopup("NextFoldersPopup"))
-        {
-            std::filesystem::path parentDir = currentPath.parent_path();
-            for (const auto& entry : std::filesystem::directory_iterator(parentDir))
-            {
-                if (entry.is_directory())
+                if (ImGui::BeginPopup(popupName.c_str()))
                 {
-                    if (ImGui::MenuItem(entry.path().filename().string().c_str()))
+                    std::filesystem::path parentDir = fullPaths[i];
+                    for (const auto& entry : std::filesystem::directory_iterator(parentDir))
                     {
-                        currentPath = entry.path();
-                        UpdateDirectoryContent();
-                        ImGui::CloseCurrentPopup();
+                        bool isAssetsOrEngine = (entry.is_directory() && parentDir == "."
+                            && (entry.path().filename() == "Assets" || (entry.path().filename() == "Engine" && showEngineContent)));
+
+                        if (entry.is_directory() && (parentDir != "." || isAssetsOrEngine))
+                        {
+                            if (ImGui::MenuItem(entry.path().filename().string().c_str()))
+                            {
+                                currentPath = entry.path();
+                                UpdateDirectoryContent();
+                                ImGui::CloseCurrentPopup();
+                            }
+                        }
                     }
+                    ImGui::EndPopup();
                 }
             }
-            ImGui::EndPopup();
         }
 
         ImGui::SameLine(ImGui::GetWindowWidth() - 30);
@@ -440,6 +451,8 @@ void ProjectWindow::DrawMenuBar()
 
         if (ImGui::BeginPopup("OptionsPopup"))
         {   
+            ImGui::SeparatorText("View Type");
+
             if (twoColumnsSelected)
             {
                 if (ImGui::MenuItem("Tiles", nullptr, tilesSelected))
@@ -460,9 +473,9 @@ void ProjectWindow::DrawMenuBar()
                     tilesSelected = false;
 				    columnSelected = true;
                 }
-
-                ImGui::Separator();
             }
+
+            ImGui::SeparatorText("Columns");
 
 			if (ImGui::MenuItem("One Column", nullptr, oneColumnSelected))
 			{
@@ -473,6 +486,14 @@ void ProjectWindow::DrawMenuBar()
             {
 				oneColumnSelected = false;
 				twoColumnsSelected = true;
+            }
+
+            ImGui::SeparatorText("Content");
+
+            if (ImGui::MenuItem("Show Engine Content", nullptr, showEngineContent))
+            {
+				showEngineContent = !showEngineContent;
+				UpdateDirectoryContent();
             }
 
             ImGui::EndPopup();

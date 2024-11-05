@@ -23,7 +23,7 @@ bool ModuleEditor::Awake()
 
     ImGuiIO& io = ImGui::GetIO();
 
-    ImFont* customFont = io.Fonts->AddFontFromFileTTF("Assets/Fonts/Roboto-Regular.ttf", 14.f);
+    ImFont* customFont = io.Fonts->AddFontFromFileTTF("Engine/Fonts/Roboto-Regular.ttf", 14.f);
     if (customFont != nullptr)
         io.FontDefault = customFont;
     
@@ -153,7 +153,7 @@ void ModuleEditor::MainMenuBar()
         if (ImGui::BeginMenu("3D Object"))
         {
             const char* objectNames[] = { "Cube", "Sphere", "Capsule", "Cylinder" };
-            const char* basePath = "Assets/Models/Primitives/";
+            const char* basePath = "Engine/Primitives/";
             const char* extension = ".fbx";
 
             for (const char* name : objectNames)

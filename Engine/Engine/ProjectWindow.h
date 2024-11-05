@@ -48,9 +48,9 @@ private:
     bool listSelected = false;
     bool tilesSelected = true;
 	bool columnSelected = false;
-
 	bool oneColumnSelected = false;
 	bool twoColumnsSelected = true;
+    bool showEngineContent = false;
 
 	float columnWidth = 100.0f;
 	float columnHeight = 95.0f;

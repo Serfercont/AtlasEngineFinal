@@ -25,15 +25,15 @@ ModuleImporter::~ModuleImporter()
 bool ModuleImporter::Awake()
 {
     // Project
-	icons.folderIcon = LoadTexture("Assets/Icons/folder.png");
-	icons.openFolderIcon = LoadTexture("Assets/Icons/open_folder.png");
-	icons.fileIcon = LoadTexture("Assets/Icons/file.png");
-    icons.dotsIcon = LoadTexture("Assets/Icons/dots.png");
+	icons.folderIcon = LoadTexture("Engine/Icons/folder.png");
+	icons.openFolderIcon = LoadTexture("Engine/Icons/open_folder.png");
+	icons.fileIcon = LoadTexture("Engine/Icons/file.png");
+    icons.dotsIcon = LoadTexture("Engine/Icons/dots.png");
 
     // Console
-	icons.infoIcon = LoadTexture("Assets/Icons/info.png");
-	icons.warningIcon = LoadTexture("Assets/Icons/warning.png");
-	icons.errorIcon = LoadTexture("Assets/Icons/error.png");
+	icons.infoIcon = LoadTexture("Engine/Icons/info.png");
+	icons.warningIcon = LoadTexture("Engine/Icons/warning.png");
+	icons.errorIcon = LoadTexture("Engine/Icons/error.png");
 
 	return true;
 }
