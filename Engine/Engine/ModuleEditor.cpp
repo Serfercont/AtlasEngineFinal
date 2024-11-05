@@ -21,7 +21,13 @@ bool ModuleEditor::Awake()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImFont* customFont = io.Fonts->AddFontFromFileTTF("Assets/Fonts/Roboto-Regular.ttf", 14.f);
+    if (customFont != nullptr)
+        io.FontDefault = customFont;
+    
+
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ApplyStyle();
