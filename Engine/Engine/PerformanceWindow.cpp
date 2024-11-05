@@ -38,7 +38,7 @@ void PerformanceWindow::DrawWindow()
 
 	ImGui::Begin(name.c_str());
 
-    if (ImGui::TreeNode("GPU"))
+    if (ImGui::TreeNodeEx("GPU", ImGuiTreeNodeFlags_DefaultOpen))
     {
         static float values[100];
         static int values_offset = 0;
@@ -91,7 +91,7 @@ void PerformanceWindow::DrawWindow()
         ImGui::TreePop();
     }
 
-    if (ImGui::TreeNode("CPU"))
+    if (ImGui::TreeNodeEx("CPU", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::SeparatorText("Information");
         
@@ -106,7 +106,7 @@ void PerformanceWindow::DrawWindow()
         ImGui::TreePop();
     }
 
-    if (ImGui::TreeNode("MEMORY"))
+    if (ImGui::TreeNodeEx("MEMORY", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::SeparatorText("Information");
 
