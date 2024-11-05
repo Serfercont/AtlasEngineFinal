@@ -31,6 +31,7 @@ public:
 	void DrawEditor();
 	void Docking();
 	void MainMenuBar();
+	void ApplyStyle();
 
 public:
 	GameObject* selectedGameObject = nullptr;
