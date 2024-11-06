@@ -113,6 +113,21 @@ std::string ModuleImporter::OpenFileDialog(const char* filter)
     return "";
 }
 
+void ModuleImporter::TryImportFile()
+{
+    if (!draggedFile.empty())
+    {
+        // Verifica si el ratón se ha soltado y está dentro de las ventanas adecuadas
+        if (app->editor->sceneWindow->IsMouseInside() || app->editor->hierarchyWindow->IsMouseInside())
+            app->importer->ImportFile(draggedFile, true);
+        else if (app->editor->projectWindow->IsMouseInside())
+            app->importer->ImportFile(draggedFile, false);
+
+        draggedFile.clear(); // Limpia la variable después de intentar importar
+    }
+	isDraggingFile = false;
+}
+
 void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
 {
     const std::string modelsDir = "Assets/Models/";
@@ -121,7 +136,7 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
     std::string extension = fileDir.substr(fileDir.find(".") + 1);
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-    auto copyFileIfNotExists = [](const std::string& source, const std::string& destination) 
+    auto copyFileIfNotExists = [this](const std::string& source, const std::string& destination)
     {
         if (!std::filesystem::exists(destination)) 
         {
@@ -129,6 +144,7 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
             std::ofstream dst(destination, std::ios::binary);
             dst << src.rdbuf();
         }
+        app->editor->projectWindow->UpdateDirectoryContent();
     };
 
     if (extension == "fbx") 
@@ -159,4 +175,10 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
     {
         LOG(LogType::LOG_WARNING, "File format not supported");
     }
+}
+
+void ModuleImporter::SetDraggedFile(const std::string& filePath)
+{
+	draggedFile = filePath;
+	isDraggingFile = true;
 }

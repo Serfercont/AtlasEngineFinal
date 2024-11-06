@@ -86,6 +86,9 @@ void ModuleEditor::DrawEditor()
             editorWindow->DrawWindow();
     }
 
+    if (app->importer->isDraggingFile)
+        app->importer->TryImportFile();
+
     ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

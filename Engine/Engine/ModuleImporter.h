@@ -32,8 +32,16 @@ public:
 
 	std::string OpenFileDialog(const char* filter);
 
+	void TryImportFile();
+
 	void ImportFile(const std::string& fileDir, bool addToScene = false);
+
+	void SetDraggedFile(const std::string& filePath);
 
 public:
 	Icons icons;
+	bool isDraggingFile = false;
+
+private:
+	std::string draggedFile;
 };
