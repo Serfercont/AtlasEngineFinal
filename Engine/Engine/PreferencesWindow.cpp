@@ -20,35 +20,6 @@ void PreferencesWindow::DrawWindow()
         ImGui::Spacing();
         ImGui::Separator();
 
-        static int w = 0;
-        for (int n = 0; n < 3; n++)
-        {
-            const char* names[] = { "Shaded", "Wireframe", "Shaded Wireframe" };
-
-            if (ImGui::Selectable(names[n], w == n))
-            {
-                w = n;
-                if (n == 0)
-                {
-                    wireframe = false;
-                    shadedWireframe = false;
-                }
-                else if (n == 1)
-                {
-                    wireframe = true;
-                    shadedWireframe = false;
-                }
-                else if (n == 2)
-                {
-                    wireframe = false;
-                    shadedWireframe = true;
-                }
-            }
-        }
-
-        ImGui::Spacing();
-        ImGui::Separator();
-
         ImGui::PushItemWidth(200.f);
         ImGui::SliderFloat("Vertex Normals Length", &vertexNormalLength, 0.05f, 0.25f, "%.2f", ImGuiSliderFlags_NoInput);
         ImGui::SliderFloat("Face Normals Length", &faceNormalLength, 0.05f, 0.25f, "%.2f", ImGuiSliderFlags_NoInput);
