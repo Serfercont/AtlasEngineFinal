@@ -117,13 +117,12 @@ void ModuleImporter::TryImportFile()
 {
     if (!draggedFile.empty())
     {
-        // Verifica si el ratón se ha soltado y está dentro de las ventanas adecuadas
         if (app->editor->sceneWindow->IsMouseInside() || app->editor->hierarchyWindow->IsMouseInside())
             app->importer->ImportFile(draggedFile, true);
         else if (app->editor->projectWindow->IsMouseInside())
             app->importer->ImportFile(draggedFile, false);
 
-        draggedFile.clear(); // Limpia la variable después de intentar importar
+        draggedFile.clear();
     }
 	isDraggingFile = false;
 }
@@ -133,8 +132,11 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
     const std::string modelsDir = "Assets/Models/";
     const std::string texturesDir = "Assets/Textures/";
 
-    std::string extension = fileDir.substr(fileDir.find(".") + 1);
+    std::string extension = std::filesystem::path(fileDir).extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+    if (!extension.empty() && extension[0] == '.')
+        extension.erase(0, 1);
 
     auto copyFileIfNotExists = [this](const std::string& source, const std::string& destination)
     {

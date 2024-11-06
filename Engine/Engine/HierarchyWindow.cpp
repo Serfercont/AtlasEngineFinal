@@ -20,7 +20,25 @@ void HierarchyWindow::DrawWindow()
 
 	ImGui::InputText("##Search", searchInput, 256);
 
+	ImGui::BeginGroup();
+
 	HierarchyTree(app->scene->root, true, searchInput);
+
+    ImVec2 availableSize = ImGui::GetContentRegionAvail();
+
+    ImGui::Dummy(availableSize);
+
+	ImGui::EndGroup();
+
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_FILE_PATH"))
+        {
+            const char* droppedFilePath = static_cast<const char*>(payload->Data);
+            app->importer->ImportFile(droppedFilePath, true);
+        }
+        ImGui::EndDragDropTarget();
+    }
 
 	ImGui::End();
 }

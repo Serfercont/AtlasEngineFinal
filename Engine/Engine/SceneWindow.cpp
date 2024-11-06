@@ -63,6 +63,16 @@ void SceneWindow::DrawWindow()
 
     ImGui::Image((void*)(intptr_t)app->renderer3D->fboTexture, windowSize, uv0, uv1);
 
+    if (ImGui::BeginDragDropTarget()) 
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_FILE_PATH"))
+        {
+            const char* droppedFilePath = static_cast<const char*>(payload->Data);
+            app->importer->ImportFile(droppedFilePath, true);
+        }
+        ImGui::EndDragDropTarget();
+    }
+
     ImGui::End();
     ImGui::PopStyleVar();
 }
