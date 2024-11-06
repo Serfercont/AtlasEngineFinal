@@ -14,6 +14,8 @@ void InspectorWindow::DrawWindow()
 {
     ImGui::Begin(name.c_str());
 
+    UpdateMouseState();
+
     if (app->editor->selectedGameObject != nullptr && app->editor->selectedGameObject->parent != nullptr)
     {
         ImGui::Checkbox("##Active", &app->editor->selectedGameObject->isActive);

@@ -16,6 +16,8 @@ void ProjectWindow::DrawWindow()
 
     DrawMenuBar();
 
+    UpdateMouseState();
+
 	int columns = oneColumnSelected ? 1 : 2;
     ImGui::Columns(columns, "ProjectColumns");
 

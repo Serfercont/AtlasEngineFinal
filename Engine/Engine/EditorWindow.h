@@ -27,9 +27,12 @@ public:
     std::string GetName() const { return name; }
 	virtual bool IsEnabled() const { return enabled; }
 	virtual void SetEnabled(bool enabled) { this->enabled = enabled; }
+	virtual void UpdateMouseState() { isMouseInside = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) ? true : false; }
+	bool IsMouseInside() const { return isMouseInside; }
 
 protected:
 	WindowType type;
     std::string name;
-	bool enabled = true;
+	bool enabled = true;	
+	bool isMouseInside = false;
 };

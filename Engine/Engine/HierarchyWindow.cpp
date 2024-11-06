@@ -16,6 +16,8 @@ void HierarchyWindow::DrawWindow()
 {
 	ImGui::Begin(name.c_str());
 
+    UpdateMouseState();
+
 	ImGui::InputText("##Search", searchInput, 256);
 
 	HierarchyTree(app->scene->root, true, searchInput);

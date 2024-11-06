@@ -23,6 +23,8 @@ void ConsoleWindow::DrawMenuBar()
 {
     ImGui::BeginMenuBar();
 
+    UpdateMouseState();
+
     ImGui::SetNextItemWidth(300.0f);
     ImGui::InputTextWithHint("##Search", "Search Log", searchBuffer, IM_ARRAYSIZE(searchBuffer));
 

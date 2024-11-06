@@ -13,6 +13,8 @@ void PreferencesWindow::DrawWindow()
 {
     ImGui::Begin(name.c_str());
 
+    UpdateMouseState();
+
     if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Checkbox("Show Textures", &drawTextures);

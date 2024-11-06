@@ -37,7 +37,8 @@ bool ModuleCamera::CleanUp()
 
 bool ModuleCamera::Update(float dt)
 {
-	if (((!isMouseInside) || (!isZooming && !isFreeLook && !isOrbiting && !isDragging)) && !isDefaultCursor)
+	bool isMouseInside = app->editor->sceneWindow->IsMouseInside();
+	if ((!isMouseInside || (!isZooming && !isFreeLook && !isOrbiting && !isDragging)) && !isDefaultCursor)
 	{
 		SetCursor(CursorType::DEFAULT);
 	}

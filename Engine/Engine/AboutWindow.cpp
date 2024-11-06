@@ -12,5 +12,7 @@ void AboutWindow::DrawWindow()
 {
 	ImGui::Begin(name.c_str());
 
+	UpdateMouseState();
+
 	ImGui::End();
 }

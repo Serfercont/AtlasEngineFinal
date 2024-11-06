@@ -51,10 +51,7 @@ void SceneWindow::DrawWindow()
         ImGui::EndMenuBar();
     }
 
-    if (ImGui::IsWindowHovered())
-        app->camera->isMouseInside = true;
-    else if (app->camera->isMouseInside)
-		app->camera->isMouseInside = false;
+	UpdateMouseState();
 
     ImVec2 textureSize = ImVec2(app->window->width, app->window->height);
     ImVec2 windowSize = ImGui::GetWindowSize();

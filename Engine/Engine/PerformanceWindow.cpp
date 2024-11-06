@@ -38,6 +38,8 @@ void PerformanceWindow::DrawWindow()
 
 	ImGui::Begin(name.c_str());
 
+    UpdateMouseState();
+
     if (ImGui::TreeNodeEx("GPU", ImGuiTreeNodeFlags_DefaultOpen))
     {
         static float values[100];
