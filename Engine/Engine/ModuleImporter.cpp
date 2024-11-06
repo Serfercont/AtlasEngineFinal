@@ -28,6 +28,9 @@ bool ModuleImporter::Awake()
 	icons.folderIcon = LoadTexture("Engine/Icons/folder.png");
 	icons.openFolderIcon = LoadTexture("Engine/Icons/open_folder.png");
 	icons.fileIcon = LoadTexture("Engine/Icons/file.png");
+	icons.pngFileIcon = LoadTexture("Engine/Icons/file.png");
+	icons.ddsFileIcon = LoadTexture("Engine/Icons/file.png");
+	icons.fbxFileIcon = LoadTexture("Engine/Icons/file.png");
     icons.dotsIcon = LoadTexture("Engine/Icons/dots.png");
 
     // Console
@@ -43,6 +46,9 @@ bool ModuleImporter::CleanUp()
 	glDeleteTextures(1, &icons.folderIcon);
 	glDeleteTextures(1, &icons.openFolderIcon);
 	glDeleteTextures(1, &icons.fileIcon);
+	glDeleteTextures(1, &icons.pngFileIcon);
+	glDeleteTextures(1, &icons.ddsFileIcon);
+	glDeleteTextures(1, &icons.fbxFileIcon);
 	glDeleteTextures(1, &icons.dotsIcon);
 	glDeleteTextures(1, &icons.infoIcon);
 	glDeleteTextures(1, &icons.warningIcon);
