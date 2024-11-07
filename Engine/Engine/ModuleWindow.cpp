@@ -27,25 +27,17 @@ bool ModuleWindow::Awake()
 		height = SCREEN_HEIGHT;
 		Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
-		if (WIN_FULLSCREEN == true)
-		{
+		if (fullscreen)
 			flags |= SDL_WINDOW_FULLSCREEN;
-		}
 
-		if (WIN_RESIZABLE == true)
-		{
+		if (resizable)
 			flags |= SDL_WINDOW_RESIZABLE;
-		}
 
-		if (WIN_BORDERLESS == true)
-		{
+		if (borderless)
 			flags |= SDL_WINDOW_BORDERLESS;
-		}
 
-		if (WIN_FULLSCREEN_DESKTOP == true)
-		{
+		if (fulldesktop)
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		}
 
 		window = SDL_CreateWindow("Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 
@@ -70,15 +62,37 @@ bool ModuleWindow::CleanUp()
 	LOG(LogType::LOG_INFO, "Destroying SDL window and quitting all SDL systems");
 
 	if (context != NULL)
-	{
 		SDL_GL_DeleteContext(context);
-	}
 
 	if (window != NULL)
-	{
 		SDL_DestroyWindow(window);
-	}
 
 	SDL_Quit();
 	return true;
+}
+
+void ModuleWindow::SetFullScreen(bool enabled)
+{
+	if (enabled)
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	else
+		SDL_SetWindowFullscreen(window, 0);
+}
+
+void ModuleWindow::SetBorderless(bool enabled)
+{
+	SDL_SetWindowBordered(window, enabled ? SDL_FALSE : SDL_TRUE);
+}
+
+void ModuleWindow::SetFullDesktop(bool enabled)
+{
+	if (enabled)
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	else
+		SDL_SetWindowFullscreen(window, 0);
+}
+
+void ModuleWindow::SetResizable(bool enabled)
+{
+	SDL_SetWindowResizable(window, resizable ? SDL_TRUE : SDL_FALSE);
 }
