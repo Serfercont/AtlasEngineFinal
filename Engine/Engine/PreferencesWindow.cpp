@@ -39,6 +39,8 @@ void PreferencesWindow::DrawWindow()
     if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Checkbox("Show Textures", &drawTextures);
+        if (ImGui::Checkbox("Cull face", &cullFace))
+            cullFace ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 
         ImGui::Spacing();
         ImGui::Separator();

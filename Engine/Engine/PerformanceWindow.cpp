@@ -212,6 +212,8 @@ void PerformanceWindow::DrawWindow()
             ImVec2(0, 80.0f)
         );
 
+		ImGui::Checkbox("FPS Overlay", &showFpsOverlay);
+
         ImGui::TreePop();
     }
 
