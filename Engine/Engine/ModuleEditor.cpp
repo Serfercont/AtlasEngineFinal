@@ -101,7 +101,6 @@ void ModuleEditor::DrawEditor()
         ImGui::End();
     }
 
-	ImGui::ShowDemoWindow();
 
     ImGui::Render();
 
@@ -290,6 +289,13 @@ void ModuleEditor::ApplyStyle()
     colors[ImGuiCol_TableBorderLight] = ImVec4{ 0.18f, 0.18f, 0.22f, 1.0f };
     colors[ImGuiCol_TableRowBg] = ImVec4{ 0.16f, 0.16f, 0.18f, 1.0f };
     colors[ImGuiCol_TableRowBgAlt] = ImVec4{ 0.14f, 0.14f, 0.16f, 1.0f };
+
+    // --- Drag & Drop ---
+    colors[ImGuiCol_DragDropTarget] = ImVec4{ 0.84f, 0.91f, 1.0f, 1.0f }; 
+
+    // --- Navigation ---
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4{ 0.58f, 0.68f, 0.80f, 0.8f }; 
+
 
     // --- Roundings ---
     style.TabRounding = 5;
