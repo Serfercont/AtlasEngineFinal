@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Module.h"
+#include "Resource.h"
 
 #include <GL/glew.h>
 #include <string>
@@ -30,13 +31,14 @@ public:
 
 	GLuint LoadTexture(const std::string& filePath);
 
-	std::string OpenFileDialog(const char* filter);
-
 	void TryImportFile();
 
 	void ImportFile(const std::string& fileDir, bool addToScene = false);
 
 	void SetDraggedFile(const std::string& filePath);
+
+	Resource* ImportFileToLibrary(const std::string& fileDir, ResourceType type);
+	void SaveTextureFile(Resource* resource);
 
 public:
 	Icons icons;

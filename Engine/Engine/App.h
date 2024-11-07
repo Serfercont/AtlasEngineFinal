@@ -8,6 +8,8 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleEditor.h"
 #include "ModuleImporter.h"
+#include "ModuleFileSystem.h"
+#include "ModuleResources.h"
 
 #include "Timer.h"
 
@@ -40,6 +42,8 @@ public:
 	ModuleImporter* importer = nullptr;
 	ModuleRenderer3D* renderer3D = nullptr;
 	ModuleEditor* editor = nullptr;
+	ModuleFileSystem* fileSystem = nullptr;
+	ModuleResources* resources = nullptr;
 
 	bool exit = false;
 

@@ -90,29 +90,6 @@ GLuint ModuleImporter::LoadTexture(const std::string& filePath)
     return textureID;
 }
 
-std::string ModuleImporter::OpenFileDialog(const char* filter)
-{
-    OPENFILENAMEA ofn; 
-    CHAR sizeFile[260] = { 0 };
-
-    ZeroMemory(&ofn, sizeof(ofn));
-    ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = NULL;
-
-    ofn.lpstrFilter = filter;
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFile = sizeFile;
-    ofn.nMaxFile = sizeof(sizeFile);
-    ofn.lpstrTitle = "Open File";
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-    if (GetOpenFileNameA(&ofn) == TRUE)
-    {
-        return std::string(ofn.lpstrFile);
-    }
-    return "";
-}
-
 void ModuleImporter::TryImportFile()
 {
     if (!draggedFile.empty())
@@ -129,53 +106,36 @@ void ModuleImporter::TryImportFile()
 
 void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
 {
-    const std::string modelsDir = "Assets/Models/";
-    const std::string texturesDir = "Assets/Textures/";
+    std::string extension = app->fileSystem->GetExtension(fileDir);
 
-    std::string extension = std::filesystem::path(fileDir).extension().string();
-    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+	bool isValidFile = extension == "fbx" || extension == "png" || extension == "dds";
 
-    if (!extension.empty() && extension[0] == '.')
-        extension.erase(0, 1);
-
-    auto copyFileIfNotExists = [this](const std::string& source, const std::string& destination)
+    if (!isValidFile)
     {
-        if (!std::filesystem::exists(destination)) 
-        {
-            std::ifstream src(source, std::ios::binary);
-            std::ofstream dst(destination, std::ios::binary);
-            dst << src.rdbuf();
-        }
-        app->editor->projectWindow->UpdateDirectoryContent();
-    };
-
-    if (extension == "fbx") 
-    {
-        std::string modelFilePath = modelsDir + std::filesystem::path(fileDir).filename().string();
-        copyFileIfNotExists(fileDir, modelFilePath);
-
-        if (!addToScene)
-			return;
-
-        app->renderer3D->meshLoader.ImportFBX(fileDir.c_str(), app->scene->root);
+        LOG(LogType::LOG_WARNING, "File format not supported");
+        return;
     }
-    else if (extension == "png" || extension == "dds")
+
+    std::string newDir = app->fileSystem->CopyFileIfNotExists(fileDir);
+
+	ResourceType resourceType = app->resources->GetResourceTypeFromExtension(extension);
+
+    Resource* newResource = ImportFileToLibrary(newDir, resourceType);
+
+    if (!addToScene)
+		return;
+
+    switch (resourceType)
     {
-        std::string textureFilePath = texturesDir + std::filesystem::path(fileDir).filename().string();
-        copyFileIfNotExists(fileDir, textureFilePath);
-
-        if (! addToScene)
-			return;
-
-        Texture* newTexture = app->renderer3D->LoadTextureImage(textureFilePath.c_str());
-        if (newTexture && app->editor->selectedGameObject) 
+	case ResourceType::MODEL:
+        app->renderer3D->meshLoader.ImportFBX(fileDir.c_str(), app->scene->root);
+		break;
+	case ResourceType::TEXTURE:
+        Texture* newTexture = app->renderer3D->LoadTextureImage(newResource->GetLibraryFileDir().c_str());
+        if (newTexture && app->editor->selectedGameObject)
         {
             app->editor->selectedGameObject->material->AddTexture(newTexture);
         }
-    }
-    else 
-    {
-        LOG(LogType::LOG_WARNING, "File format not supported");
     }
 }
 
@@ -183,4 +143,46 @@ void ModuleImporter::SetDraggedFile(const std::string& filePath)
 {
 	draggedFile = filePath;
 	isDraggingFile = true;
+}
+
+Resource* ModuleImporter::ImportFileToLibrary(const std::string& fileDir, ResourceType type)
+{
+    Resource* resource = app->resources->CreateResource(fileDir, type);
+
+    switch (type)
+    {
+	case ResourceType::MODEL:
+		// ImportModelFile(resource);
+		break;
+	case ResourceType::TEXTURE:
+		SaveTextureFile(resource);
+        break;
+    }
+
+	return resource;
+}
+
+void ModuleImporter::SaveTextureFile(Resource* resource)
+{
+    ILuint imageID;
+    ilGenImages(1, &imageID);
+    ilBindImage(imageID);
+
+    ilLoadImage(resource->GetAssetFileDir().c_str());
+
+    ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);
+    ILuint size = ilSaveL(IL_DDS, nullptr, 0);
+
+    ILubyte* data = new ILubyte[size];
+    if (ilSaveL(IL_DDS, data, size) > 0) {
+        std::string filePath = resource->GetLibraryFileDir();
+        std::ofstream file(filePath, std::ios::binary);
+        if (file.is_open()) {
+            file.write((char*)data, size);
+            file.close();
+        }
+    }
+
+    ilDeleteImages(1, &imageID);
+    delete[] data;
 }

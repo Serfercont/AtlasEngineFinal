@@ -370,7 +370,7 @@ void ProjectWindow::DrawMenuBar()
                 "DDS Files (*.dds)\0*.dds\0"
                 "\0";
 
-            std::string selectedFile = app->importer->OpenFileDialog(filter);
+            std::string selectedFile = app->fileSystem->OpenFileDialog(filter);
             if (!selectedFile.empty())
             {
 				app->importer->ImportFile(selectedFile);
