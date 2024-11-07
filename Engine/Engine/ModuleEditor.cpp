@@ -1,6 +1,8 @@
 #include "ModuleEditor.h"
 #include "App.h"
 
+#include "imgui_internal.h"
+
 ModuleEditor::ModuleEditor(App* app) : Module(app)
 {}
 
@@ -85,6 +87,21 @@ void ModuleEditor::DrawEditor()
         if (editorWindow->IsEnabled())
             editorWindow->DrawWindow();
     }
+
+	// Draw status bar
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+
+    if (ImGui::BeginViewportSideBar("##MainStatusBar", viewport, ImGuiDir_Down, ImGui::GetFrameHeight(), windowFlags)) 
+    {
+        if (ImGui::BeginMenuBar())
+        {
+            ImGui::EndMenuBar();
+        }
+        ImGui::End();
+    }
+
+	ImGui::ShowDemoWindow();
 
     ImGui::Render();
 
