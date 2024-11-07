@@ -13,38 +13,11 @@ void PreferencesWindow::DrawWindow()
 {
     ImGui::Begin(name.c_str());
 
+    UpdateMouseState();
+
     if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Checkbox("Show Textures", &drawTextures);
-
-        ImGui::Spacing();
-        ImGui::Separator();
-
-        static int w = 0;
-        for (int n = 0; n < 3; n++)
-        {
-            const char* names[] = { "Shaded", "Wireframe", "Shaded Wireframe" };
-
-            if (ImGui::Selectable(names[n], w == n))
-            {
-                w = n;
-                if (n == 0)
-                {
-                    wireframe = false;
-                    shadedWireframe = false;
-                }
-                else if (n == 1)
-                {
-                    wireframe = true;
-                    shadedWireframe = false;
-                }
-                else if (n == 2)
-                {
-                    wireframe = false;
-                    shadedWireframe = true;
-                }
-            }
-        }
 
         ImGui::Spacing();
         ImGui::Separator();

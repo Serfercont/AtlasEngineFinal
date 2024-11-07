@@ -7,10 +7,10 @@
 #define MAX_KEYS 256
 #define MAX_MOUSE_BUTTONS 5
 
-#define BMP_ZOOM "Assets/Cursors/zoom.bmp"
-#define BMP_FREELOOK "Assets/Cursors/freeLook.bmp"
-#define BMP_DRAG "Assets/Cursors/drag.bmp"
-#define BMP_ORBIT "Assets/Cursors/orbit.bmp"
+#define BMP_ZOOM "Engine/Cursors/zoom.bmp"
+#define BMP_FREELOOK "Engine/Cursors/freeLook.bmp"
+#define BMP_DRAG "Engine/Cursors/drag.bmp"
+#define BMP_ORBIT "Engine/Cursors/orbit.bmp"
 
 enum KEY_STATE
 {

@@ -107,7 +107,7 @@ bool ModuleInput::PreUpdate(float dt)
 		{
 			std::string droppedFileDir(e.drop.file);
 
-			app->importer->ImportFile(droppedFileDir, true);
+			app->importer->SetDraggedFile(droppedFileDir);
 
 			SDL_free(e.drop.file);
 			break;

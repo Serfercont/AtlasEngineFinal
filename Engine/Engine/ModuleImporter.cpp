@@ -25,15 +25,18 @@ ModuleImporter::~ModuleImporter()
 bool ModuleImporter::Awake()
 {
     // Project
-	icons.folderIcon = LoadTexture("Assets/Icons/folder.png");
-	icons.openFolderIcon = LoadTexture("Assets/Icons/open_folder.png");
-	icons.fileIcon = LoadTexture("Assets/Icons/file.png");
-    icons.dotsIcon = LoadTexture("Assets/Icons/dots.png");
+	icons.folderIcon = LoadTexture("Engine/Icons/folder.png");
+	icons.openFolderIcon = LoadTexture("Engine/Icons/open_folder.png");
+	icons.fileIcon = LoadTexture("Engine/Icons/file.png");
+	icons.pngFileIcon = LoadTexture("Engine/Icons/file.png");
+	icons.ddsFileIcon = LoadTexture("Engine/Icons/file.png");
+	icons.fbxFileIcon = LoadTexture("Engine/Icons/file.png");
+    icons.dotsIcon = LoadTexture("Engine/Icons/dots.png");
 
     // Console
-	icons.infoIcon = LoadTexture("Assets/Icons/info.png");
-	icons.warningIcon = LoadTexture("Assets/Icons/warning.png");
-	icons.errorIcon = LoadTexture("Assets/Icons/error.png");
+	icons.infoIcon = LoadTexture("Engine/Icons/info.png");
+	icons.warningIcon = LoadTexture("Engine/Icons/warning.png");
+	icons.errorIcon = LoadTexture("Engine/Icons/error.png");
 
 	return true;
 }
@@ -43,6 +46,9 @@ bool ModuleImporter::CleanUp()
 	glDeleteTextures(1, &icons.folderIcon);
 	glDeleteTextures(1, &icons.openFolderIcon);
 	glDeleteTextures(1, &icons.fileIcon);
+	glDeleteTextures(1, &icons.pngFileIcon);
+	glDeleteTextures(1, &icons.ddsFileIcon);
+	glDeleteTextures(1, &icons.fbxFileIcon);
 	glDeleteTextures(1, &icons.dotsIcon);
 	glDeleteTextures(1, &icons.infoIcon);
 	glDeleteTextures(1, &icons.warningIcon);
@@ -107,15 +113,32 @@ std::string ModuleImporter::OpenFileDialog(const char* filter)
     return "";
 }
 
+void ModuleImporter::TryImportFile()
+{
+    if (!draggedFile.empty())
+    {
+        if (app->editor->sceneWindow->IsMouseInside() || app->editor->hierarchyWindow->IsMouseInside())
+            app->importer->ImportFile(draggedFile, true);
+        else if (app->editor->projectWindow->IsMouseInside())
+            app->importer->ImportFile(draggedFile, false);
+
+        draggedFile.clear();
+    }
+	isDraggingFile = false;
+}
+
 void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
 {
     const std::string modelsDir = "Assets/Models/";
     const std::string texturesDir = "Assets/Textures/";
 
-    std::string extension = fileDir.substr(fileDir.find(".") + 1);
+    std::string extension = std::filesystem::path(fileDir).extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-    auto copyFileIfNotExists = [](const std::string& source, const std::string& destination) 
+    if (!extension.empty() && extension[0] == '.')
+        extension.erase(0, 1);
+
+    auto copyFileIfNotExists = [this](const std::string& source, const std::string& destination)
     {
         if (!std::filesystem::exists(destination)) 
         {
@@ -123,6 +146,7 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
             std::ofstream dst(destination, std::ios::binary);
             dst << src.rdbuf();
         }
+        app->editor->projectWindow->UpdateDirectoryContent();
     };
 
     if (extension == "fbx") 
@@ -153,4 +177,10 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
     {
         LOG(LogType::LOG_WARNING, "File format not supported");
     }
+}
+
+void ModuleImporter::SetDraggedFile(const std::string& filePath)
+{
+	draggedFile = filePath;
+	isDraggingFile = true;
 }

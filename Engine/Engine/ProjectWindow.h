@@ -6,6 +6,22 @@
 #include <vector>
 #include <string>
 
+#include <GL/glew.h>
+
+struct IconSizes 
+{
+    float smallIcon = 16.0f;
+    float mediumIcon = 32.0f;
+    float largeIcon = 64.0f;
+};
+
+struct ColumnSettings 
+{
+    float width = 100.0f;
+    float height = 95.0f;
+    float maxTextWidth = 80.0f;
+};
+
 class ProjectWindow : public EditorWindow
 {
 public:
@@ -14,11 +30,12 @@ public:
 
     void DrawWindow() override;
 
-    void SetupInitialColumnWidth();
-
     void UpdateDirectoryContent();
-    std::vector<std::string> GetPathParts() const;
-    
+
+    std::vector<std::string> GetPathParts() const;	
+  
+private:
+	GLuint GetFileIcon(const std::filesystem::path& entry) const;    
     void DrawFoldersTree(const std::filesystem::path& directoryPath);
     void DrawFileItem(const std::filesystem::directory_entry& entry);
 
@@ -26,7 +43,8 @@ public:
     void DrawMenuBar();
     void DrawSelectionBar();
 
-	void ConfigureColumns();
+    void SetupInitialColumnWidth();
+    void ConfigureColumns();
 
 	void DrawTile(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
 	void DrawListItem(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
@@ -36,6 +54,7 @@ public:
 
     void HandleItemClick(const std::filesystem::directory_entry& entry, bool& shouldBreakLoop);
     void HandleDragDrop(const std::filesystem::directory_entry& entry);
+
 private:
     std::filesystem::path currentPath;
 	std::filesystem::path selectedPath;
@@ -48,14 +67,10 @@ private:
     bool listSelected = false;
     bool tilesSelected = true;
 	bool columnSelected = false;
-
 	bool oneColumnSelected = false;
 	bool twoColumnsSelected = true;
+    bool showEngineContent = false;
 
-	float columnWidth = 100.0f;
-	float columnHeight = 95.0f;
-	float maxTextWidth = 80.0f;
-    float smallIconSize = 16.0f;
-	float mediumIconSize = 32.0f;
-	float largeIconSize = 64.0f;
+    IconSizes iconSizes;
+    ColumnSettings columnSettings;
 };
