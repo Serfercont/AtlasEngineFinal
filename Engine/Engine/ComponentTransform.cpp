@@ -30,13 +30,12 @@ void ComponentTransform::OnEditor()
 
         // Position
         ImGui::AlignTextToFramePadding();
-        ImGui::Text("Position   ");
+        ImGui::Text("Position      ");
         ImGui::PushItemWidth(40);
 
         for (int i = 0; i < 3; ++i) {
             ImGui::SameLine();
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text(labels[i]);
+            SetButtonColor(labels[i]);
             ImGui::SameLine();
             float floatValue = position[i];
             std::string formattedValue = std::to_string(floatValue);
@@ -51,14 +50,13 @@ void ComponentTransform::OnEditor()
 
         // Rotation
         ImGui::AlignTextToFramePadding();
-        ImGui::Text("Rotation   ");
+        ImGui::Text("Rotation      ");
         ImGui::PushItemWidth(40);
 
         for (int i = 0; i < 3; ++i) {
             ImGui::SameLine();
-            ImGui::Text(labels[i]);
+            SetButtonColor(labels[i]);
             ImGui::SameLine();
-
             float eulerAngle = eulerRotation[i];
             if (eulerAngle == -0.0f) {
                 eulerAngle = 0.0f;
@@ -96,8 +94,7 @@ void ComponentTransform::OnEditor()
         bool scaleChanged = false;
         for (int i = 0; i < 3; ++i) {
             ImGui::SameLine();
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text(labels[i]);
+            SetButtonColor(labels[i]);
             ImGui::SameLine();
             float floatValue = scale[i];
             std::string formattedValue = std::to_string(floatValue);
@@ -211,4 +208,29 @@ bool ComponentTransform::Decompose(const glm::float4x4& transform, glm::vec3& tr
     rotation = glm::quat_cast(rotationMatrix);
 
     return true;
+}
+
+void ComponentTransform::SetButtonColor(const char* label)
+{
+    ImVec4 buttonColor;
+    if (strcmp(label, "X") == 0)
+    {
+        buttonColor = ImVec4(0.8f, 0.4f, 0.4f, 0.7f); // Red
+    }
+    else if (strcmp(label, "Y") == 0)
+    {
+        buttonColor = ImVec4(0.4f, 0.8f, 0.4f, 0.7f); // Green
+    }
+    else if (strcmp(label, "Z") == 0)
+    {
+        buttonColor = ImVec4(0.4f, 0.4f, 0.8f, 0.7f); // Blue
+    }
+
+    ImGui::PushStyleColor(ImGuiCol_Button, buttonColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, buttonColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonColor.x * 0.9f, buttonColor.y * 0.9f, buttonColor.z * 0.9f, 1.0f));
+
+    ImGui::Button(label);
+
+    ImGui::PopStyleColor(3);
 }
