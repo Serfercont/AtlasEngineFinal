@@ -1,6 +1,8 @@
 #include "ModuleEditor.h"
 #include "App.h"
 
+#include "imgui_internal.h"
+
 ModuleEditor::ModuleEditor(App* app) : Module(app)
 {}
 
@@ -85,6 +87,19 @@ void ModuleEditor::DrawEditor()
         if (editorWindow->IsEnabled())
             editorWindow->DrawWindow();
     }
+
+	/*// Draw status bar
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+
+    if (ImGui::BeginViewportSideBar("##MainStatusBar", viewport, ImGuiDir_Down, ImGui::GetFrameHeight(), windowFlags)) 
+    {
+        if (ImGui::BeginMenuBar())
+        {
+            ImGui::EndMenuBar();
+        }
+        ImGui::End();
+    }*/
 
     if (app->importer->isDraggingFile)
         app->importer->TryImportFile();
@@ -276,6 +291,13 @@ void ModuleEditor::ApplyStyle()
     colors[ImGuiCol_TableBorderLight] = ImVec4{ 0.18f, 0.18f, 0.22f, 1.0f };
     colors[ImGuiCol_TableRowBg] = ImVec4{ 0.16f, 0.16f, 0.18f, 1.0f };
     colors[ImGuiCol_TableRowBgAlt] = ImVec4{ 0.14f, 0.14f, 0.16f, 1.0f };
+
+    // --- Drag & Drop ---
+    colors[ImGuiCol_DragDropTarget] = ImVec4{ 0.84f, 0.91f, 1.0f, 1.0f }; 
+
+    // --- Navigation ---
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4{ 0.58f, 0.68f, 0.80f, 0.8f }; 
+
 
     // --- Roundings ---
     style.TabRounding = 5;

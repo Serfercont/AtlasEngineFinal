@@ -125,7 +125,6 @@ void PerformanceWindow::DrawWindow()
         ImGui::TextColored(dataTextColor, "%d MB", statex.ullAvailPhys / (1024 * 1024));
 
         int memoryusage = (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024);
-
         float memoryUsePercentage = ((float)(statex.ullTotalPhys - statex.ullAvailPhys) / statex.ullTotalPhys) * 100.0f;
 
         static float totalMemoryValues[100] = { 0 };
@@ -154,8 +153,64 @@ void PerformanceWindow::DrawWindow()
 
             privateMemoryValues[privateValuesOffset] = privateMemoryUsageMB;
             privateValuesOffset = (privateValuesOffset + 1) % IM_ARRAYSIZE(privateMemoryValues);
-
         }
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNodeEx("Framerates", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::SeparatorText("Information");
+        if (frameCount > 1)
+        {
+            dt = app->GetDT();
+            currentFps = 1.0f / dt;
+        }
+    
+        fpsHistory[fpsHistoryOffset] = currentFps;
+        fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
+
+        totalFps += currentFps;
+        frameCount++;
+
+
+        if (currentFps < minFps) {
+            minFps = currentFps;
+        }
+        if (currentFps > maxFps) {
+            maxFps = currentFps;
+        }
+
+        float averageFps = totalFps / frameCount;
+
+        ImGui::Text("Current FPS:");
+        ImGui::SameLine();
+        ImGui::TextColored(dataTextColor, "%d", static_cast<int>(currentFps));
+
+        ImGui::Text("Average FPS:");
+        ImGui::SameLine();
+        ImGui::TextColored(dataTextColor, "%d", static_cast<int>(averageFps));
+
+        ImGui::Text("Min FPS:");
+        ImGui::SameLine();
+        ImGui::TextColored(dataTextColor, "%d", static_cast<int>(minFps));
+
+        ImGui::Text("Max FPS:");
+        ImGui::SameLine();
+        ImGui::TextColored(dataTextColor, "%d", static_cast<int>(maxFps));
+
+        char fpsOverlay[32];
+        sprintf_s(fpsOverlay, "%d FPS", static_cast<int>(currentFps));
+        ImGui::PlotLines(
+            "##FPSHistory",
+            fpsHistory,
+            FPS_HISTORY_SIZE,
+            fpsHistoryOffset,
+            fpsOverlay,
+            minFps,
+            maxFps * 1.2f,
+            ImVec2(0, 80.0f)
+        );
 
         ImGui::TreePop();
     }
