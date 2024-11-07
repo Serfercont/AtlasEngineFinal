@@ -28,9 +28,9 @@ bool ModuleImporter::Awake()
 	icons.folderIcon = LoadTexture("Engine/Icons/folder.png");
 	icons.openFolderIcon = LoadTexture("Engine/Icons/open_folder.png");
 	icons.fileIcon = LoadTexture("Engine/Icons/file.png");
-	icons.pngFileIcon = LoadTexture("Engine/Icons/file.png");
-	icons.ddsFileIcon = LoadTexture("Engine/Icons/file.png");
-	icons.fbxFileIcon = LoadTexture("Engine/Icons/file.png");
+	icons.pngFileIcon = LoadTexture("Engine/Icons/file_png.png");
+	icons.ddsFileIcon = LoadTexture("Engine/Icons/file_dds.png");
+	icons.fbxFileIcon = LoadTexture("Engine/Icons/file_fbx.png");
     icons.dotsIcon = LoadTexture("Engine/Icons/dots.png");
 
     // Console
