@@ -7,24 +7,11 @@ Timer::Timer()
 
 void Timer::Start()
 {
-	running = true;
-	started_at = SDL_GetTicks();
+	frequency = SDL_GetPerformanceFrequency();
+	startTime = SDL_GetPerformanceCounter();
 }
 
-void Timer::Stop()
+double Timer::ReadMs() const
 {
-	running = false;
-	stopped_at = SDL_GetTicks();
-}
-
-Uint32 Timer::Read()
-{
-	if (running == true)
-	{
-		return SDL_GetTicks() - started_at;
-	}
-	else
-	{
-		return stopped_at - started_at;
-	}
+	return ((double)(SDL_GetPerformanceCounter() - startTime) / frequency * 1000);
 }

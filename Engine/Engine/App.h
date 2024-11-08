@@ -46,7 +46,7 @@ public:
 	bool vsync = true;
 
 private:
-	Timer	ms_timer;
+	Timer	timer;
 	float	dt;
 
 	std::list<Module*> modules;

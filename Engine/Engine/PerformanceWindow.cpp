@@ -88,7 +88,12 @@ void PerformanceWindow::DrawWindow()
 
         char overlay[32];
         sprintf_s(overlay, "Memory Usage %.2f%% (%d MB)", memoryUsePercentage, memoryUse / 1024);
-        ImGui::PlotLines("##MemoryUsage", values, IM_ARRAYSIZE(values), values_offset, overlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
+        ImGui::PlotLines("##MemoryUsage",
+            values, IM_ARRAYSIZE(values),
+            values_offset, overlay,
+            0.0f, 100.0f,
+            ImVec2(ImGui::GetColumnWidth() - 20, 80.0f)
+        );
 
         ImGui::TreePop();
     }
@@ -96,7 +101,7 @@ void PerformanceWindow::DrawWindow()
     if (ImGui::TreeNodeEx("CPU", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::SeparatorText("Information");
-        
+
         ImGui::Text("CPU Name:");
         ImGui::SameLine();
         ImGui::TextColored(dataTextColor, "%s", cpuName.c_str());
@@ -136,7 +141,12 @@ void PerformanceWindow::DrawWindow()
         char totalOverlay[32];
         sprintf_s(totalOverlay, "Memory Usage %.2f%% (%d MB)", memoryUsePercentage, memoryusage);
 
-        ImGui::PlotLines("##MemoryUsage", totalMemoryValues, IM_ARRAYSIZE(totalMemoryValues), totalValuesOffset, totalOverlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
+        ImGui::PlotLines("##MemoryUsage",
+            totalMemoryValues, IM_ARRAYSIZE(totalMemoryValues),
+            totalValuesOffset, totalOverlay,
+            0.0f, 100.0f,
+            ImVec2(ImGui::GetColumnWidth() - 20, 80.0f)
+        );
 
         PROCESS_MEMORY_COUNTERS_EX pmc;
         if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) 
@@ -161,29 +171,36 @@ void PerformanceWindow::DrawWindow()
     if (ImGui::TreeNodeEx("Framerates", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::SeparatorText("Information");
-        if (frameCount > 1)
+        if (totalFrameCount > 1)
         {
             dt = app->GetDT();
-            if (dt > 0)
-                currentFps = 1.0f / dt;
-            else
-                currentFps = 0;
 
-            if (currentFps < minFps) {
+            currentFps = 1.0f / dt;
+
+            if (currentFps < minFps)
                 minFps = currentFps;
-            }
-            if (currentFps > maxFps) {
+            if (currentFps > maxFps && currentFps <= std::stoi(fpsOptions[IM_ARRAYSIZE(fpsOptions) - 1]))
                 maxFps = currentFps;
+
+            fpsHistory[fpsHistoryOffset] = currentFps;
+            fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
+
+            totalFps = 0;
+            frameCount = 0;
+
+            for (int i = 0; i < FPS_HISTORY_SIZE; i++)
+            {
+                if (fpsHistory[i] != 0)
+                {
+                    totalFps += fpsHistory[i];
+                    frameCount++;
+                }
             }
         }
-    
-        fpsHistory[fpsHistoryOffset] = currentFps;
-        fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
-
-        totalFps += currentFps;
-        frameCount++;
 
         float averageFps = totalFps / frameCount;
+
+        totalFrameCount++;
 
         ImGui::Text("Current FPS:");
         ImGui::SameLine();
@@ -209,18 +226,17 @@ void PerformanceWindow::DrawWindow()
             FPS_HISTORY_SIZE,
             fpsHistoryOffset,
             fpsOverlay,
-            minFps,
-            averageFps * 1.2f,
-            ImVec2(0, 80.0f)
+            minFps - 20,
+            maxFps + 20,
+            ImVec2(ImGui::GetColumnWidth() - 20, 80.0f)
         );
 
-		ImGui::Checkbox("FPS Overlay", &showFpsOverlay);
-		if (ImGui::Checkbox("VSync", &app->vsync))
+        ImGui::Checkbox("FPS Overlay", &showFpsOverlay);
+        if (ImGui::Checkbox("VSync", &app->vsync))
             SDL_GL_SetSwapInterval(app->vsync ? 1 : 0);
 
         ImGui::BeginDisabled(app->vsync);
 
-        const char* fpsOptions[] = { "30", "60", "90", "120", "144", "240" };
         static int selectedFpsIndex = 1;
 
         ImGui::SetNextItemWidth(100);
@@ -235,5 +251,5 @@ void PerformanceWindow::DrawWindow()
         ImGui::TreePop();
     }
 
-	ImGui::End();
+    ImGui::End();
 }

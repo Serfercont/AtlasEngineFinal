@@ -40,7 +40,7 @@ bool App::Awake()
 		ret = module->Awake();
 	}
 
-	ms_timer.Start();
+	timer.Start();
 
 	return ret;
 }
@@ -62,8 +62,8 @@ bool App::Start()
 
 void App::PrepareUpdate()
 {
-	dt = (float)ms_timer.Read() / 1000.0f;
-	ms_timer.Start();
+	dt = (float)timer.ReadMs() / 1000.0f;
+	timer.Start();
 }
 
 bool App::Update()
@@ -125,7 +125,7 @@ void App::FinishUpdate()
 	{
 		const float frameDelay = 1000.0f / maxFps;
 
-		float frameTime = ms_timer.Read();
+		float frameTime = timer.ReadMs();
 
 		if (frameTime < frameDelay)
 			SDL_Delay((Uint32)(frameDelay - frameTime));
