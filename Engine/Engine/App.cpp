@@ -121,7 +121,15 @@ bool App::Update()
 
 void App::FinishUpdate()
 {
+	if (!vsync)
+	{
+		const float frameDelay = 1000.0f / maxFps;
 
+		float frameTime = ms_timer.Read();
+
+		if (frameTime < frameDelay)
+			SDL_Delay((Uint32)(frameDelay - frameTime));
+	}
 }
 
 bool App::CleanUp()

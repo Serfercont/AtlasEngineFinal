@@ -164,7 +164,17 @@ void PerformanceWindow::DrawWindow()
         if (frameCount > 1)
         {
             dt = app->GetDT();
-            currentFps = 1.0f / dt;
+            if (dt > 0)
+                currentFps = 1.0f / dt;
+            else
+                currentFps = 0;
+
+            if (currentFps < minFps) {
+                minFps = currentFps;
+            }
+            if (currentFps > maxFps) {
+                maxFps = currentFps;
+            }
         }
     
         fpsHistory[fpsHistoryOffset] = currentFps;
@@ -172,14 +182,6 @@ void PerformanceWindow::DrawWindow()
 
         totalFps += currentFps;
         frameCount++;
-
-
-        if (currentFps < minFps) {
-            minFps = currentFps;
-        }
-        if (currentFps > maxFps) {
-            maxFps = currentFps;
-        }
 
         float averageFps = totalFps / frameCount;
 
@@ -208,11 +210,27 @@ void PerformanceWindow::DrawWindow()
             fpsHistoryOffset,
             fpsOverlay,
             minFps,
-            maxFps * 1.2f,
+            averageFps * 1.2f,
             ImVec2(0, 80.0f)
         );
 
 		ImGui::Checkbox("FPS Overlay", &showFpsOverlay);
+		if (ImGui::Checkbox("VSync", &app->vsync))
+            SDL_GL_SetSwapInterval(app->vsync ? 1 : 0);
+
+        ImGui::BeginDisabled(app->vsync);
+
+        const char* fpsOptions[] = { "30", "60", "90", "120", "144", "240" };
+        static int selectedFpsIndex = 1;
+
+        ImGui::SetNextItemWidth(100);
+
+        if (ImGui::Combo("Cap FPS", &selectedFpsIndex, fpsOptions, IM_ARRAYSIZE(fpsOptions)))
+        {
+            app->maxFps = std::stoi(fpsOptions[selectedFpsIndex]);
+        }
+
+        ImGui::EndDisabled();
 
         ImGui::TreePop();
     }

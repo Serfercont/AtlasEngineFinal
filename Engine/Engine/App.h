@@ -42,6 +42,8 @@ public:
 	ModuleEditor* editor = nullptr;
 
 	bool exit = false;
+	int maxFps = 60;
+	bool vsync = true;
 
 private:
 	Timer	ms_timer;
