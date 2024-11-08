@@ -125,7 +125,7 @@ void App::FinishUpdate()
 	{
 		const float frameDelay = 1000.0f / maxFps;
 
-		float frameTime = timer.ReadMs();
+		float frameTime = (float)timer.ReadMs();
 
 		if (frameTime < frameDelay)
 			SDL_Delay((Uint32)(frameDelay - frameTime));

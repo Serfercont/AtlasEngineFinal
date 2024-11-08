@@ -31,7 +31,7 @@ public:
 	std::vector<Mesh*> mesh;
 	MeshLoader meshLoader;
 
-	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
+	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4] = { 0 };
 	unsigned int checkerTextureId;
 
 	Grid grid;

@@ -1,10 +1,8 @@
 #include "ModuleWindow.h"
 #include "App.h"
 
-ModuleWindow::ModuleWindow(App* app) : Module(app)
+ModuleWindow::ModuleWindow(App* app) : Module(app), window(NULL), screenSurface(NULL), width(SCREEN_WIDTH), height(SCREEN_HEIGHT), context(NULL)
 {
-	window = NULL;
-	screenSurface = NULL;
 }
 
 ModuleWindow::~ModuleWindow()

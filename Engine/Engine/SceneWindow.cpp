@@ -53,7 +53,7 @@ void SceneWindow::DrawWindow()
 
 	UpdateMouseState();
 
-    ImVec2 textureSize = ImVec2(app->window->width, app->window->height);
+    ImVec2 textureSize = ImVec2((float)app->window->width, (float)app->window->height);
     ImVec2 windowSize = ImGui::GetWindowSize();
 
     ImVec2 uv0 = ImVec2((textureSize.x - windowSize.x) / (2 * textureSize.x),

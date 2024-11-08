@@ -12,7 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app)
+ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app), rbo(0), fboTexture(0), fbo(0), checkerTextureId(0)
 {
 }
 

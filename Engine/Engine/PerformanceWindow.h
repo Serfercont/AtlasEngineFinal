@@ -32,8 +32,8 @@ private:
 	float totalFps = 0.0f;
 	int frameCount = 0;
 	int totalFrameCount = 0;
-	float dt;
-	float currentFps;
+	float dt = 0;
+	float currentFps = 0;
 
 	static const int FPS_HISTORY_SIZE = 100;
 	float fpsHistory[FPS_HISTORY_SIZE] = {};

@@ -129,7 +129,7 @@ void PerformanceWindow::DrawWindow()
         ImGui::SameLine();
         ImGui::TextColored(dataTextColor, "%d MB", statex.ullAvailPhys / (1024 * 1024));
 
-        int memoryusage = (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024);
+        int memoryusage = (int)((statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024));
         float memoryUsePercentage = ((float)(statex.ullTotalPhys - statex.ullAvailPhys) / statex.ullTotalPhys) * 100.0f;
 
         static float totalMemoryValues[100] = { 0 };
