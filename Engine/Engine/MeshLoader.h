@@ -22,8 +22,14 @@ public:
 
 	void ImportFBX(const char* path, GameObject* gameObject);
 	void LoadNode(aiNode* node, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName);
-	Mesh* LoadMesh(aiMesh* newMesh, const aiScene* scene);
-	void SaveMeshToCustomFile(const Mesh& mesh, const std::string& filePath);
+	void SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, const std::string& filePath);
 	Mesh* LoadMeshFromCustomFile(const std::string& filePath);
+	void SaveModelToCustomFile(const aiScene* scene, const std::string& fileName);
+	void LoadModelFromCustomFile(const std::string& filePath, GameObject* root);
+
+private:
+	void SaveNodeToBuffer(const aiNode* node, std::vector<char>& buffer, size_t& currentPos);
+	void LoadNodeFromBuffer(const char* buffer, size_t& currentPos, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName);
+	size_t CalculateNodeSize(const aiNode* node);
 };
 

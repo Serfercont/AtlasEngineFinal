@@ -28,7 +28,6 @@ public:
 	Texture* LoadTextureImage(const char* file);
 
 public:
-	std::vector<Mesh*> mesh;
 	MeshLoader meshLoader;
 
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];

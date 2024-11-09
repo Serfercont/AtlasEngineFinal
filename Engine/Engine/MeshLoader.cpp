@@ -25,331 +25,475 @@ void MeshLoader::DisableDebugger()
 
 void MeshLoader::ImportFBX(const char* path, GameObject* root)
 {
-	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+    const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+    if (scene == nullptr)
+    {
+        LOG(LogType::LOG_ERROR, "Error loading scene %s", path);
+        return;
+    }
 
-	if (scene == nullptr) 
-	{
-		LOG(LogType::LOG_ERROR, "Error loading scene %s", path);
-		return;
-	}
+    std::string fileName = path;
+    fileName = fileName.substr(fileName.find_last_of("/\\") + 1);
+    fileName = fileName.substr(0, fileName.find_last_of("."));
 
-	std::string fileName = path;
-	fileName = fileName.substr(fileName.find_last_of("/\\") + 1);
-	fileName = fileName.substr(0, fileName.find_last_of("."));
+    std::string modelFilePath = "Library/Models/" + fileName + ".model";
+    std::ifstream modelFile(modelFilePath, std::ios::binary);
 
-	std::vector<Mesh*> meshes;
+    if (modelFile.good())
+    {
+        modelFile.close();
+        LoadModelFromCustomFile(modelFilePath, root);
+        LOG(LogType::LOG_INFO, "Loaded model from custom file: %s", modelFilePath.c_str());
+    }
+    else
+    {
+        SaveModelToCustomFile(scene, fileName);
+        LoadModelFromCustomFile(modelFilePath, root);
+        LOG(LogType::LOG_INFO, "Created and loaded new custom model file: %s", modelFilePath.c_str());
+    }
 
-	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
-	{
-		std::string customFilePath = "Library/Meshes/" + fileName + std::to_string(i) + ".mesh";
-
-		std::ifstream customFile(customFilePath, std::ios::binary);
-		Mesh* mesh = nullptr;
-
-		if (customFile.good()) 
-		{
-			mesh = LoadMeshFromCustomFile(customFilePath);
-		}
-		else 
-		{
-			mesh = LoadMesh(scene->mMeshes[i], scene);
-			SaveMeshToCustomFile(*mesh, customFilePath);
-		}
-
-		meshes.push_back(mesh);
-	}
-
-	LoadNode(scene->mRootNode, meshes, root, fileName.c_str());
-
-	for (unsigned int i = 0; i < meshes.size(); i++)
-	{
-		app->renderer3D->mesh.push_back(meshes[i]);
-	}
-
-	aiReleaseImport(scene);
+    aiReleaseImport(scene);
 }
 
 void MeshLoader::LoadNode(aiNode* node, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
 {
-	for (unsigned int i = 0; i < node->mNumMeshes; i++)
-	{
-		Mesh* meshPtr = meshes[node->mMeshes[i]];
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        Mesh* meshPtr = meshes[node->mMeshes[i]];
 
-		GameObject* gameObjectNode = new GameObject(node->mName.C_Str(), parent);
-		ComponentMesh* componentMesh = dynamic_cast<ComponentMesh*>(gameObjectNode->AddComponent(gameObjectNode->mesh));
+        GameObject* gameObjectNode = new GameObject(node->mName.C_Str(), parent);
+        ComponentMesh* componentMesh = dynamic_cast<ComponentMesh*>(gameObjectNode->AddComponent(gameObjectNode->mesh));
 
-		componentMesh->mesh = meshPtr;
+        componentMesh->mesh = meshPtr;
 
-		if (!meshPtr->diffuseTexturePath.empty())
-		{
-			Texture* newTexture = app->renderer3D->LoadTextureImage(meshPtr->diffuseTexturePath.c_str());
-			if (newTexture != nullptr)
-				gameObjectNode->material->AddTexture(newTexture);
-		}
+        if (!meshPtr->diffuseTexturePath.empty())
+        {
+            Texture* newTexture = app->renderer3D->LoadTextureImage(meshPtr->diffuseTexturePath.c_str());
+            if (newTexture != nullptr)
+                gameObjectNode->material->AddTexture(newTexture);
+        }
 
-		parent->children.push_back(gameObjectNode);
-	}
+        parent->children.push_back(gameObjectNode);
+    }
 
-	if (node->mNumChildren > 0)
-	{
-		GameObject* holder = new GameObject(fileName, parent);
-		parent->children.push_back(holder);
+    if (node->mNumChildren > 0)
+    {
+        GameObject* holder = new GameObject(fileName, parent);
+        parent->children.push_back(holder);
 
-		for (unsigned int i = 0; i < node->mNumChildren; i++)
-		{
-			LoadNode(node->mChildren[i], meshes, holder, node->mName.C_Str());
-		}
-	}
+        for (unsigned int i = 0; i < node->mNumChildren; i++)
+        {
+            LoadNode(node->mChildren[i], meshes, holder, node->mName.C_Str());
+        }
+    }
 }
 
-Mesh* MeshLoader::LoadMesh(aiMesh* newMesh, const aiScene* scene)
+void MeshLoader::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, const std::string& filePath)
 {
-	Mesh* mesh = new Mesh();
+    // Validate mesh data
+    if (!newMesh || !newMesh->HasPositions() || !newMesh->HasNormals() ||
+        !newMesh->HasTextureCoords(0) || !newMesh->HasFaces())
+    {
+        LOG(LogType::LOG_ERROR, "Invalid aiMesh data");
+        return;
+    }
 
-	// Vertices
-	mesh->verticesCount = newMesh->mNumVertices;
-	mesh->vertices = new float[mesh->verticesCount * 3];
-	memcpy(mesh->vertices, newMesh->mVertices, sizeof(float) * mesh->verticesCount * 3);
-	LOG(LogType::LOG_INFO, "New mesh with %d vertices", mesh->verticesCount);
+    // Get counts
+    const uint32_t ranges[4] =
+    {
+        newMesh->mNumFaces * 3,
+        newMesh->mNumVertices,
+        newMesh->mNumVertices,
+        newMesh->mNumVertices
+    };
 
-	// Normals
-	if (newMesh->HasNormals())
-	{
-		mesh->normalsCount = mesh->verticesCount;
+    // Process texture coordinates
+    std::unique_ptr<float[]> texCoords(new float[newMesh->mNumVertices * 2]);
+    for (unsigned int i = 0; i < newMesh->mNumVertices; i++)
+    {
+        texCoords[i * 2] = newMesh->mTextureCoords[0][i].x;
+        texCoords[i * 2 + 1] = newMesh->mTextureCoords[0][i].y;
+    }
 
-		mesh->normals = new float[mesh->normalsCount * 3];
-		memcpy(mesh->normals, newMesh->mNormals, sizeof(float) * mesh->normalsCount * 3);
-		LOG(LogType::LOG_INFO, "New mesh with %d normals", mesh->normalsCount);
-	}
+    // Process indices
+    std::unique_ptr<uint32_t[]> indices(new uint32_t[newMesh->mNumFaces * 3]);
+    for (uint32_t i = 0; i < newMesh->mNumFaces; ++i)
+    {
+        if (newMesh->mFaces[i].mNumIndices != 3)
+        {
+            LOG(LogType::LOG_WARNING, "Geometry face with != 3 indices!");
+            continue;
+        }
+        memcpy(&indices[i * 3], newMesh->mFaces[i].mIndices, 3 * sizeof(uint32_t));
+    }
 
-	// Faces
-	if (newMesh->HasFaces())
-	{
-		mesh->indicesCount = newMesh->mNumFaces * 3;
-		mesh->indices = new uint[mesh->indicesCount];
-		for (uint i = 0; i < newMesh->mNumFaces; ++i)
-		{
-			if (newMesh->mFaces[i].mNumIndices != 3)
-			{
-				LOG(LogType::LOG_WARNING, "Geometry face with != 3 indices!");
-			}
-			else
-			{
-				memcpy(&mesh->indices[i * 3], newMesh->mFaces[i].mIndices, 3 * sizeof(uint));
-			}
-		}
-	}
+    // Material properties
+    glm::vec4 diffuseColor(1.0f);
+    glm::vec4 specularColor(1.0f);
+    glm::vec4 ambientColor(1.0f);
+    std::string diffuseTexturePath;
 
-	// Texture Coords
-	if (newMesh->HasTextureCoords(0))
-	{
-		mesh->texCoordsCount = newMesh->mNumVertices;
-		mesh->texCoords = new float[newMesh->mNumVertices * 2];
+    // Process material
+    if (newMesh->mMaterialIndex >= 0)
+    {
+        aiMaterial* material = scene->mMaterials[newMesh->mMaterialIndex];
+        aiColor4D color;
 
-		for (unsigned int i = 0; i < mesh->texCoordsCount; i++)
-		{
-			mesh->texCoords[i * 2] = newMesh->mTextureCoords[0][i].x;
-			mesh->texCoords[i * 2 + 1] = newMesh->mTextureCoords[0][i].y;
-		}
+        if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
+        {
+            diffuseColor = glm::vec4(color.r, color.g, color.b, color.a);
+            LOG(LogType::LOG_INFO, "Loaded diffuse color");
+        }
 
-		LOG(LogType::LOG_INFO, "New mesh with %d texture coords", mesh->texCoordsCount);
-	}
+        if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
+        {
+            specularColor = glm::vec4(color.r, color.g, color.b, color.a);
+            LOG(LogType::LOG_INFO, "Loaded specular color");
+        }
 
-	// Load Material
-	if (newMesh->mMaterialIndex >= 0)
-	{
-		aiMaterial* material = scene->mMaterials[newMesh->mMaterialIndex];
-		aiColor4D color;
+        if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
+        {
+            ambientColor = glm::vec4(color.r, color.g, color.b, color.a);
+            LOG(LogType::LOG_INFO, "Loaded ambient color");
+        }
 
-		// Diffuse color
-		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
-		{
-			mesh->diffuseColor = glm::vec4(color.r, color.g, color.b, color.a);
-			LOG(LogType::LOG_INFO, "Loaded diffuse color");
-		}
+        aiString texturePath;
+        if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+        {
+            std::string basePath = "Assets/Textures/";
+            diffuseTexturePath = basePath + texturePath.C_Str();
+            LOG(LogType::LOG_INFO, "Loaded diffuse texture: %s", texturePath.C_Str());
+        }
+    }
 
-		// Specular color
-		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
-		{
-			mesh->specularColor = glm::vec4(color.r, color.g, color.b, color.a);
-			LOG(LogType::LOG_INFO, "Loaded specular color");
-		}
+    // Calculate total size needed
+    const size_t size = sizeof(ranges)
+        + (sizeof(uint32_t) * ranges[0])
+        + (sizeof(float) * ranges[1] * 3)
+        + (sizeof(float) * ranges[2] * 3)
+        + (sizeof(float) * ranges[3] * 2)
+        + (sizeof(glm::vec4) * 3)
+        + sizeof(uint32_t)
+        + diffuseTexturePath.size() + 1;
 
-		// Ambient color
-		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
-		{
-			mesh->ambientColor = glm::vec4(color.r, color.g, color.b, color.a);
-			LOG(LogType::LOG_INFO, "Loaded ambient color");
-		}
+    // Allocate buffer and write data
+    std::unique_ptr<char[]> fileBuffer(new char[size]);
+    char* cursor = fileBuffer.get();
 
-		// Diffuse texture
-		aiString texturePath;
-		if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
-		{
-			std::string basePath = "Assets/Textures/";
-			mesh->diffuseTexturePath = basePath + texturePath.C_Str();
-			LOG(LogType::LOG_INFO, "Loaded diffuse texture: %s", texturePath.C_Str());
-		}
-	}
 
-	mesh->InitMesh();
+    auto writeData = [&](const void* data, size_t bytes)
+        {
+            memcpy(cursor, data, bytes);
+            cursor += bytes;
+        };
 
-	return mesh;
-}
+    // Write all data
+    writeData(ranges, sizeof(ranges));
+    writeData(indices.get(), sizeof(uint32_t) * ranges[0]);
+    writeData(newMesh->mVertices, sizeof(float) * ranges[1] * 3);
+    writeData(newMesh->mNormals, sizeof(float) * ranges[2] * 3);
+    writeData(texCoords.get(), sizeof(float) * ranges[3] * 2);
+    writeData(&diffuseColor, sizeof(glm::vec4));
+    writeData(&specularColor, sizeof(glm::vec4));
+    writeData(&ambientColor, sizeof(glm::vec4));
 
-void MeshLoader::SaveMeshToCustomFile(const Mesh& mesh, const std::string& filePath)
-{
-	if (!mesh.indices || !mesh.vertices || !mesh.normals || !mesh.texCoords ||
-		mesh.indicesCount == 0 || mesh.verticesCount == 0 ||
-		mesh.normalsCount == 0 || mesh.texCoordsCount == 0) 
-	{
-		LOG(LogType::LOG_ERROR, "Invalid mesh data");
-		return;
-	}
+    const uint32_t texturePathLength = static_cast<uint32_t>(diffuseTexturePath.size());
+    writeData(&texturePathLength, sizeof(uint32_t));
+    writeData(diffuseTexturePath.c_str(), texturePathLength + 1);
 
-	const uint32_t ranges[4] = 
-	{
-		mesh.indicesCount,
-		mesh.verticesCount,
-		mesh.normalsCount,
-		mesh.texCoordsCount
-	};
-
-	// Calculate total size needed
-	const size_t size = sizeof(ranges)
-		+ (sizeof(uint32_t) * mesh.indicesCount)
-		+ (sizeof(float) * mesh.verticesCount * 3)
-		+ (sizeof(float) * mesh.normalsCount * 3)
-		+ (sizeof(float) * mesh.texCoordsCount * 2)
-		+ (sizeof(glm::vec4) * 3)
-		+ sizeof(uint32_t)
-		+ mesh.diffuseTexturePath.size() + 1;
-
-	// Allocate buffer
-	std::unique_ptr<char[]> fileBuffer(new char[size]);
-	char* cursor = fileBuffer.get();
-
-	size_t remainingSize = size;
-	size_t bytes;
-
-	// Ranges
-	bytes = sizeof(ranges);
-	memcpy(cursor, ranges, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	// Indices
-	bytes = sizeof(uint32_t) * mesh.indicesCount;
-	memcpy(cursor, mesh.indices, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	// Vertices
-	bytes = sizeof(float) * mesh.verticesCount * 3;
-	memcpy(cursor, mesh.vertices, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	// Normals
-	bytes = sizeof(float) * mesh.normalsCount * 3;
-	memcpy(cursor, mesh.normals, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	// Texture coords
-	bytes = sizeof(float) * mesh.texCoordsCount * 2;
-	memcpy(cursor, mesh.texCoords, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	// Materials
-	bytes = sizeof(glm::vec4);
-	memcpy(cursor, &mesh.diffuseColor, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	memcpy(cursor, &mesh.specularColor, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	memcpy(cursor, &mesh.ambientColor, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	// Texture path length
-	const uint32_t texturePathLength = static_cast<uint32_t>(mesh.diffuseTexturePath.size());
-	bytes = sizeof(uint32_t);
-	memcpy(cursor, &texturePathLength, bytes);
-	cursor += bytes;
-	remainingSize -= bytes;
-
-	// Texture path
-	bytes = texturePathLength + 1;
-	memcpy(cursor, mesh.diffuseTexturePath.c_str(), bytes);
-	cursor += bytes;
-
-	// Write to file
-	std::ofstream file(filePath, std::ios::binary);
-	if (file.is_open()) 
-	{
-		file.write(fileBuffer.get(), size);
-		file.close();
-		LOG(LogType::LOG_INFO, "Mesh saved to custom file: %s", filePath.c_str());
-	}
-	else 
-	{
-		LOG(LogType::LOG_ERROR, "Failed to save mesh to custom file: %s", filePath.c_str());
-	}
+    // Write to file
+    std::ofstream file(filePath, std::ios::binary);
+    if (file.is_open())
+    {
+        file.write(fileBuffer.get(), size);
+        file.close();
+        LOG(LogType::LOG_INFO, "Mesh saved directly to custom file: %s", filePath.c_str());
+    }
+    else
+    {
+        LOG(LogType::LOG_ERROR, "Failed to save mesh to custom file: %s", filePath.c_str());
+    }
 }
 
 Mesh* MeshLoader::LoadMeshFromCustomFile(const std::string& filePath)
 {
-	std::ifstream file(filePath, std::ios::binary);
-	if (!file.is_open()) 
-	{
-		LOG(LogType::LOG_ERROR, "Failed to open file for loading data.");
-		return nullptr;
-	}
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file.is_open())
+    {
+        LOG(LogType::LOG_ERROR, "Failed to open file for loading data.");
+        return nullptr;
+    }
 
-	uint32_t ranges[4];
-	file.read(reinterpret_cast<char*>(ranges), sizeof(ranges));
+    uint32_t ranges[4];
+    file.read(reinterpret_cast<char*>(ranges), sizeof(ranges));
 
-	Mesh* mesh = new Mesh();
-	mesh->indicesCount = ranges[0];
-	mesh->verticesCount = ranges[1];
-	mesh->normalsCount = ranges[2];
-	mesh->texCoordsCount = ranges[3];
+    Mesh* mesh = new Mesh();
+    mesh->indicesCount = ranges[0];
+    mesh->verticesCount = ranges[1];
+    mesh->normalsCount = ranges[2];
+    mesh->texCoordsCount = ranges[3];
 
-	// Indices
-	mesh->indices = new uint32_t[mesh->indicesCount];
-	file.read(reinterpret_cast<char*>(mesh->indices), sizeof(uint32_t) * mesh->indicesCount);
+    // Indices
+    mesh->indices = new uint32_t[mesh->indicesCount];
+    file.read(reinterpret_cast<char*>(mesh->indices), sizeof(uint32_t) * mesh->indicesCount);
 
-	// Vertices
-	mesh->vertices = new float[mesh->verticesCount * 3];
-	file.read(reinterpret_cast<char*>(mesh->vertices), sizeof(float) * mesh->verticesCount * 3);
+    // Vertices
+    mesh->vertices = new float[mesh->verticesCount * 3];
+    file.read(reinterpret_cast<char*>(mesh->vertices), sizeof(float) * mesh->verticesCount * 3);
 
-	// Normals
-	mesh->normals = new float[mesh->normalsCount * 3];
-	file.read(reinterpret_cast<char*>(mesh->normals), sizeof(float) * mesh->normalsCount * 3);
+    // Normals
+    mesh->normals = new float[mesh->normalsCount * 3];
+    file.read(reinterpret_cast<char*>(mesh->normals), sizeof(float) * mesh->normalsCount * 3);
 
-	// Texture coords
-	mesh->texCoords = new float[mesh->texCoordsCount * 2];
-	file.read(reinterpret_cast<char*>(mesh->texCoords), sizeof(float) * mesh->texCoordsCount * 2);
+    // Texture coords
+    mesh->texCoords = new float[mesh->texCoordsCount * 2];
+    file.read(reinterpret_cast<char*>(mesh->texCoords), sizeof(float) * mesh->texCoordsCount * 2);
 
-	// Materials
-	file.read(reinterpret_cast<char*>(&mesh->diffuseColor), sizeof(glm::vec4));
-	file.read(reinterpret_cast<char*>(&mesh->specularColor), sizeof(glm::vec4));
-	file.read(reinterpret_cast<char*>(&mesh->ambientColor), sizeof(glm::vec4));
+    // Materials
+    file.read(reinterpret_cast<char*>(&mesh->diffuseColor), sizeof(glm::vec4));
+    file.read(reinterpret_cast<char*>(&mesh->specularColor), sizeof(glm::vec4));
+    file.read(reinterpret_cast<char*>(&mesh->ambientColor), sizeof(glm::vec4));
 
-	// Texture
-	uint32_t texturePathLength;
-	file.read(reinterpret_cast<char*>(&texturePathLength), sizeof(uint32_t));
-	mesh->diffuseTexturePath.resize(texturePathLength);
-	file.read(&mesh->diffuseTexturePath[0], texturePathLength);
+    // Texture
+    uint32_t texturePathLength;
+    file.read(reinterpret_cast<char*>(&texturePathLength), sizeof(uint32_t));
+    mesh->diffuseTexturePath.resize(texturePathLength);
+    file.read(&mesh->diffuseTexturePath[0], texturePathLength);
 
-	file.close();
+    file.close();
 
-	mesh->InitMesh();
+    mesh->InitMesh();
 
-	return mesh;
+    return mesh;
+}
+
+void MeshLoader::SaveModelToCustomFile(const aiScene* scene, const std::string& fileName)
+{
+    // Save meshes to custom files
+    std::vector<std::string> meshPaths;
+    for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+    {
+        std::string meshPath = "Library/Meshes/" + fileName + std::to_string(i) + ".mesh";
+        SaveMeshToCustomFile(scene->mMeshes[i], scene, meshPath);
+        meshPaths.push_back(meshPath);
+    }
+
+    std::vector<char> buffer;
+    size_t currentPos = 0;
+
+    // Save number of meshes
+    uint32_t numMeshes = scene->mNumMeshes;
+    buffer.resize(buffer.size() + sizeof(uint32_t));
+    memcpy(buffer.data() + currentPos, &numMeshes, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+
+    // Save mesh paths
+    for (const auto& path : meshPaths)
+    {
+        uint32_t pathLength = static_cast<uint32_t>(path.size());
+
+        // Save path length
+        buffer.resize(buffer.size() + sizeof(uint32_t));
+        memcpy(buffer.data() + currentPos, &pathLength, sizeof(uint32_t));
+        currentPos += sizeof(uint32_t);
+
+        // Save path
+        buffer.resize(buffer.size() + pathLength + 1);
+        memcpy(buffer.data() + currentPos, path.c_str(), pathLength + 1);
+        currentPos += pathLength + 1;
+    }
+
+    // Calculate and reserve space for the node hierarchy
+    size_t nodeSize = CalculateNodeSize(scene->mRootNode);
+    buffer.resize(buffer.size() + nodeSize);
+
+    // Save root node
+    SaveNodeToBuffer(scene->mRootNode, buffer, currentPos);
+
+    // Write to file
+    std::string modelPath = "Library/Models/" + fileName + ".model";
+    std::ofstream file(modelPath, std::ios::binary);
+    if (file.is_open())
+    {
+        file.write(buffer.data(), buffer.size());
+        file.close();
+        LOG(LogType::LOG_INFO, "Model saved to custom file: %s", modelPath.c_str());
+    }
+    else
+    {
+        LOG(LogType::LOG_ERROR, "Failed to save model to custom file: %s", modelPath.c_str());
+    }
+}
+
+void MeshLoader::SaveNodeToBuffer(const aiNode* node, std::vector<char>& buffer, size_t& currentPos)
+{
+    // Save node name
+    uint32_t nameLength = static_cast<uint32_t>(strlen(node->mName.C_Str()));
+    memcpy(buffer.data() + currentPos, &nameLength, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+    memcpy(buffer.data() + currentPos, node->mName.C_Str(), nameLength + 1);
+    currentPos += nameLength + 1;
+
+    // Save number of meshes
+    uint32_t numMeshes = node->mNumMeshes;
+    memcpy(buffer.data() + currentPos, &numMeshes, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+
+    // Save meshes indices
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        uint32_t meshIndex = node->mMeshes[i];
+        memcpy(buffer.data() + currentPos, &meshIndex, sizeof(uint32_t));
+        currentPos += sizeof(uint32_t);
+    }
+
+    // Save number of children
+    uint32_t numChildren = node->mNumChildren;
+    memcpy(buffer.data() + currentPos, &numChildren, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+
+    // Save children nodes
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        SaveNodeToBuffer(node->mChildren[i], buffer, currentPos);
+    }
+}
+
+void MeshLoader::LoadModelFromCustomFile(const std::string& filePath, GameObject* root)
+{
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file.is_open())
+    {
+        LOG(LogType::LOG_ERROR, "Failed to open model file: %s", filePath.c_str());
+        return;
+    }
+
+    // Read file into buffer
+    file.seekg(0, std::ios::end);
+    size_t fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<char> buffer(fileSize);
+    file.read(buffer.data(), fileSize);
+    file.close();
+
+    size_t currentPos = 0;
+
+    // Meshes number
+    uint32_t numMeshes;
+    memcpy(&numMeshes, buffer.data() + currentPos, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+
+    // Load meshes
+    std::vector<Mesh*> meshes;
+    for (uint32_t i = 0; i < numMeshes; i++)
+    {
+        // Mesh path
+        uint32_t pathLength;
+        memcpy(&pathLength, buffer.data() + currentPos, sizeof(uint32_t));
+        currentPos += sizeof(uint32_t);
+
+        std::string meshPath(buffer.data() + currentPos, pathLength);
+        currentPos += pathLength + 1;
+
+        // Load mesh from file
+        Mesh* mesh = LoadMeshFromCustomFile(meshPath);
+        if (mesh)
+        {
+            meshes.push_back(mesh);
+        }
+    }
+
+    // Get file name
+    std::string fileName = filePath;
+    fileName = fileName.substr(fileName.find_last_of("/\\") + 1);
+    fileName = fileName.substr(0, fileName.find_last_of("."));
+
+    // Load root node
+    LoadNodeFromBuffer(buffer.data(), currentPos, meshes, root, fileName.c_str());
+}
+
+void MeshLoader::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
+{
+    // Node name
+    uint32_t nameLength;
+    memcpy(&nameLength, buffer + currentPos, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+
+    std::string nodeName(buffer + currentPos, nameLength);
+    currentPos += nameLength + 1;
+
+    // Node meshes number
+    uint32_t numMeshes;
+    memcpy(&numMeshes, buffer + currentPos, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+
+    // Create GameObject if there are meshes
+    GameObject* gameObjectNode = nullptr;
+    if (numMeshes > 0)
+    {
+        gameObjectNode = new GameObject(nodeName.c_str(), parent);
+
+        // Process meshes
+        for (uint32_t i = 0; i < numMeshes; i++)
+        {
+            uint32_t meshIndex;
+            memcpy(&meshIndex, buffer + currentPos, sizeof(uint32_t));
+            currentPos += sizeof(uint32_t);
+
+            if (meshIndex < meshes.size())
+            {
+                ComponentMesh* componentMesh = dynamic_cast<ComponentMesh*>(gameObjectNode->AddComponent(gameObjectNode->mesh));
+                componentMesh->mesh = meshes[meshIndex];
+
+                if (!meshes[meshIndex]->diffuseTexturePath.empty())
+                {
+                    Texture* newTexture = app->renderer3D->LoadTextureImage(meshes[meshIndex]->diffuseTexturePath.c_str());
+                    if (newTexture != nullptr)
+                        gameObjectNode->material->AddTexture(newTexture);
+                }
+            }
+        }
+
+        parent->children.push_back(gameObjectNode);
+    }
+
+    uint32_t numChildren;
+    memcpy(&numChildren, buffer + currentPos, sizeof(uint32_t));
+    currentPos += sizeof(uint32_t);
+
+    // Processs children nodes
+    if (numChildren > 0)
+    {
+        GameObject* holder = gameObjectNode ? gameObjectNode : new GameObject(fileName, parent);
+        if (!gameObjectNode)
+            parent->children.push_back(holder);
+
+        for (uint32_t i = 0; i < numChildren; i++)
+        {
+            LoadNodeFromBuffer(buffer, currentPos, meshes, holder, nodeName.c_str());
+        }
+    }
+}
+
+size_t MeshLoader::CalculateNodeSize(const aiNode* node)
+{
+    size_t size = 0;
+
+    // Node name size
+    size += sizeof(uint32_t) + strlen(node->mName.C_Str()) + 1;
+
+    // Meshes size
+    size += sizeof(uint32_t);
+    size += sizeof(uint32_t) * node->mNumMeshes;
+
+    // Children size
+    size += sizeof(uint32_t);
+
+    // Children nodes size
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        size += CalculateNodeSize(node->mChildren[i]);
+    }
+
+    return size;
 }

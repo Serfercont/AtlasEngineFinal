@@ -159,11 +159,6 @@ bool ModuleRenderer3D::CleanUp()
 
 	meshLoader.DisableDebugger();
 
-	for (unsigned int i = 0; i < mesh.size(); i++)
-	{
-		mesh[i]->CleanUpMesh();
-	}
-
 	return true;
 }
 
