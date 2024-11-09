@@ -46,6 +46,9 @@ std::string ModuleFileSystem::OpenFileDialog(const char* filter)
 
 std::string ModuleFileSystem::CopyFileIfNotExists(const std::string& source)
 {
+    if (source.find("Engine/") != std::string::npos || source.find("Engine\\") != std::string::npos)
+        return source;
+
 	std::string extension = GetExtension(source);
     std::string assetsDir;
 

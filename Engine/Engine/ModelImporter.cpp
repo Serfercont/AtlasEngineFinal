@@ -39,13 +39,15 @@ bool ModelImporter::SaveModel(Resource* resource)
     return true;
 }
 
-bool ModelImporter::LoadModel(const char* path, GameObject* root)
+bool ModelImporter::LoadModel(Resource* resource, GameObject* root)
 {
     if (!root)
     {
         LOG(LogType::LOG_ERROR, "Invalid root GameObject provided");
         return false;
     }
+
+	const char* path = resource->GetLibraryFileDir().c_str();
 
     std::string modelFilePath = path;
     std::ifstream modelFile(modelFilePath, std::ios::binary);
@@ -135,8 +137,11 @@ void ModelImporter::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, 
         if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
         {
             std::string basePath = "Assets/Textures/";
-            diffuseTexturePath = basePath + texturePath.C_Str();
-            LOG(LogType::LOG_INFO, "Loaded diffuse texture: %s", texturePath.C_Str());
+            if (app->fileSystem->FileExists(basePath + texturePath.C_Str()))
+            {
+                diffuseTexturePath = basePath + texturePath.C_Str();
+                app->importer->ImportFile(diffuseTexturePath.c_str());
+            }   
         }
     }
 
@@ -421,7 +426,10 @@ void ModelImporter::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, s
 
                 if (!meshes[meshIndex]->diffuseTexturePath.empty())
                 {
-                    Texture* newTexture = app->renderer3D->LoadTextureImage(meshes[meshIndex]->diffuseTexturePath.c_str());
+                    std::string extension = app->fileSystem->GetExtension(meshes[meshIndex]->diffuseTexturePath);
+                    ResourceType resourceType = app->resources->GetResourceTypeFromExtension(extension);
+                    Resource* newResource = app->resources->FindResourceInLibrary(meshes[meshIndex]->diffuseTexturePath, resourceType);
+                    Texture* newTexture = app->importer->textureImporter->LoadTextureImage(newResource);
                     if (newTexture != nullptr)
                         gameObjectNode->material->AddTexture(newTexture);
                 }

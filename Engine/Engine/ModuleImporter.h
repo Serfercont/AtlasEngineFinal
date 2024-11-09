@@ -2,6 +2,9 @@
 
 #include "Module.h"
 #include "Resource.h"
+#include "Texture.h"
+#include "TextureImporter.h"
+#include "ModelImporter.h"
 
 #include <GL/glew.h>
 #include <string>
@@ -29,20 +32,18 @@ public:
 	bool Awake();
 	bool CleanUp();
 
-	GLuint LoadTexture(const std::string& filePath);
-
 	void TryImportFile();
-
 	void ImportFile(const std::string& fileDir, bool addToScene = false);
-
 	void SetDraggedFile(const std::string& filePath);
 
 	Resource* ImportFileToLibrary(const std::string& fileDir, ResourceType type);
-	void SaveTextureFile(Resource* resource);
 
 public:
 	Icons icons;
 	bool isDraggingFile = false;
+
+	TextureImporter* textureImporter;
+	ModelImporter* modelImporter;
 
 private:
 	std::string draggedFile;

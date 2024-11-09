@@ -215,22 +215,3 @@ void ModuleRenderer3D::CreateFramebuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-Texture* ModuleRenderer3D::LoadTextureImage(const char* file)
-{
-	ILuint image;
-	ilGenImages(1, &image);
-	ilBindImage(image);
-
-	if (!ilLoadImage(file))
-	{
-		LOG(LogType::LOG_WARNING, "Image not loaded");
-		return nullptr;
-	}
-
-	Texture* newTexture = new Texture(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
-
-	ilDeleteImages(1, &image);
-
-	return newTexture;
-}

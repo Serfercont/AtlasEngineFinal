@@ -2,9 +2,6 @@
 #include "App.h"
 #include "Logger.h"
 
-#include "IL/il.h"
-#include "IL/ilu.h"
-#include "IL/ilut.h"
 #include <Windows.h>
 
 #include <filesystem>
@@ -12,10 +9,8 @@
 
 ModuleImporter::ModuleImporter(App* app) : Module(app)
 {
-
-    ilInit();
-    iluInit();
-    ilutInit();
+	textureImporter = new TextureImporter();
+	modelImporter = new ModelImporter();
 }
 
 ModuleImporter::~ModuleImporter()
@@ -25,18 +20,18 @@ ModuleImporter::~ModuleImporter()
 bool ModuleImporter::Awake()
 {
     // Project
-	icons.folderIcon = LoadTexture("Engine/Icons/folder.png");
-	icons.openFolderIcon = LoadTexture("Engine/Icons/open_folder.png");
-	icons.fileIcon = LoadTexture("Engine/Icons/file.png");
-	icons.pngFileIcon = LoadTexture("Engine/Icons/file_png.png");
-	icons.ddsFileIcon = LoadTexture("Engine/Icons/file_dds.png");
-	icons.fbxFileIcon = LoadTexture("Engine/Icons/file_fbx.png");
-    icons.dotsIcon = LoadTexture("Engine/Icons/dots.png");
+	icons.folderIcon = textureImporter->LoadIconImage("Engine/Icons/folder.png");
+	icons.openFolderIcon = textureImporter->LoadIconImage("Engine/Icons/open_folder.png");
+	icons.fileIcon = textureImporter->LoadIconImage("Engine/Icons/file.png");
+	icons.pngFileIcon = textureImporter->LoadIconImage("Engine/Icons/file_png.png");
+	icons.ddsFileIcon = textureImporter->LoadIconImage("Engine/Icons/file_dds.png");
+	icons.fbxFileIcon = textureImporter->LoadIconImage("Engine/Icons/file_fbx.png");
+    icons.dotsIcon = textureImporter->LoadIconImage("Engine/Icons/dots.png");
 
     // Console
-	icons.infoIcon = LoadTexture("Engine/Icons/info.png");
-	icons.warningIcon = LoadTexture("Engine/Icons/warning.png");
-	icons.errorIcon = LoadTexture("Engine/Icons/error.png");
+	icons.infoIcon = textureImporter->LoadIconImage("Engine/Icons/info.png");
+	icons.warningIcon = textureImporter->LoadIconImage("Engine/Icons/warning.png");
+	icons.errorIcon = textureImporter->LoadIconImage("Engine/Icons/error.png");
 
 	return true;
 }
@@ -55,39 +50,6 @@ bool ModuleImporter::CleanUp()
 	glDeleteTextures(1, &icons.errorIcon);
 
 	return true;
-}
-
-GLuint ModuleImporter::LoadTexture(const std::string& filePath)
-{
-    ilClearColour(255, 255, 255, 255);
-
-    ILuint imageID;
-    ilGenImages(1, &imageID);
-    ilBindImage(imageID);
-
-    if (ilLoadImage(filePath.c_str()) == IL_FALSE)
-    {
-        ilDeleteImages(1, &imageID);
-        return 0;
-    }
-
-    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH),
-        ilGetInteger(IL_IMAGE_HEIGHT), 0, GL_RGBA, GL_UNSIGNED_BYTE, ilGetData());
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    ilDeleteImages(1, &imageID);
-
-    return textureID;
 }
 
 void ModuleImporter::TryImportFile()
@@ -131,10 +93,10 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
     switch (resourceType)
     {
 	case ResourceType::MODEL:
-        app->renderer3D->modelImporter.LoadModel(newResource->GetLibraryFileDir().c_str(), app->scene->root);
+        modelImporter->LoadModel(newResource, app->scene->root);
 		break;
 	case ResourceType::TEXTURE:
-        Texture* newTexture = app->renderer3D->LoadTextureImage(newResource->GetLibraryFileDir().c_str());
+        Texture* newTexture = textureImporter->LoadTextureImage(newResource);
         if (newTexture && app->editor->selectedGameObject)
         {
             app->editor->selectedGameObject->material->AddTexture(newTexture);
@@ -155,38 +117,12 @@ Resource* ModuleImporter::ImportFileToLibrary(const std::string& fileDir, Resour
     switch (type)
     {
 	case ResourceType::MODEL:
-		app->renderer3D->modelImporter.SaveModel(resource);
+		modelImporter->SaveModel(resource);
 		break;
 	case ResourceType::TEXTURE:
-		SaveTextureFile(resource);
+		textureImporter->SaveTextureFile(resource);
         break;
     }
 
 	return resource;
-}
-
-void ModuleImporter::SaveTextureFile(Resource* resource)
-{
-    ILuint imageID;
-    ilGenImages(1, &imageID);
-    ilBindImage(imageID);
-
-    ilLoadImage(resource->GetAssetFileDir().c_str());
-
-    ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);
-    ILuint size = ilSaveL(IL_DDS, nullptr, 0);
-
-    std::vector<ILubyte> data(size);
-    if (ilSaveL(IL_DDS, data.data(), size) > 0) 
-    {
-        std::string filePath = resource->GetLibraryFileDir();
-        std::ofstream file(filePath, std::ios::binary);
-        if (file.is_open()) 
-        {
-            file.write(reinterpret_cast<char*>(data.data()), size);
-            file.close();
-        }
-    }
-
-    ilDeleteImages(1, &imageID);
 }

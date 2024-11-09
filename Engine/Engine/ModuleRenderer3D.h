@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Module.h"
-#include "ModelImporter.h"
 #include "Grid.h"
 
 #include <SDL2/SDL_video.h>
@@ -25,11 +24,7 @@ public:
 	void OnResize(int width, int height);
 	void CreateFramebuffer();
 
-	Texture* LoadTextureImage(const char* file);
-
 public:
-	ModelImporter modelImporter;
-
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
 	unsigned int checkerTextureId;
 

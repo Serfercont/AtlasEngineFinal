@@ -19,7 +19,7 @@ public:
     ~ModelImporter();
 
     bool SaveModel(Resource* resource);
-    bool LoadModel(const char* path, GameObject* root);
+    bool LoadModel(Resource* resource, GameObject* root);
 
 private:
 	// Save functions
