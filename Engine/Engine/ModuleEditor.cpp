@@ -167,6 +167,7 @@ void ModuleEditor::MainMenuBar()
 	    if (ImGui::MenuItem("Create Empty"))
 	    {
 		    app->scene->CreateGameObject("GameObject", app->scene->root);
+            selectedGameObject = app->scene->root->children.back();
 	    }
         if (ImGui::BeginMenu("3D Object"))
         {

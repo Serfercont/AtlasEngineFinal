@@ -18,7 +18,45 @@ void HierarchyWindow::DrawWindow()
 
     UpdateMouseState();
 
-	ImGui::InputText("##Search", searchInput, 256);
+    if (ImGui::Button("+", ImVec2(20,20)))
+    {
+        ImGui::OpenPopup("GameObject");
+    }
+
+    if (ImGui::BeginPopup("GameObject"))
+    {
+        if (ImGui::MenuItem("Create Empty"))
+        {
+            app->scene->CreateGameObject("GameObject", app->scene->root);
+            app->editor->selectedGameObject = app->scene->root->children.back();
+        }
+        if (ImGui::BeginMenu("3D Object"))
+        {
+            const char* objectNames[] = { "Cube", "Sphere", "Capsule", "Cylinder" };
+            const char* basePath = "Engine/Primitives/";
+            const char* extension = ".fbx";
+
+            for (const char* name : objectNames)
+            {
+                std::string fullPath = std::string(basePath) + name + extension;
+
+                if (ImGui::MenuItem(name))
+                {
+                    app->renderer3D->meshLoader.ImportFBX(fullPath.c_str(), app->scene->root);
+                    app->editor->selectedGameObject = app->scene->root->children.back();
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine();
+
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+	ImGui::InputTextWithHint("##Search", "Search", searchInput, 256);
 
 	ImGui::BeginGroup();
 
@@ -82,7 +120,7 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
             app->editor->selectedGameObject = node;
         }
 
-        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0) && !ImGui::IsItemToggledOpen())
         {
             node->isEditing = true;
         }
