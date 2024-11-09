@@ -1,10 +1,10 @@
 #pragma once
 
+#include "ModelImporter.h"
 #include "Module.h"
 #include "Resource.h"
 #include "Texture.h"
 #include "TextureImporter.h"
-#include "ModelImporter.h"
 
 #include <GL/glew.h>
 #include <string>

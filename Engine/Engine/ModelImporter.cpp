@@ -35,7 +35,7 @@ bool ModelImporter::SaveModel(Resource* resource)
     SaveModelToCustomFile(scene, fileName);
     aiReleaseImport(scene);
 
-    LOG(LogType::LOG_INFO, "Model saved successfully to: %s", path);
+    LOG(LogType::LOG_INFO, "%s model Saved", fileName.c_str());
     return true;
 }
 
