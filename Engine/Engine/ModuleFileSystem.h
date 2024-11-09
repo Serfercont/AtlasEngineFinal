@@ -19,4 +19,6 @@ public:
 	std::string GetExtension(const std::string& filePath);
 	std::string GetNameFromPath(const std::string& filePath);
 	std::string GetFileNameWithoutExtension(const std::string& filePath);
+
+	bool FileExists(const std::string& filePath);
 };

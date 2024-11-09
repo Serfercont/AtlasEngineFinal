@@ -87,3 +87,8 @@ std::string ModuleFileSystem::GetFileNameWithoutExtension(const std::string& fil
 {
     return std::filesystem::path(filePath).stem().string();
 }
+
+bool ModuleFileSystem::FileExists(const std::string& filePath)
+{
+    return std::filesystem::exists(filePath);
+}

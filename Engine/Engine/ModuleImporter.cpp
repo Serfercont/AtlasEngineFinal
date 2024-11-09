@@ -120,7 +120,10 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
 
 	ResourceType resourceType = app->resources->GetResourceTypeFromExtension(extension);
 
-    Resource* newResource = ImportFileToLibrary(newDir, resourceType);
+    Resource* newResource = app->resources->FindResourceInLibrary(newDir, resourceType);
+
+    if (!newResource)
+        newResource = ImportFileToLibrary(newDir, resourceType);
 
     if (!addToScene)
 		return;
@@ -128,7 +131,7 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
     switch (resourceType)
     {
 	case ResourceType::MODEL:
-        app->renderer3D->meshLoader.ImportFBX(fileDir.c_str(), app->scene->root);
+        app->renderer3D->modelImporter.LoadModel(newResource->GetLibraryFileDir().c_str(), app->scene->root);
 		break;
 	case ResourceType::TEXTURE:
         Texture* newTexture = app->renderer3D->LoadTextureImage(newResource->GetLibraryFileDir().c_str());
@@ -152,7 +155,7 @@ Resource* ModuleImporter::ImportFileToLibrary(const std::string& fileDir, Resour
     switch (type)
     {
 	case ResourceType::MODEL:
-		// ImportModelFile(resource);
+		app->renderer3D->modelImporter.SaveModel(resource);
 		break;
 	case ResourceType::TEXTURE:
 		SaveTextureFile(resource);
@@ -173,16 +176,17 @@ void ModuleImporter::SaveTextureFile(Resource* resource)
     ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);
     ILuint size = ilSaveL(IL_DDS, nullptr, 0);
 
-    ILubyte* data = new ILubyte[size];
-    if (ilSaveL(IL_DDS, data, size) > 0) {
+    std::vector<ILubyte> data(size);
+    if (ilSaveL(IL_DDS, data.data(), size) > 0) 
+    {
         std::string filePath = resource->GetLibraryFileDir();
         std::ofstream file(filePath, std::ios::binary);
-        if (file.is_open()) {
-            file.write((char*)data, size);
+        if (file.is_open()) 
+        {
+            file.write(reinterpret_cast<char*>(data.data()), size);
             file.close();
         }
     }
 
     ilDeleteImages(1, &imageID);
-    delete[] data;
 }

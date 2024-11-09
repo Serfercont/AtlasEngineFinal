@@ -19,4 +19,6 @@ public:
 	ResourceType GetResourceTypeFromExtension(const std::string& extension);
 
 	std::string CreateLibraryFileDir(std::string name, ResourceType type);
+
+	Resource* FindResourceInLibrary(const std::string& fileDir, ResourceType type);
 };

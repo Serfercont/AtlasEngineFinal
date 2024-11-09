@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Module.h"
-#include "MeshLoader.h"
+#include "ModelImporter.h"
 #include "Grid.h"
 
 #include <SDL2/SDL_video.h>
@@ -28,7 +28,7 @@ public:
 	Texture* LoadTextureImage(const char* file);
 
 public:
-	MeshLoader meshLoader;
+	ModelImporter modelImporter;
 
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
 	unsigned int checkerTextureId;

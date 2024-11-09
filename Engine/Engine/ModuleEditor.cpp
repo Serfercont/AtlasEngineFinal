@@ -180,7 +180,7 @@ void ModuleEditor::MainMenuBar()
 
                 if (ImGui::MenuItem(name))
                 {
-                    app->renderer3D->meshLoader.ImportFBX(fullPath.c_str(), app->scene->root);
+					app->importer->ImportFile(fullPath, true);
                     selectedGameObject = app->scene->root->children.back();
                 }
             }

@@ -29,6 +29,11 @@ App::App(int argc, char* argv[])
 
 App::~App()
 {
+	for (auto it = modules.rbegin(); it != modules.rend(); ++it)
+	{
+		delete (*it);
+	}
+
 	modules.clear();
 }
 

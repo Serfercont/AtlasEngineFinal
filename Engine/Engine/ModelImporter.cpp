@@ -1,94 +1,68 @@
-#include "MeshLoader.h"
+#include "ModelImporter.h"
 #include "App.h"
 #include "ComponentMesh.h"
 
 #include <iostream>
 #include <fstream>
 
-MeshLoader::MeshLoader()
-{}
-
-MeshLoader::~MeshLoader()
-{}
-
-void MeshLoader::EnableDebugger()
+ModelImporter::ModelImporter()
 {
-	struct aiLogStream stream;
+    struct aiLogStream stream;
 	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
 	aiAttachLogStream(&stream);
 }
 
-void MeshLoader::DisableDebugger()
+ModelImporter::~ModelImporter()
 {
-	aiDetachAllLogStreams();
+    aiDetachAllLogStreams();
 }
 
-void MeshLoader::ImportFBX(const char* path, GameObject* root)
+bool ModelImporter::SaveModel(Resource* resource)
 {
+    const char* path = resource->GetAssetFileDir().c_str();
+
     const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
     if (scene == nullptr)
     {
         LOG(LogType::LOG_ERROR, "Error loading scene %s", path);
-        return;
+        return false;
     }
 
     std::string fileName = path;
     fileName = fileName.substr(fileName.find_last_of("/\\") + 1);
     fileName = fileName.substr(0, fileName.find_last_of("."));
 
-    std::string modelFilePath = "Library/Models/" + fileName + ".model";
+    SaveModelToCustomFile(scene, fileName);
+    aiReleaseImport(scene);
+
+    LOG(LogType::LOG_INFO, "Model saved successfully to: %s", path);
+    return true;
+}
+
+bool ModelImporter::LoadModel(const char* path, GameObject* root)
+{
+    if (!root)
+    {
+        LOG(LogType::LOG_ERROR, "Invalid root GameObject provided");
+        return false;
+    }
+
+    std::string modelFilePath = path;
     std::ifstream modelFile(modelFilePath, std::ios::binary);
 
-    if (modelFile.good())
+    if (!modelFile.good())
     {
-        modelFile.close();
-        LoadModelFromCustomFile(modelFilePath, root);
-        LOG(LogType::LOG_INFO, "Loaded model from custom file: %s", modelFilePath.c_str());
-    }
-    else
-    {
-        SaveModelToCustomFile(scene, fileName);
-        LoadModelFromCustomFile(modelFilePath, root);
-        LOG(LogType::LOG_INFO, "Created and loaded new custom model file: %s", modelFilePath.c_str());
+        LOG(LogType::LOG_ERROR, "Failed to open model file: %s", path);
+        return false;
     }
 
-    aiReleaseImport(scene);
+    modelFile.close();
+    LoadModelFromCustomFile(modelFilePath, root);
+    LOG(LogType::LOG_INFO, "Model loaded successfully from: %s", path);
+    return true;
 }
 
-void MeshLoader::LoadNode(aiNode* node, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
-{
-    for (unsigned int i = 0; i < node->mNumMeshes; i++)
-    {
-        Mesh* meshPtr = meshes[node->mMeshes[i]];
-
-        GameObject* gameObjectNode = new GameObject(node->mName.C_Str(), parent);
-        ComponentMesh* componentMesh = dynamic_cast<ComponentMesh*>(gameObjectNode->AddComponent(gameObjectNode->mesh));
-
-        componentMesh->mesh = meshPtr;
-
-        if (!meshPtr->diffuseTexturePath.empty())
-        {
-            Texture* newTexture = app->renderer3D->LoadTextureImage(meshPtr->diffuseTexturePath.c_str());
-            if (newTexture != nullptr)
-                gameObjectNode->material->AddTexture(newTexture);
-        }
-
-        parent->children.push_back(gameObjectNode);
-    }
-
-    if (node->mNumChildren > 0)
-    {
-        GameObject* holder = new GameObject(fileName, parent);
-        parent->children.push_back(holder);
-
-        for (unsigned int i = 0; i < node->mNumChildren; i++)
-        {
-            LoadNode(node->mChildren[i], meshes, holder, node->mName.C_Str());
-        }
-    }
-}
-
-void MeshLoader::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, const std::string& filePath)
+void ModelImporter::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, const std::string& filePath)
 {
     // Validate mesh data
     if (!newMesh || !newMesh->HasPositions() || !newMesh->HasNormals() ||
@@ -121,7 +95,7 @@ void MeshLoader::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, con
     {
         if (newMesh->mFaces[i].mNumIndices != 3)
         {
-            LOG(LogType::LOG_WARNING, "Geometry face with != 3 indices!");
+            LOG(LogType::LOG_WARNING, "Face does not have 3 indices");
             continue;
         }
         memcpy(&indices[i * 3], newMesh->mFaces[i].mIndices, 3 * sizeof(uint32_t));
@@ -215,7 +189,7 @@ void MeshLoader::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, con
     }
 }
 
-Mesh* MeshLoader::LoadMeshFromCustomFile(const std::string& filePath)
+Mesh* ModelImporter::LoadMeshFromCustomFile(const std::string& filePath)
 {
     std::ifstream file(filePath, std::ios::binary);
     if (!file.is_open())
@@ -267,7 +241,7 @@ Mesh* MeshLoader::LoadMeshFromCustomFile(const std::string& filePath)
     return mesh;
 }
 
-void MeshLoader::SaveModelToCustomFile(const aiScene* scene, const std::string& fileName)
+void ModelImporter::SaveModelToCustomFile(const aiScene* scene, const std::string& fileName)
 {
     // Save meshes to custom files
     std::vector<std::string> meshPaths;
@@ -325,7 +299,7 @@ void MeshLoader::SaveModelToCustomFile(const aiScene* scene, const std::string& 
     }
 }
 
-void MeshLoader::SaveNodeToBuffer(const aiNode* node, std::vector<char>& buffer, size_t& currentPos)
+void ModelImporter::SaveNodeToBuffer(const aiNode* node, std::vector<char>& buffer, size_t& currentPos)
 {
     // Save node name
     uint32_t nameLength = static_cast<uint32_t>(strlen(node->mName.C_Str()));
@@ -359,7 +333,7 @@ void MeshLoader::SaveNodeToBuffer(const aiNode* node, std::vector<char>& buffer,
     }
 }
 
-void MeshLoader::LoadModelFromCustomFile(const std::string& filePath, GameObject* root)
+void ModelImporter::LoadModelFromCustomFile(const std::string& filePath, GameObject* root)
 {
     std::ifstream file(filePath, std::ios::binary);
     if (!file.is_open())
@@ -412,7 +386,7 @@ void MeshLoader::LoadModelFromCustomFile(const std::string& filePath, GameObject
     LoadNodeFromBuffer(buffer.data(), currentPos, meshes, root, fileName.c_str());
 }
 
-void MeshLoader::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
+void ModelImporter::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, std::vector<Mesh*>& meshes, GameObject* parent, const char* fileName)
 {
     // Node name
     uint32_t nameLength;
@@ -475,7 +449,7 @@ void MeshLoader::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, std:
     }
 }
 
-size_t MeshLoader::CalculateNodeSize(const aiNode* node)
+size_t ModelImporter::CalculateNodeSize(const aiNode* node)
 {
     size_t size = 0;
 

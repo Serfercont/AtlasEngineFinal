@@ -68,3 +68,19 @@ std::string ModuleResources::CreateLibraryFileDir(std::string name, ResourceType
 
 	return std::string();
 }
+
+Resource* ModuleResources::FindResourceInLibrary(const std::string& fileDir, ResourceType type)
+{
+	std::string fileName = app->fileSystem->GetFileNameWithoutExtension(fileDir);
+	std::string libraryFileDir = CreateLibraryFileDir(fileName, type);
+
+	if (app->fileSystem->FileExists(libraryFileDir))
+	{
+		Resource* resource = new Resource(fileName, type);
+		resource->SetAssetFileDir(fileDir.c_str());
+		resource->SetLibraryFileDir(libraryFileDir);
+		return resource;
+	}
+
+	return nullptr;
+}

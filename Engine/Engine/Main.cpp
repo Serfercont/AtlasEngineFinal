@@ -71,6 +71,7 @@ int main(int argc, char* argv[])
 
 			if (app->CleanUp() == true)
 			{
+				delete app;
 				result = EXIT_SUCCESS;
 				state = MAIN_EXIT;
 			}
