@@ -45,9 +45,7 @@ Component* GameObject::AddComponent(Component* component)
 Component* GameObject::GetComponent(ComponentType type)
 {
 	for (auto it = components.begin(); it != components.end(); ++it) {
-
 		if ((*it)->type == type) {
-
 			return (*it);
 		}
 	}

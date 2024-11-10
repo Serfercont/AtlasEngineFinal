@@ -37,7 +37,8 @@ bool ModuleCamera::CleanUp()
 
 bool ModuleCamera::Update(float dt)
 {
-	if (((!isMouseInside) || (!isZooming && !isFreeLook && !isOrbiting && !isDragging)) && !isDefaultCursor)
+	bool isMouseInside = app->editor->sceneWindow->IsMouseInside();
+	if ((!isMouseInside || (!isZooming && !isFreeLook && !isOrbiting && !isDragging)) && !isDefaultCursor)
 	{
 		SetCursor(CursorType::DEFAULT);
 	}
@@ -76,19 +77,19 @@ void ModuleCamera::HandleInput()
 
 void ModuleCamera::HandleMovement(glm::vec3& newPos, float speed, float fastSpeed)
 {
-    if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT 
+	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT
 		&& app->input->GetKey(SDL_SCANCODE_LALT) == KEY_IDLE)
-    {
-        if (app->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) speed = fastSpeed;
+	{
+		if (app->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) speed = fastSpeed;
 
-        if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
-        if (app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;
+		if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
+		if (app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;
 
-        if (app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
-        if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
+		if (app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
+		if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
 
 		SetCursor(CursorType::FREELOOK);
-    }
+	}
 	else if (isFreeLook)
 		isFreeLook = false;
 
@@ -126,7 +127,7 @@ void ModuleCamera::HandleRotation()
 		RotateCamera(dx, dy);
 	}
 
-	if (app->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT 
+	if (app->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT
 		&& app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
 	{
 		pos -= ref;
@@ -139,16 +140,16 @@ void ModuleCamera::HandleRotation()
 	else if (isOrbiting)
 		isOrbiting = false;
 
-	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT 
+	if (app->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT
 		&& app->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
 	{
 		float sensitivity = 0.01f;
 		float zoomDelta = dy * sensitivity;
 		glm::vec3 direction = glm::normalize(pos - ref);
 		pos += direction * zoomDelta;
-		
+
 		SetCursor(CursorType::ZOOM);
-	}						
+	}
 	else if (isZooming)
 		isZooming = false;
 }
@@ -184,15 +185,15 @@ void ModuleCamera::RotateCamera(int dx, int dy)
 void ModuleCamera::FrameSelected()
 {
 	if (app->editor->selectedGameObject)
-    {
-        pos = glm::vec3(
-            app->editor->selectedGameObject->transform->position.x,
-            app->editor->selectedGameObject->transform->position.y + 5.0f,
-            app->editor->selectedGameObject->transform->position.z + 5.0f
-        );
-        ref = app->editor->selectedGameObject->transform->position;
-        LookAt(ref);
-    }
+	{
+		pos = glm::vec3(
+			app->editor->selectedGameObject->transform->position.x,
+			app->editor->selectedGameObject->transform->position.y + 5.0f,
+			app->editor->selectedGameObject->transform->position.z + 5.0f
+		);
+		ref = app->editor->selectedGameObject->transform->position;
+		LookAt(ref);
+	}
 	else
 	{
 		pos = glm::vec3(0.0f, 5.0f, 5.0f);
@@ -217,7 +218,7 @@ const glm::mat4& ModuleCamera::GetViewMatrix() const
 	return viewMatrix;
 }
 
-void ModuleCamera::CalculateViewMatrix() 
+void ModuleCamera::CalculateViewMatrix()
 {
 	viewMatrix = glm::mat4(
 		X.x, Y.x, Z.x, 0.0f,
@@ -233,7 +234,7 @@ glm::mat4 ModuleCamera::GetProjectionMatrix() const
 	return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
 }
 
-glm::vec3 ModuleCamera::RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis) 
+glm::vec3 ModuleCamera::RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis)
 {
 	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, axis);
 

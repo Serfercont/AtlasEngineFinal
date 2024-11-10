@@ -11,22 +11,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
-ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app)
+ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app), rbo(0), fboTexture(0), fbo(0), checkerTextureId(0)
 {
 }
-
 
 ModuleRenderer3D::~ModuleRenderer3D()
 {
 }
 
-
 bool ModuleRenderer3D::Awake()
 {
 	bool ret = true;
-
-	meshLoader.EnableDebugger();
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
@@ -105,7 +100,7 @@ bool ModuleRenderer3D::Awake()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
-	meshLoader.ImportFBX("Assets/Models/BakerHouse.fbx", app->scene->root);
+	app->importer->ImportFile("Assets/Models/BakerHouse.fbx", true);
 	app->editor->selectedGameObject = app->scene->root->children[0];
 
 	CreateFramebuffer();
@@ -157,13 +152,6 @@ bool ModuleRenderer3D::CleanUp()
 	glDeleteTextures(1, &fboTexture);
 	glDeleteRenderbuffers(1, &rbo);
 
-	meshLoader.DisableDebugger();
-
-	for (unsigned int i = 0; i < mesh.size(); i++)
-	{
-		mesh[i]->CleanUpMesh();
-	}
-
 	return true;
 }
 
@@ -180,8 +168,8 @@ void ModuleRenderer3D::OnResize(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-    glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
-    glLoadMatrixf(glm::value_ptr(projectionMatrix));
+	glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
+	glLoadMatrixf(glm::value_ptr(projectionMatrix));
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -204,7 +192,7 @@ void ModuleRenderer3D::CreateFramebuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	glGenTextures(1, &fboTexture);
-	glBindTexture(GL_TEXTURE_2D, fboTexture);	
+	glBindTexture(GL_TEXTURE_2D, fboTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, app->window->width, app->window->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -217,29 +205,9 @@ void ModuleRenderer3D::CreateFramebuffer()
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		LOG(LogType::LOG_ERROR, "Framebuffer is not complete!");
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-Texture* ModuleRenderer3D::LoadTextureImage(const char* file)
-{
-	ILuint image;
-	ilGenImages(1, &image);
-	ilBindImage(image);
-
-	if (!ilLoadImage(file))
-	{
-		LOG(LogType::LOG_WARNING, "Image not loaded");
-		return nullptr;
-	}
-
-	Texture* newTexture = new Texture(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
-
-	ilDeleteImages(1, &image);
-
-	return newTexture;
 }

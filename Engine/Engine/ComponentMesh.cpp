@@ -21,11 +21,11 @@ void ComponentMesh::Update()
 		glMultMatrixf(glm::value_ptr(transform->globalTransform));
 	}
 
-	ComponentMaterial* material = gameObject->material; 
+	ComponentMaterial* material = gameObject->material;
 
 	mesh->DrawMesh(
-		material->textureId, 
-		app->editor->preferencesWindow->drawTextures, 
+		material->textureId,
+		app->editor->preferencesWindow->drawTextures,
 		app->editor->preferencesWindow->wireframe,
 		app->editor->preferencesWindow->shadedWireframe
 	);
@@ -33,8 +33,8 @@ void ComponentMesh::Update()
 	if (showVertexNormals || showFaceNormals)
 	{
 		mesh->DrawNormals(
-			showVertexNormals, 
-			showFaceNormals, 
+			showVertexNormals,
+			showFaceNormals,
 			app->editor->preferencesWindow->vertexNormalLength,
 			app->editor->preferencesWindow->faceNormalLength,
 			app->editor->preferencesWindow->vertexNormalColor,

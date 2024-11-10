@@ -1,10 +1,8 @@
 #include "ModuleWindow.h"
 #include "App.h"
 
-ModuleWindow::ModuleWindow(App* app) : Module(app)
+ModuleWindow::ModuleWindow(App* app) : Module(app), window(NULL), screenSurface(NULL), width(SCREEN_WIDTH), height(SCREEN_HEIGHT), context(NULL)
 {
-	window = NULL;
-	screenSurface = NULL;
 }
 
 ModuleWindow::~ModuleWindow()
@@ -27,32 +25,21 @@ bool ModuleWindow::Awake()
 		height = SCREEN_HEIGHT;
 		Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-
-		if (WIN_FULLSCREEN == true)
-		{
+		if (fullscreen)
 			flags |= SDL_WINDOW_FULLSCREEN;
-		}
 
-		if (WIN_RESIZABLE == true)
-		{
+		if (resizable)
 			flags |= SDL_WINDOW_RESIZABLE;
-		}
 
-		if (WIN_BORDERLESS == true)
-		{
+		if (borderless)
 			flags |= SDL_WINDOW_BORDERLESS;
-		}
 
-		if (WIN_FULLSCREEN_DESKTOP == true)
-		{
+		if (fulldesktop)
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		}
 
 		window = SDL_CreateWindow("Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 
-		if(window == NULL)
+		if (window == NULL)
 		{
 			LOG(LogType::LOG_ERROR, "Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;
@@ -73,15 +60,37 @@ bool ModuleWindow::CleanUp()
 	LOG(LogType::LOG_INFO, "Destroying SDL window and quitting all SDL systems");
 
 	if (context != NULL)
-	{
 		SDL_GL_DeleteContext(context);
-	}
 
 	if (window != NULL)
-	{
 		SDL_DestroyWindow(window);
-	}
 
 	SDL_Quit();
 	return true;
+}
+
+void ModuleWindow::SetFullScreen(bool enabled)
+{
+	if (enabled)
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	else
+		SDL_SetWindowFullscreen(window, 0);
+}
+
+void ModuleWindow::SetBorderless(bool enabled)
+{
+	SDL_SetWindowBordered(window, enabled ? SDL_FALSE : SDL_TRUE);
+}
+
+void ModuleWindow::SetFullDesktop(bool enabled)
+{
+	if (enabled)
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	else
+		SDL_SetWindowFullscreen(window, 0);
+}
+
+void ModuleWindow::SetResizable(bool enabled)
+{
+	SDL_SetWindowResizable(window, resizable ? SDL_TRUE : SDL_FALSE);
 }

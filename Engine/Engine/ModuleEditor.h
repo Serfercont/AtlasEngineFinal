@@ -31,6 +31,7 @@ public:
 	void DrawEditor();
 	void Docking();
 	void MainMenuBar();
+	void ApplyStyle();
 
 public:
 	GameObject* selectedGameObject = nullptr;
@@ -43,6 +44,8 @@ public:
 	PerformanceWindow* performanceWindow = nullptr;
 	PreferencesWindow* preferencesWindow = nullptr;
 	AboutWindow* aboutWindow = nullptr;
+
+	ImVec4 dataTextColor = ImVec4(0.45f, 0.55f, 0.75f, 1.0f);
 
 private:
 

@@ -11,20 +11,29 @@ App::App(int argc, char* argv[])
 	input = new ModuleInput(this);
 	scene = new ModuleScene(this);
 	importer = new ModuleImporter(this);
-	renderer3D = new ModuleRenderer3D(this);	
+	renderer3D = new ModuleRenderer3D(this);
 	editor = new ModuleEditor(this);
+	fileSystem = new ModuleFileSystem(this);
+	resources = new ModuleResources(this);
 
 	AddModule(window);
 	AddModule(camera);
-	AddModule(input);	
+	AddModule(input);
+	AddModule(fileSystem);
+	AddModule(resources);
 	AddModule(importer);
 	AddModule(scene);
-	AddModule(editor);	
-	AddModule(renderer3D);	
+	AddModule(editor);
+	AddModule(renderer3D);
 }
 
 App::~App()
 {
+	for (auto it = modules.rbegin(); it != modules.rend(); ++it)
+	{
+		delete (*it);
+	}
+
 	modules.clear();
 }
 
@@ -40,7 +49,7 @@ bool App::Awake()
 		ret = module->Awake();
 	}
 
-	ms_timer.Start();
+	timer.Start();
 
 	return ret;
 }
@@ -62,8 +71,8 @@ bool App::Start()
 
 void App::PrepareUpdate()
 {
-	dt = (float)ms_timer.Read() / 1000.0f;
-	ms_timer.Start();
+	dt = (float)timer.ReadMs() / 1000.0f;
+	timer.Start();
 }
 
 bool App::Update()
@@ -121,7 +130,15 @@ bool App::Update()
 
 void App::FinishUpdate()
 {
+	if (!vsync)
+	{
+		const float frameDelay = 1000.0f / maxFps;
 
+		float frameTime = (float)timer.ReadMs();
+
+		if (frameTime < frameDelay)
+			SDL_Delay((Uint32)(frameDelay - frameTime));
+	}
 }
 
 bool App::CleanUp()

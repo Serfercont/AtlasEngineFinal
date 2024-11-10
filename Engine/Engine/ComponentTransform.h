@@ -19,6 +19,9 @@ public:
 
 	bool Decompose(const glm::float4x4& transform, glm::vec3& translation, glm::quat& rotation, glm::vec3& scale);
 
+private:
+	void SetButtonColor(const char* label);
+
 public:
 	glm::float4x4 localTransform;
 	glm::float4x4 globalTransform;
@@ -32,4 +35,3 @@ public:
 	float initialScale[3] = { 1.0f, 1.0f, 1.0f };
 	bool updateTransform = false;
 };
-

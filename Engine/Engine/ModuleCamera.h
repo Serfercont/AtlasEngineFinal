@@ -39,8 +39,6 @@ public:
 	float farPlane = 512.0f;
 	int screenWidth, screenHeight;
 
-	bool isMouseInside = false;
-
 private:
 	glm::vec3 X, Y, Z;
 	glm::vec3 pos, ref;

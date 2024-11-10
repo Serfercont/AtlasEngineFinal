@@ -5,9 +5,9 @@
 
 #include <windows.h>
 #include <shellapi.h>
-#include <algorithm> 
+#include <algorithm>
 
-ComponentMaterial::ComponentMaterial(GameObject* gameObject) : Component(gameObject, ComponentType::MATERIAL), materialTexture(nullptr)
+ComponentMaterial::ComponentMaterial(GameObject* gameObject) : Component(gameObject, ComponentType::MATERIAL), materialTexture(nullptr), textureId(-1)
 {
 }
 
@@ -17,7 +17,6 @@ ComponentMaterial::~ComponentMaterial()
 
 void ComponentMaterial::Update()
 {
-
 }
 
 void ComponentMaterial::OnEditor()
@@ -28,7 +27,7 @@ void ComponentMaterial::OnEditor()
 		{
 			ImGui::Text("Path: %s", materialTexture->texturePath);
 			ImGui::Text("Texture Size: %i x %i", materialTexture->textureWidth, materialTexture->textureHeight);
-			ImGui::Image((int*)materialTexture->textureId, ImVec2(200, 200), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((ImTextureID)(uintptr_t)materialTexture->textureId, ImVec2(200, 200), ImVec2(0, 1), ImVec2(1, 0));
 
 			if (ImGui::MenuItem("Show in Explorer"))
 			{

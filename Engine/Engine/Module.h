@@ -9,6 +9,8 @@ public:
 	Module(App* parent) : active(false), app(parent)
 	{}
 
+	virtual ~Module() {}
+
 	void Init()
 	{
 		active = true;

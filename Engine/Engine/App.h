@@ -8,6 +8,8 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleEditor.h"
 #include "ModuleImporter.h"
+#include "ModuleFileSystem.h"
+#include "ModuleResources.h"
 
 #include "Timer.h"
 
@@ -36,15 +38,19 @@ public:
 	ModuleWindow* window = nullptr;
 	ModuleCamera* camera = nullptr;
 	ModuleInput* input = nullptr;
-	ModuleScene* scene = nullptr;	
+	ModuleScene* scene = nullptr;
 	ModuleImporter* importer = nullptr;
 	ModuleRenderer3D* renderer3D = nullptr;
 	ModuleEditor* editor = nullptr;
+	ModuleFileSystem* fileSystem = nullptr;
+	ModuleResources* resources = nullptr;
 
 	bool exit = false;
+	int maxFps = 60;
+	bool vsync = true;
 
 private:
-	Timer	ms_timer;
+	Timer	timer;
 	float	dt;
 
 	std::list<Module*> modules;

@@ -16,6 +16,12 @@
     <Filter Include="Sources\Modules\EditorWindows">
       <UniqueIdentifier>{aad46190-fc9b-4c9e-b349-ed6b1ff4d58f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Modules\Importers">
+      <UniqueIdentifier>{af84dab0-c0a1-46ab-9cec-f94ea3a22960}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Resources">
+      <UniqueIdentifier>{4e6b0dc0-7c0b-4a00-a392-41642e384ea8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -34,12 +40,6 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>Sources\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Sources\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshLoader.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
     <ClCompile Include="ModuleEditor.cpp">
@@ -72,9 +72,6 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Sources\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="ConsoleWindow.cpp">
       <Filter>Sources\Modules\EditorWindows</Filter>
     </ClCompile>
@@ -102,6 +99,24 @@
     <ClCompile Include="SceneWindow.cpp">
       <Filter>Sources\Modules\EditorWindows</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleFileSystem.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleResources.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelImporter.cpp">
+      <Filter>Sources\Modules\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureImporter.cpp">
+      <Filter>Sources\Modules\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Sources\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -117,12 +132,6 @@
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
-      <Filter>Sources\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Sources\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshLoader.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
     <ClInclude Include="Module.h">
@@ -158,9 +167,6 @@
     <ClInclude Include="Logger.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Sources\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="ConsoleWindow.h">
       <Filter>Sources\Modules\EditorWindows</Filter>
     </ClInclude>
@@ -190,6 +196,27 @@
     </ClInclude>
     <ClInclude Include="AboutWindow.h">
       <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleFileSystem.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleResources.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelImporter.h">
+      <Filter>Sources\Modules\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureImporter.h">
+      <Filter>Sources\Modules\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Sources\Resources</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

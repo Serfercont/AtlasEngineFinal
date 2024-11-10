@@ -12,6 +12,6 @@ public:
 
 	float lineColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	float cellSize = 1.0f;
-	float gridSize = 200.0f;	
+	float gridSize = 200.0f;
 	float lineWidth = 1.0f;
 };
