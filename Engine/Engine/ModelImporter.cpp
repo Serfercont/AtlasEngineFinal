@@ -84,16 +84,16 @@ void ModelImporter::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, 
     };
 
     // Process texture coordinates
-    std::unique_ptr<float[]> texCoords(new float[newMesh->mNumVertices * 2]);
-    for (unsigned int i = 0; i < newMesh->mNumVertices; i++)
+    std::unique_ptr<float[]> texCoords(new float[static_cast<size_t>(newMesh->mNumVertices) * 2]);
+    for (size_t i = 0; i < newMesh->mNumVertices; i++)
     {
         texCoords[i * 2] = newMesh->mTextureCoords[0][i].x;
         texCoords[i * 2 + 1] = newMesh->mTextureCoords[0][i].y;
     }
 
     // Process indices
-    std::unique_ptr<uint32_t[]> indices(new uint32_t[newMesh->mNumFaces * 3]);
-    for (uint32_t i = 0; i < newMesh->mNumFaces; ++i)
+    std::unique_ptr<uint32_t[]> indices(new uint32_t[static_cast<size_t>(newMesh->mNumFaces) * 3]);
+    for (size_t i = 0; i < static_cast<size_t>(newMesh->mNumFaces); ++i)
     {
         if (newMesh->mFaces[i].mNumIndices != 3)
         {
@@ -178,7 +178,7 @@ void ModelImporter::SaveMeshToCustomFile(aiMesh* newMesh, const aiScene* scene, 
 
     const uint32_t texturePathLength = static_cast<uint32_t>(diffuseTexturePath.size());
     writeData(&texturePathLength, sizeof(uint32_t));
-    writeData(diffuseTexturePath.c_str(), texturePathLength + 1);
+    writeData(diffuseTexturePath.c_str(), static_cast<size_t>(texturePathLength) + 1);
 
     // Write to file
     std::ofstream file(filePath, std::ios::binary);
@@ -203,7 +203,7 @@ Mesh* ModelImporter::LoadMeshFromCustomFile(const std::string& filePath)
         return nullptr;
     }
 
-    uint32_t ranges[4];
+    uint32_t ranges[4] = { 0,0,0,0 };
     file.read(reinterpret_cast<char*>(ranges), sizeof(ranges));
 
     Mesh* mesh = new Mesh();
@@ -234,7 +234,7 @@ Mesh* ModelImporter::LoadMeshFromCustomFile(const std::string& filePath)
     file.read(reinterpret_cast<char*>(&mesh->ambientColor), sizeof(glm::vec4));
 
     // Texture
-    uint32_t texturePathLength;
+    uint32_t texturePathLength = 0;
     file.read(reinterpret_cast<char*>(&texturePathLength), sizeof(uint32_t));
     mesh->diffuseTexturePath.resize(texturePathLength);
     file.read(&mesh->diffuseTexturePath[0], texturePathLength);
@@ -277,9 +277,9 @@ void ModelImporter::SaveModelToCustomFile(const aiScene* scene, const std::strin
         currentPos += sizeof(uint32_t);
 
         // Save path
-        buffer.resize(buffer.size() + pathLength + 1);
-        memcpy(buffer.data() + currentPos, path.c_str(), pathLength + 1);
-        currentPos += pathLength + 1;
+        buffer.resize(buffer.size() + static_cast<size_t>(pathLength) + 1);
+        memcpy(buffer.data() + currentPos, path.c_str(), static_cast<size_t>(pathLength) + 1);
+        currentPos += static_cast<size_t>(pathLength) + 1;
     }
 
     // Calculate and reserve space for the node hierarchy
@@ -310,8 +310,8 @@ void ModelImporter::SaveNodeToBuffer(const aiNode* node, std::vector<char>& buff
     uint32_t nameLength = static_cast<uint32_t>(strlen(node->mName.C_Str()));
     memcpy(buffer.data() + currentPos, &nameLength, sizeof(uint32_t));
     currentPos += sizeof(uint32_t);
-    memcpy(buffer.data() + currentPos, node->mName.C_Str(), nameLength + 1);
-    currentPos += nameLength + 1;
+    memcpy(buffer.data() + currentPos, node->mName.C_Str(), static_cast<size_t>(nameLength) + 1);
+    currentPos += static_cast<size_t>(nameLength) + 1;
 
     // Save number of meshes
     uint32_t numMeshes = node->mNumMeshes;
@@ -371,8 +371,8 @@ void ModelImporter::LoadModelFromCustomFile(const std::string& filePath, GameObj
         memcpy(&pathLength, buffer.data() + currentPos, sizeof(uint32_t));
         currentPos += sizeof(uint32_t);
 
-        std::string meshPath(buffer.data() + currentPos, pathLength);
-        currentPos += pathLength + 1;
+        std::string meshPath(buffer.data() + currentPos, static_cast<size_t>(pathLength));
+        currentPos += static_cast<size_t>(pathLength) + 1;
 
         // Load mesh from file
         Mesh* mesh = LoadMeshFromCustomFile(meshPath);
@@ -398,8 +398,8 @@ void ModelImporter::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, s
     memcpy(&nameLength, buffer + currentPos, sizeof(uint32_t));
     currentPos += sizeof(uint32_t);
 
-    std::string nodeName(buffer + currentPos, nameLength);
-    currentPos += nameLength + 1;
+    std::string nodeName(buffer + currentPos, static_cast<size_t>(nameLength));
+    currentPos += static_cast<size_t>(nameLength) + 1;
 
     // Node meshes number
     uint32_t numMeshes;
