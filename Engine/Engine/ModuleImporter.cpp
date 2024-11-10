@@ -2,9 +2,6 @@
 #include "App.h"
 #include "Logger.h"
 
-#include "IL/il.h"
-#include "IL/ilu.h"
-#include "IL/ilut.h"
 #include <Windows.h>
 
 #include <filesystem>
@@ -12,10 +9,8 @@
 
 ModuleImporter::ModuleImporter(App* app) : Module(app)
 {
-
-    ilInit();
-    iluInit();
-    ilutInit();
+	textureImporter = new TextureImporter();
+	modelImporter = new ModelImporter();
 }
 
 ModuleImporter::~ModuleImporter()
@@ -25,18 +20,18 @@ ModuleImporter::~ModuleImporter()
 bool ModuleImporter::Awake()
 {
     // Project
-	icons.folderIcon = LoadTexture("Engine/Icons/folder.png");
-	icons.openFolderIcon = LoadTexture("Engine/Icons/open_folder.png");
-	icons.fileIcon = LoadTexture("Engine/Icons/file.png");
-	icons.pngFileIcon = LoadTexture("Engine/Icons/file_png.png");
-	icons.ddsFileIcon = LoadTexture("Engine/Icons/file_dds.png");
-	icons.fbxFileIcon = LoadTexture("Engine/Icons/file_fbx.png");
-    icons.dotsIcon = LoadTexture("Engine/Icons/dots.png");
+	icons.folderIcon = textureImporter->LoadIconImage("Engine/Icons/folder.png");
+	icons.openFolderIcon = textureImporter->LoadIconImage("Engine/Icons/open_folder.png");
+	icons.fileIcon = textureImporter->LoadIconImage("Engine/Icons/file.png");
+	icons.pngFileIcon = textureImporter->LoadIconImage("Engine/Icons/file_png.png");
+	icons.ddsFileIcon = textureImporter->LoadIconImage("Engine/Icons/file_dds.png");
+	icons.fbxFileIcon = textureImporter->LoadIconImage("Engine/Icons/file_fbx.png");
+    icons.dotsIcon = textureImporter->LoadIconImage("Engine/Icons/dots.png");
 
     // Console
-	icons.infoIcon = LoadTexture("Engine/Icons/info.png");
-	icons.warningIcon = LoadTexture("Engine/Icons/warning.png");
-	icons.errorIcon = LoadTexture("Engine/Icons/error.png");
+	icons.infoIcon = textureImporter->LoadIconImage("Engine/Icons/info.png");
+	icons.warningIcon = textureImporter->LoadIconImage("Engine/Icons/warning.png");
+	icons.errorIcon = textureImporter->LoadIconImage("Engine/Icons/error.png");
 
 	return true;
 }
@@ -57,62 +52,6 @@ bool ModuleImporter::CleanUp()
 	return true;
 }
 
-GLuint ModuleImporter::LoadTexture(const std::string& filePath)
-{
-    ilClearColour(255, 255, 255, 255);
-
-    ILuint imageID;
-    ilGenImages(1, &imageID);
-    ilBindImage(imageID);
-
-    if (ilLoadImage(filePath.c_str()) == IL_FALSE)
-    {
-        ilDeleteImages(1, &imageID);
-        return 0;
-    }
-
-    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH),
-        ilGetInteger(IL_IMAGE_HEIGHT), 0, GL_RGBA, GL_UNSIGNED_BYTE, ilGetData());
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    ilDeleteImages(1, &imageID);
-
-    return textureID;
-}
-
-std::string ModuleImporter::OpenFileDialog(const char* filter)
-{
-    OPENFILENAMEA ofn; 
-    CHAR sizeFile[260] = { 0 };
-
-    ZeroMemory(&ofn, sizeof(ofn));
-    ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = NULL;
-
-    ofn.lpstrFilter = filter;
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFile = sizeFile;
-    ofn.nMaxFile = sizeof(sizeFile);
-    ofn.lpstrTitle = "Open File";
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-    if (GetOpenFileNameA(&ofn) == TRUE)
-    {
-        return std::string(ofn.lpstrFile);
-    }
-    return "";
-}
-
 void ModuleImporter::TryImportFile()
 {
     if (!draggedFile.empty())
@@ -129,53 +68,43 @@ void ModuleImporter::TryImportFile()
 
 void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
 {
-    const std::string modelsDir = "Assets/Models/";
-    const std::string texturesDir = "Assets/Textures/";
+    std::string extension = app->fileSystem->GetExtension(fileDir);
 
-    std::string extension = std::filesystem::path(fileDir).extension().string();
-    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+	bool isValidFile = extension == "fbx" || extension == "png" || extension == "dds";
 
-    if (!extension.empty() && extension[0] == '.')
-        extension.erase(0, 1);
-
-    auto copyFileIfNotExists = [this](const std::string& source, const std::string& destination)
+    if (!isValidFile)
     {
-        if (!std::filesystem::exists(destination)) 
-        {
-            std::ifstream src(source, std::ios::binary);
-            std::ofstream dst(destination, std::ios::binary);
-            dst << src.rdbuf();
-        }
-        app->editor->projectWindow->UpdateDirectoryContent();
-    };
-
-    if (extension == "fbx") 
-    {
-        std::string modelFilePath = modelsDir + std::filesystem::path(fileDir).filename().string();
-        copyFileIfNotExists(fileDir, modelFilePath);
-
-        if (!addToScene)
-			return;
-
-        app->renderer3D->meshLoader.ImportFBX(fileDir.c_str(), app->scene->root);
+        LOG(LogType::LOG_WARNING, "File format not supported");
+        return;
     }
-    else if (extension == "png" || extension == "dds")
+
+    std::string newDir = app->fileSystem->CopyFileIfNotExists(fileDir);
+
+	ResourceType resourceType = app->resources->GetResourceTypeFromExtension(extension);
+
+    Resource* newResource = app->resources->FindResourceInLibrary(newDir, resourceType);
+
+    if (!newResource)
+        newResource = ImportFileToLibrary(newDir, resourceType);
+
+    if (addToScene)
+        LoadToScene(newResource, resourceType);
+}
+
+void ModuleImporter::LoadToScene(Resource* newResource, ResourceType resourceType)
+{
+    switch (resourceType)
     {
-        std::string textureFilePath = texturesDir + std::filesystem::path(fileDir).filename().string();
-        copyFileIfNotExists(fileDir, textureFilePath);
-
-        if (! addToScene)
-			return;
-
-        Texture* newTexture = app->renderer3D->LoadTextureImage(textureFilePath.c_str());
-        if (newTexture && app->editor->selectedGameObject) 
+    case ResourceType::MODEL:
+        modelImporter->LoadModel(newResource, app->scene->root);
+        break;
+    case ResourceType::TEXTURE:
+        Texture* newTexture = textureImporter->LoadTextureImage(newResource);
+        if (newTexture && app->editor->selectedGameObject)
         {
             app->editor->selectedGameObject->material->AddTexture(newTexture);
         }
-    }
-    else 
-    {
-        LOG(LogType::LOG_WARNING, "File format not supported");
+        break;
     }
 }
 
@@ -183,4 +112,21 @@ void ModuleImporter::SetDraggedFile(const std::string& filePath)
 {
 	draggedFile = filePath;
 	isDraggingFile = true;
+}
+
+Resource* ModuleImporter::ImportFileToLibrary(const std::string& fileDir, ResourceType type)
+{
+    Resource* resource = app->resources->CreateResource(fileDir, type);
+
+    switch (type)
+    {
+	case ResourceType::MODEL:
+		modelImporter->SaveModel(resource);
+		break;
+	case ResourceType::TEXTURE:
+		textureImporter->SaveTextureFile(resource);
+        break;
+    }
+
+	return resource;
 }

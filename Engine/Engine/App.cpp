@@ -13,10 +13,14 @@ App::App(int argc, char* argv[])
 	importer = new ModuleImporter(this);
 	renderer3D = new ModuleRenderer3D(this);	
 	editor = new ModuleEditor(this);
+	fileSystem = new ModuleFileSystem(this);
+	resources = new ModuleResources(this);
 
 	AddModule(window);
 	AddModule(camera);
 	AddModule(input);	
+	AddModule(fileSystem);
+	AddModule(resources);
 	AddModule(importer);
 	AddModule(scene);
 	AddModule(editor);	
@@ -25,6 +29,11 @@ App::App(int argc, char* argv[])
 
 App::~App()
 {
+	for (auto it = modules.rbegin(); it != modules.rend(); ++it)
+	{
+		delete (*it);
+	}
+
 	modules.clear();
 }
 

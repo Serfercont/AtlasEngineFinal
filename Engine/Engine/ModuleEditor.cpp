@@ -181,7 +181,12 @@ void ModuleEditor::MainMenuBar()
 
                 if (ImGui::MenuItem(name))
                 {
-                    app->renderer3D->meshLoader.ImportFBX(fullPath.c_str(), app->scene->root);
+					Resource* resource = app->resources->FindResourceInLibrary(fullPath, ResourceType::MODEL);
+					if (!resource)
+						resource = app->importer->ImportFileToLibrary(fullPath, ResourceType::MODEL);
+                    
+					app->importer->modelImporter->LoadModel(resource, app->scene->root);
+
                     selectedGameObject = app->scene->root->children.back();
                 }
             }

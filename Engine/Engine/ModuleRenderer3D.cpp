@@ -26,8 +26,6 @@ bool ModuleRenderer3D::Awake()
 {
 	bool ret = true;
 
-	meshLoader.EnableDebugger();
-
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		LOG(LogType::LOG_ERROR, "Error in loading Glew: %s\n", glewGetErrorString(err));
@@ -105,7 +103,7 @@ bool ModuleRenderer3D::Awake()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 
-	meshLoader.ImportFBX("Assets/Models/BakerHouse.fbx", app->scene->root);
+	app->importer->ImportFile("Assets/Models/BakerHouse.fbx", true);
 	app->editor->selectedGameObject = app->scene->root->children[0];
 
 	CreateFramebuffer();
@@ -156,13 +154,6 @@ bool ModuleRenderer3D::CleanUp()
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(1, &fboTexture);
 	glDeleteRenderbuffers(1, &rbo);
-
-	meshLoader.DisableDebugger();
-
-	for (unsigned int i = 0; i < mesh.size(); i++)
-	{
-		mesh[i]->CleanUpMesh();
-	}
 
 	return true;
 }
@@ -223,23 +214,4 @@ void ModuleRenderer3D::CreateFramebuffer()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-Texture* ModuleRenderer3D::LoadTextureImage(const char* file)
-{
-	ILuint image;
-	ilGenImages(1, &image);
-	ilBindImage(image);
-
-	if (!ilLoadImage(file))
-	{
-		LOG(LogType::LOG_WARNING, "Image not loaded");
-		return nullptr;
-	}
-
-	Texture* newTexture = new Texture(ilutGLBindTexImage(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), file);
-
-	ilDeleteImages(1, &image);
-
-	return newTexture;
 }

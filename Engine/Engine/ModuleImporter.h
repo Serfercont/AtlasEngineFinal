@@ -1,6 +1,10 @@
 #pragma once
 
+#include "ModelImporter.h"
 #include "Module.h"
+#include "Resource.h"
+#include "Texture.h"
+#include "TextureImporter.h"
 
 #include <GL/glew.h>
 #include <string>
@@ -28,19 +32,19 @@ public:
 	bool Awake();
 	bool CleanUp();
 
-	GLuint LoadTexture(const std::string& filePath);
-
-	std::string OpenFileDialog(const char* filter);
-
 	void TryImportFile();
-
 	void ImportFile(const std::string& fileDir, bool addToScene = false);
-
 	void SetDraggedFile(const std::string& filePath);
+
+	Resource* ImportFileToLibrary(const std::string& fileDir, ResourceType type);
+	void LoadToScene(Resource* newResource, ResourceType resourceType);
 
 public:
 	Icons icons;
 	bool isDraggingFile = false;
+
+	TextureImporter* textureImporter;
+	ModelImporter* modelImporter;
 
 private:
 	std::string draggedFile;

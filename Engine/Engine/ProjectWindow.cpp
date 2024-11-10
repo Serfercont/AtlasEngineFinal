@@ -338,7 +338,12 @@ void ProjectWindow::HandleDragDrop(const std::filesystem::directory_entry& entry
 {
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
     {
-        const std::string filePath = entry.path().string();
+        std::string filePath = entry.path().string();
+
+        if (filePath.substr(0, 2) == ".\\")
+        {
+            filePath = filePath.substr(2);
+        }
 
         ImTextureID iconTexture = (ImTextureID)(uintptr_t)(entry.is_directory() 
             ? app->importer->icons.folderIcon
@@ -370,7 +375,7 @@ void ProjectWindow::DrawMenuBar()
                 "DDS Files (*.dds)\0*.dds\0"
                 "\0";
 
-            std::string selectedFile = app->importer->OpenFileDialog(filter);
+            std::string selectedFile = app->fileSystem->OpenFileDialog(filter);
             if (!selectedFile.empty())
             {
 				app->importer->ImportFile(selectedFile);

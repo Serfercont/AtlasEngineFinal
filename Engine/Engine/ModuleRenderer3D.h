@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Module.h"
-#include "MeshLoader.h"
 #include "Grid.h"
 
 #include <SDL2/SDL_video.h>
@@ -25,13 +24,8 @@ public:
 	void OnResize(int width, int height);
 	void CreateFramebuffer();
 
-	Texture* LoadTextureImage(const char* file);
-
 public:
-	std::vector<Mesh*> mesh;
-	MeshLoader meshLoader;
-
-	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4] = { 0 };
+	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
 	unsigned int checkerTextureId;
 
 	Grid grid;
