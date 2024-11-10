@@ -37,6 +37,7 @@ public:
 	void SetDraggedFile(const std::string& filePath);
 
 	Resource* ImportFileToLibrary(const std::string& fileDir, ResourceType type);
+	void LoadToScene(Resource* newResource, ResourceType resourceType);
 
 public:
 	Icons icons;

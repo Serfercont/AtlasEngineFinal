@@ -87,20 +87,24 @@ void ModuleImporter::ImportFile(const std::string& fileDir, bool addToScene)
     if (!newResource)
         newResource = ImportFileToLibrary(newDir, resourceType);
 
-    if (!addToScene)
-		return;
+    if (addToScene)
+        LoadToScene(newResource, resourceType);
+}
 
+void ModuleImporter::LoadToScene(Resource* newResource, ResourceType resourceType)
+{
     switch (resourceType)
     {
-	case ResourceType::MODEL:
+    case ResourceType::MODEL:
         modelImporter->LoadModel(newResource, app->scene->root);
-		break;
-	case ResourceType::TEXTURE:
+        break;
+    case ResourceType::TEXTURE:
         Texture* newTexture = textureImporter->LoadTextureImage(newResource);
         if (newTexture && app->editor->selectedGameObject)
         {
             app->editor->selectedGameObject->material->AddTexture(newTexture);
         }
+        break;
     }
 }
 
