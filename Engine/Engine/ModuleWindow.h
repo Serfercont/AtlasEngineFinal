@@ -21,6 +21,11 @@ public:
 	bool Awake();
 	bool CleanUp();
 
+	void SetFullScreen(bool enabled);
+	void SetBorderless(bool enabled);
+	void SetFullDesktop(bool enabled);
+	void SetResizable(bool enabled);
+
 public:
 	SDL_Window* window;
 	SDL_GLContext context;
@@ -28,4 +33,9 @@ public:
 
 	int width;
 	int height;
+
+	bool fullscreen = WIN_FULLSCREEN;
+	bool borderless = WIN_BORDERLESS;
+	bool fulldesktop = WIN_FULLSCREEN_DESKTOP;
+	bool resizable = WIN_RESIZABLE;
 };

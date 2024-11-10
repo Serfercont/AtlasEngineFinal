@@ -16,6 +16,7 @@ public:
 	bool drawTextures = true;
 	bool wireframe = false;
 	bool shadedWireframe = false;
+	bool cullFace = true;
 
 	// Normals settings
 	float vertexNormalLength = 0.1f;

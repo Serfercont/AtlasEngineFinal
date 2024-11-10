@@ -53,7 +53,7 @@ void SceneWindow::DrawWindow()
 
 	UpdateMouseState();
 
-    ImVec2 textureSize = ImVec2(app->window->width, app->window->height);
+    ImVec2 textureSize = ImVec2((float)app->window->width, (float)app->window->height);
     ImVec2 windowSize = ImGui::GetWindowSize();
 
     ImVec2 uv0 = ImVec2((textureSize.x - windowSize.x) / (2 * textureSize.x),
@@ -71,6 +71,25 @@ void SceneWindow::DrawWindow()
             app->importer->ImportFile(droppedFilePath, true);
         }
         ImGui::EndDragDropTarget();
+    }
+
+    if (ImGui::IsWindowDocked() && app->editor->performanceWindow->showFpsOverlay)
+    {
+        if (windowSize.x > 120 && windowSize.y > 100)
+        {        
+            float dt = app->GetDT();
+            float currentFps = 1.0f / dt;
+            float ms = dt * 1000.0f;
+
+            ImVec2 windowPos = ImGui::GetWindowPos();
+            ImVec2 topRightPos = ImVec2(windowPos.x + windowSize.x - 80, windowPos.y + 60);
+            ImVec4 overlayColor = ImVec4(0.0f, 1.0f, 0.8f, 1.0f);
+            ImGui::SetNextWindowPos(topRightPos);
+            ImGui::Begin("FPSOverlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground);
+            ImGui::TextColored(overlayColor, "%.2f FPS", currentFps);
+            ImGui::TextColored(overlayColor, "%.2f ms", ms);
+            ImGui::End();
+        }
     }
 
     ImGui::End();

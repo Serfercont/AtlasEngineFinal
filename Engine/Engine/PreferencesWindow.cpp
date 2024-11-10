@@ -14,10 +14,33 @@ void PreferencesWindow::DrawWindow()
     ImGui::Begin(name.c_str());
 
     UpdateMouseState();
+    if (ImGui::CollapsingHeader("Screen options", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::Checkbox("Full Screen", &app->window->fullscreen))
+        {
+            app->window->SetFullScreen(app->window->fullscreen);
+        }
+        if (ImGui::Checkbox("Full Desktop", &app->window->fulldesktop))
+        {
+            app->window->SetFullDesktop(app->window->fulldesktop);
+        }
+        if (ImGui::Checkbox("Borderless", &app->window->borderless))
+        {
+            app->window->SetBorderless(app->window->borderless);
+        }
+        if (ImGui::Checkbox("Resizable", &app->window->resizable))
+        {
+            app->window->SetResizable(app->window->resizable);
+        }
+
+    }
+
 
     if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Checkbox("Show Textures", &drawTextures);
+        if (ImGui::Checkbox("Cull face", &cullFace))
+            cullFace ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 
         ImGui::Spacing();
         ImGui::Separator();

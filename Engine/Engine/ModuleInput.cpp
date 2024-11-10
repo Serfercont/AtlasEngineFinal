@@ -3,7 +3,7 @@
 
 #include <string>
 
-ModuleInput::ModuleInput(App* app) : Module(app)
+ModuleInput::ModuleInput(App* app) : Module(app), cursor(DEFAULT), mouse_x(0), mouse_y(0), mouse_z(0), mouse_x_motion(0), mouse_y_motion(0)
 {
 	for (int i = 0; i < MAX_KEYS; ++i) keyboard[i] = KEY_IDLE;
 

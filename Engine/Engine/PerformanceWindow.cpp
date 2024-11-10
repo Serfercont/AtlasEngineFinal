@@ -88,7 +88,12 @@ void PerformanceWindow::DrawWindow()
 
         char overlay[32];
         sprintf_s(overlay, "Memory Usage %.2f%% (%d MB)", memoryUsePercentage, memoryUse / 1024);
-        ImGui::PlotLines("##MemoryUsage", values, IM_ARRAYSIZE(values), values_offset, overlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
+        ImGui::PlotLines("##MemoryUsage",
+            values, IM_ARRAYSIZE(values),
+            values_offset, overlay,
+            0.0f, 100.0f,
+            ImVec2(ImGui::GetColumnWidth() - 20, 80.0f)
+        );
 
         ImGui::TreePop();
     }
@@ -96,7 +101,7 @@ void PerformanceWindow::DrawWindow()
     if (ImGui::TreeNodeEx("CPU", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::SeparatorText("Information");
-        
+
         ImGui::Text("CPU Name:");
         ImGui::SameLine();
         ImGui::TextColored(dataTextColor, "%s", cpuName.c_str());
@@ -124,7 +129,7 @@ void PerformanceWindow::DrawWindow()
         ImGui::SameLine();
         ImGui::TextColored(dataTextColor, "%d MB", statex.ullAvailPhys / (1024 * 1024));
 
-        int memoryusage = (statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024);
+        int memoryusage = (int)((statex.ullTotalPhys - statex.ullAvailPhys) / (1024 * 1024));
         float memoryUsePercentage = ((float)(statex.ullTotalPhys - statex.ullAvailPhys) / statex.ullTotalPhys) * 100.0f;
 
         static float totalMemoryValues[100] = { 0 };
@@ -136,7 +141,12 @@ void PerformanceWindow::DrawWindow()
         char totalOverlay[32];
         sprintf_s(totalOverlay, "Memory Usage %.2f%% (%d MB)", memoryUsePercentage, memoryusage);
 
-        ImGui::PlotLines("##MemoryUsage", totalMemoryValues, IM_ARRAYSIZE(totalMemoryValues), totalValuesOffset, totalOverlay, 0.0f, 100.0f, ImVec2(0, 80.0f));
+        ImGui::PlotLines("##MemoryUsage",
+            totalMemoryValues, IM_ARRAYSIZE(totalMemoryValues),
+            totalValuesOffset, totalOverlay,
+            0.0f, 100.0f,
+            ImVec2(ImGui::GetColumnWidth() - 20, 80.0f)
+        );
 
         PROCESS_MEMORY_COUNTERS_EX pmc;
         if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) 
@@ -161,27 +171,36 @@ void PerformanceWindow::DrawWindow()
     if (ImGui::TreeNodeEx("Framerates", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::SeparatorText("Information");
-        if (frameCount > 1)
+        if (totalFrameCount > 1)
         {
             dt = app->GetDT();
+
             currentFps = 1.0f / dt;
-        }
-    
-        fpsHistory[fpsHistoryOffset] = currentFps;
-        fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
 
-        totalFps += currentFps;
-        frameCount++;
+            if (currentFps < minFps)
+                minFps = currentFps;
+            if (currentFps > maxFps && currentFps <= std::stoi(fpsOptions[IM_ARRAYSIZE(fpsOptions) - 1]))
+                maxFps = currentFps;
 
+            fpsHistory[fpsHistoryOffset] = currentFps;
+            fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
 
-        if (currentFps < minFps) {
-            minFps = currentFps;
-        }
-        if (currentFps > maxFps) {
-            maxFps = currentFps;
+            totalFps = 0;
+            frameCount = 0;
+
+            for (int i = 0; i < FPS_HISTORY_SIZE; i++)
+            {
+                if (fpsHistory[i] != 0)
+                {
+                    totalFps += fpsHistory[i];
+                    frameCount++;
+                }
+            }
         }
 
         float averageFps = totalFps / frameCount;
+
+        totalFrameCount++;
 
         ImGui::Text("Current FPS:");
         ImGui::SameLine();
@@ -207,13 +226,30 @@ void PerformanceWindow::DrawWindow()
             FPS_HISTORY_SIZE,
             fpsHistoryOffset,
             fpsOverlay,
-            minFps,
-            maxFps * 1.2f,
-            ImVec2(0, 80.0f)
+            minFps - 20,
+            maxFps + 20,
+            ImVec2(ImGui::GetColumnWidth() - 20, 80.0f)
         );
+
+        ImGui::Checkbox("FPS Overlay", &showFpsOverlay);
+        if (ImGui::Checkbox("VSync", &app->vsync))
+            SDL_GL_SetSwapInterval(app->vsync ? 1 : 0);
+
+        ImGui::BeginDisabled(app->vsync);
+
+        static int selectedFpsIndex = 1;
+
+        ImGui::SetNextItemWidth(100);
+
+        if (ImGui::Combo("Cap FPS", &selectedFpsIndex, fpsOptions, IM_ARRAYSIZE(fpsOptions)))
+        {
+            app->maxFps = std::stoi(fpsOptions[selectedFpsIndex]);
+        }
+
+        ImGui::EndDisabled();
 
         ImGui::TreePop();
     }
 
-	ImGui::End();
+    ImGui::End();
 }

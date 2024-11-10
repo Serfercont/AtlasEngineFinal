@@ -8,13 +8,9 @@ public:
 	Timer();
 
 	void Start();
-	void Stop();
-
-	Uint32 Read();
+	double ReadMs() const;
 
 private:
-
-	bool	running;
-	Uint32	started_at;
-	Uint32	stopped_at;
+	Uint64 startTime;
+	Uint64 frequency;
 };
