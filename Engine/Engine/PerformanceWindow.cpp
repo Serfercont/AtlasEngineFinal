@@ -168,7 +168,7 @@ void PerformanceWindow::DrawWindow()
 		ImGui::TreePop();
 	}
 
-	if (ImGui::TreeNodeEx("Framerates", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::TreeNodeEx("FRAMERATES", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::SeparatorText("Information");
 		if (totalFrameCount > 1)
