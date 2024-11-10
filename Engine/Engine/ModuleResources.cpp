@@ -25,14 +25,14 @@ Resource* ModuleResources::CreateResource(const std::string& fileDir, ResourceTy
 
 	std::string fileName = app->fileSystem->GetFileNameWithoutExtension(fileDir);
 
-    switch (type)
-    {
+	switch (type)
+	{
 	case ResourceType::MODEL:
 		resource = new Resource(fileName, ResourceType::MODEL);
 		break;
 	case ResourceType::TEXTURE:
 		resource = new Resource(fileName, ResourceType::TEXTURE);
-    }
+	}
 
 	if (resource)
 	{
@@ -41,17 +41,17 @@ Resource* ModuleResources::CreateResource(const std::string& fileDir, ResourceTy
 		resource->SetLibraryFileDir(libraryFileDir);
 	}
 
-    return resource;
+	return resource;
 }
 
 ResourceType ModuleResources::GetResourceTypeFromExtension(const std::string& extension)
 {
-    if (extension == "fbx")
-        return ResourceType::MODEL;
-    else if (extension == "png" || extension == "dds")
-        return ResourceType::TEXTURE;
-    else
-        return ResourceType::UNKNOWN;
+	if (extension == "fbx")
+		return ResourceType::MODEL;
+	else if (extension == "png" || extension == "dds")
+		return ResourceType::TEXTURE;
+	else
+		return ResourceType::UNKNOWN;
 }
 
 std::string ModuleResources::CreateLibraryFileDir(std::string name, ResourceType type)

@@ -12,7 +12,7 @@ public:
 	GLuint textureId;
 
 	int textureWidth;
-	int textureHeight;	
-		
+	int textureHeight;
+
 	char* texturePath;
 };

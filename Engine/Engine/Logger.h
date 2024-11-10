@@ -5,9 +5,9 @@
 
 enum class LogType
 {
-    LOG_INFO,
-    LOG_WARNING,
-    LOG_ERROR
+	LOG_INFO,
+	LOG_WARNING,
+	LOG_ERROR
 };
 
 struct LogInfo
@@ -21,14 +21,14 @@ struct LogInfo
 class Logger
 {
 public:
-    static void Log(const char file[], int line, LogType type, const char* format, ...);
-    void AddLog(LogType type, std::string message);
-    void Clear();
+	static void Log(const char file[], int line, LogType type, const char* format, ...);
+	void AddLog(LogType type, std::string message);
+	void Clear();
 
 	const std::vector<LogInfo> GetLogs() const { return logs; }
 
 private:
-    std::vector<LogInfo> logs;
+	std::vector<LogInfo> logs;
 };
 
 extern Logger logger;

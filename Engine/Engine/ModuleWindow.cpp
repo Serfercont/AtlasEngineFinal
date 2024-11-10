@@ -39,7 +39,7 @@ bool ModuleWindow::Awake()
 
 		window = SDL_CreateWindow("Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 
-		if(window == NULL)
+		if (window == NULL)
 		{
 			LOG(LogType::LOG_ERROR, "Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;

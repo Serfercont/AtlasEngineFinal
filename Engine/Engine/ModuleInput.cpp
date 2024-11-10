@@ -179,7 +179,7 @@ void ModuleInput::SetCursor()
 
 	if (sdlCursor != SDL_GetCursor())
 		SDL_SetCursor(sdlCursor);
-}  
+}
 
 void ModuleInput::CreateCursors()
 {
@@ -199,19 +199,19 @@ void ModuleInput::CreateCursors()
 	orbitCursor.reset(SDL_CreateColorCursor(orbitSurface.get(), 5, 0));
 }
 
-void ModuleInput::MakeCursorTransparent(SDL_Surface* surface) 
+void ModuleInput::MakeCursorTransparent(SDL_Surface* surface)
 {
 	if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
 
 	Uint32* pixels = (Uint32*)surface->pixels;
 	int pixelCount = (surface->w) * (surface->h);
 
-	for (int i = 0; i < pixelCount; i++) 
+	for (int i = 0; i < pixelCount; i++)
 	{
 		Uint8 r, g, b, a;
 		SDL_GetRGBA(pixels[i], surface->format, &r, &g, &b, &a);
 
-		if (r == 255 && g == 0 && b == 0) 
+		if (r == 255 && g == 0 && b == 0)
 		{
 			pixels[i] = SDL_MapRGBA(surface->format, r, g, b, 0);
 		}

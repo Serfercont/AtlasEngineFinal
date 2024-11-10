@@ -6,25 +6,25 @@
 
 enum class WindowType
 {
-	HIERARCHY,	
+	HIERARCHY,
 	INSPECTOR,
 	CONSOLE,
-	PROJECT,	
+	PROJECT,
 	SCENE,
 	PERFORMANCE,
 	PREFERENCES,
 	ABOUT
 };
 
-class EditorWindow 
+class EditorWindow
 {
 public:
-    EditorWindow(const WindowType type, const std::string& name) : type(type), name(name) {}
-    virtual ~EditorWindow() {}
+	EditorWindow(const WindowType type, const std::string& name) : type(type), name(name) {}
+	virtual ~EditorWindow() {}
 
-    virtual void DrawWindow() = 0;
+	virtual void DrawWindow() = 0;
 	WindowType GetType() const { return type; }
-    std::string GetName() const { return name; }
+	std::string GetName() const { return name; }
 	virtual bool IsEnabled() const { return enabled; }
 	virtual void SetEnabled(bool enabled) { this->enabled = enabled; }
 	virtual void UpdateMouseState() { isMouseInside = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) ? true : false; }
@@ -32,7 +32,7 @@ public:
 
 protected:
 	WindowType type;
-    std::string name;
-	bool enabled = true;	
+	std::string name;
+	bool enabled = true;
 	bool isMouseInside = false;
 };

@@ -35,4 +35,3 @@ public:
 	float initialScale[3] = { 1.0f, 1.0f, 1.0f };
 	bool updateTransform = false;
 };
-

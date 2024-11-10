@@ -12,35 +12,35 @@ InspectorWindow::~InspectorWindow()
 
 void InspectorWindow::DrawWindow()
 {
-    ImGui::Begin(name.c_str());
+	ImGui::Begin(name.c_str());
 
-    UpdateMouseState();
+	UpdateMouseState();
 
-    if (app->editor->selectedGameObject != nullptr && app->editor->selectedGameObject->parent != nullptr)
-    {
-        ImGui::Checkbox("##Active", &app->editor->selectedGameObject->isActive);
-        ImGui::SameLine();
+	if (app->editor->selectedGameObject != nullptr && app->editor->selectedGameObject->parent != nullptr)
+	{
+		ImGui::Checkbox("##Active", &app->editor->selectedGameObject->isActive);
+		ImGui::SameLine();
 
-        strcpy_s(inputName, app->editor->selectedGameObject->name.c_str());
+		strcpy_s(inputName, app->editor->selectedGameObject->name.c_str());
 
-        if (ImGui::InputText("##InspectorName", inputName, sizeof(inputName), inputTextFlags)
-            || (isEditingInspector && !ImGui::IsItemActive() && !ImGui::IsAnyItemActive()))
-        {
-            if (inputName[0] != '\0') app->editor->selectedGameObject->name = inputName;
-            isEditingInspector = false;
-        }
+		if (ImGui::InputText("##InspectorName", inputName, sizeof(inputName), inputTextFlags)
+			|| (isEditingInspector && !ImGui::IsItemActive() && !ImGui::IsAnyItemActive()))
+		{
+			if (inputName[0] != '\0') app->editor->selectedGameObject->name = inputName;
+			isEditingInspector = false;
+		}
 
-        if (ImGui::IsItemClicked())
-        {
-            isEditingInspector = true;
-            ImGui::SetKeyboardFocusHere(-1);
-        }
+		if (ImGui::IsItemClicked())
+		{
+			isEditingInspector = true;
+			ImGui::SetKeyboardFocusHere(-1);
+		}
 
-        for (auto i = 0; i < app->editor->selectedGameObject->components.size(); i++)
-        {
-            app->editor->selectedGameObject->components[i]->OnEditor();
-        }
-    }
+		for (auto i = 0; i < app->editor->selectedGameObject->components.size(); i++)
+		{
+			app->editor->selectedGameObject->components[i]->OnEditor();
+		}
+	}
 
-    ImGui::End();
+	ImGui::End();
 }

@@ -3,10 +3,10 @@
 #include "EditorWindow.h"
 #include "Logger.h"
 
-class ConsoleWindow : public EditorWindow 
+class ConsoleWindow : public EditorWindow
 {
 public:
-    ConsoleWindow(const WindowType type, const std::string& name);
+	ConsoleWindow(const WindowType type, const std::string& name);
 	~ConsoleWindow();
 
 	void DrawWindow() override;

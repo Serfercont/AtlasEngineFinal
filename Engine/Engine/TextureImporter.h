@@ -13,6 +13,6 @@ public:
 
 	void SaveTextureFile(Resource* resource);
 	Texture* LoadTextureImage(Resource* resource);
-	
+
 	GLuint LoadIconImage(const std::string& filePath);
 };

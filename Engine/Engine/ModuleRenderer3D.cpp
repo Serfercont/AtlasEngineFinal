@@ -11,16 +11,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
 ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app), rbo(0), fboTexture(0), fbo(0), checkerTextureId(0)
 {
 }
 
-
 ModuleRenderer3D::~ModuleRenderer3D()
 {
 }
-
 
 bool ModuleRenderer3D::Awake()
 {
@@ -171,8 +168,8 @@ void ModuleRenderer3D::OnResize(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-    glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
-    glLoadMatrixf(glm::value_ptr(projectionMatrix));
+	glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
+	glLoadMatrixf(glm::value_ptr(projectionMatrix));
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -195,7 +192,7 @@ void ModuleRenderer3D::CreateFramebuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	glGenTextures(1, &fboTexture);
-	glBindTexture(GL_TEXTURE_2D, fboTexture);	
+	glBindTexture(GL_TEXTURE_2D, fboTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, app->window->width, app->window->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -207,7 +204,6 @@ void ModuleRenderer3D::CreateFramebuffer()
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, app->window->width, app->window->height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		LOG(LogType::LOG_ERROR, "Framebuffer is not complete!");

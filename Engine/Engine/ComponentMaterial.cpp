@@ -5,7 +5,7 @@
 
 #include <windows.h>
 #include <shellapi.h>
-#include <algorithm> 
+#include <algorithm>
 
 ComponentMaterial::ComponentMaterial(GameObject* gameObject) : Component(gameObject, ComponentType::MATERIAL), materialTexture(nullptr), textureId(-1)
 {
@@ -17,7 +17,6 @@ ComponentMaterial::~ComponentMaterial()
 
 void ComponentMaterial::Update()
 {
-
 }
 
 void ComponentMaterial::OnEditor()

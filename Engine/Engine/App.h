@@ -38,7 +38,7 @@ public:
 	ModuleWindow* window = nullptr;
 	ModuleCamera* camera = nullptr;
 	ModuleInput* input = nullptr;
-	ModuleScene* scene = nullptr;	
+	ModuleScene* scene = nullptr;
 	ModuleImporter* importer = nullptr;
 	ModuleRenderer3D* renderer3D = nullptr;
 	ModuleEditor* editor = nullptr;
