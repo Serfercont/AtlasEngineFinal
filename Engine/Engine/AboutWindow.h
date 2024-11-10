@@ -9,4 +9,6 @@ public:
 	~AboutWindow();
 
 	void DrawWindow() override;
+
+	void HyperLink(const char* text, const char* url);
 };
