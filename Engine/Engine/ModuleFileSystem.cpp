@@ -5,6 +5,10 @@
 
 ModuleFileSystem::ModuleFileSystem(App* app) : Module(app)
 {
+    std::filesystem::create_directories("Library");
+    std::filesystem::create_directories("Library/Textures");
+    std::filesystem::create_directories("Library/Meshes");
+    std::filesystem::create_directories("Library/Models");
 }
 
 ModuleFileSystem::~ModuleFileSystem()
