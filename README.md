@@ -1,7 +1,7 @@
 # SpectraEngine
 
 ## Description
-**SpectraEngine** is a 3D game engine developed in **C++** with **OpenGL**, currently capable of rendering geometry with a range of controls and information displays.
+**AtlasEngine** is a 3D game engine developed in **C++** with **OpenGL**, currently capable of rendering geometry with a range of controls and information displays.
 
 The project is under active development, and the code is available on [GitHub](https://github.com/CITM-UPC/SpectraEngine).
 
