@@ -86,7 +86,7 @@ void HierarchyWindow::DrawWindow()
 
 void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* searchText)
 {
-    // Validaciones previas
+    
     if (!node) return;
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -126,7 +126,7 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
             app->editor->selectedGameObject = node;
         }
 
-        // Drag and Drop Source
+       
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
         {
             ImGui::SetDragDropPayload("HIERARCHY_NODE", &node, sizeof(GameObject*));
@@ -134,19 +134,19 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
             ImGui::EndDragDropSource();
         }
 
-        // Drag and Drop Target
+        
         if (ImGui::BeginDragDropTarget())
         {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
             {
                 GameObject* draggedNode = *(GameObject**)payload->Data;
 
-                // Validaciones más robustas
+              
                 if (draggedNode && draggedNode != node &&
-                    !IsDescendant(draggedNode, node) &&  // No permitir mover a un descendiente
-                    node != draggedNode->parent)        // No mover si ya es su padre actual
+                    !IsDescendant(draggedNode, node) && 
+                    node != draggedNode->parent)       
                 {
-                    // Eliminar del padre anterior
+                    
                     if (draggedNode->parent)
                     {
                         auto& siblings = draggedNode->parent->children;
@@ -156,7 +156,7 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
                         );
                     }
 
-                    // Establecer nuevo padre
+                    
                     draggedNode->parent = node;
                     node->children.push_back(draggedNode);
                 }
@@ -164,7 +164,7 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
             ImGui::EndDragDropTarget();
         }
 
-        // Renderizar hijos recursivamente
+        
         if (isOpen && !node->children.empty())
         {
             for (auto child : node->children)
@@ -181,7 +181,7 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
     }
     else
     {
-        // Filtrar recursivamente
+        
         for (auto child : node->children)
         {
             HierarchyTree(child, false, searchText);
@@ -193,7 +193,7 @@ bool HierarchyWindow::ValidateHierarchy(GameObject* node)
 {
     if (!node) return false;
 
-    // Comprobar referencias circulares
+   
     std::vector<GameObject*> visited;
     return !HasCircularReference(node, visited);
 }
@@ -202,11 +202,11 @@ bool HierarchyWindow::HasCircularReference(GameObject* node, std::vector<GameObj
 {
     if (!node) return false;
 
-    // Comprueba si el nodo ya está en el vector
+   
     if (std::find(visited.begin(), visited.end(), node) != visited.end())
-        return true; // Referencia circular detectada
+        return true; 
 
-    visited.push_back(node); // Añade el nodo a la lista de visitados
+    visited.push_back(node); 
 
     for (auto child : node->children)
     {
@@ -214,13 +214,12 @@ bool HierarchyWindow::HasCircularReference(GameObject* node, std::vector<GameObj
             return true;
     }
 
-    visited.pop_back(); // Elimina el nodo al retroceder en la recursión
-    return false;
+    visited.pop_back(); 
 }
-// Nueva función para manejar nodos sueltos (mover a la raíz)
+
 void HierarchyWindow::DropNodeToRoot(GameObject* draggedNode)
 {
-    // Si tiene un padre, desconéctalo
+  
     if (draggedNode->parent)
     {
         auto& siblings = draggedNode->parent->children;
@@ -231,7 +230,7 @@ void HierarchyWindow::DropNodeToRoot(GameObject* draggedNode)
     app->scene->root->children.push_back(draggedNode);
 }
 
-// Nueva función: Comprueba si `potentialChild` es descendiente de `parent`
+
 bool HierarchyWindow::IsDescendant(GameObject* potentialChild, GameObject* parent)
 {
     if (!parent) return false;
