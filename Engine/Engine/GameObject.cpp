@@ -66,7 +66,7 @@ Component* GameObject::GetComponent(ComponentType type)
 	return nullptr;
 }
 
-// NUEVA FUNCIÓN: Eliminar el GameObject
+
 void GameObject::Delete()
 {
 	
