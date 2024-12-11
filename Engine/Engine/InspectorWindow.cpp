@@ -40,6 +40,14 @@ void InspectorWindow::DrawWindow()
 		{
 			app->editor->selectedGameObject->components[i]->OnEditor();
 		}
+
+	
+		if (ImGui::Button("Delete GameObject"))
+		{
+			app->editor->selectedGameObject->Delete();
+			delete app->editor->selectedGameObject;
+			app->editor->selectedGameObject = nullptr;
+		}
 	}
 
 	ImGui::End();
