@@ -129,14 +129,14 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 
 	const Frustum& frustum = app->camera->GetFrustum();
 
-	for (GameObject* gameObject : app->scene->root->children) {
-		const AABB& box = gameObject->GetBoundingBox();
+	//for (GameObject* gameObject : app->scene->root->children) {
+	//	const AABB& box = gameObject->GetBoundingBox();
 
-		if (frustum.IsBoxInside(box)) {
-			DrawAABB(box); // Dibuja el contorno del AABB
-			gameObject->Render(); // Renderiza el objeto si está visible
-		}
-	}
+	//	if (frustum.IsBoxInside(box)) {
+	//		DrawAABB(box); // Dibuja el contorno del AABB
+	//		gameObject->Render(); // Renderiza el objeto si está visible
+	//	}
+	//}
 
 	return true;
 }
@@ -223,36 +223,36 @@ void ModuleRenderer3D::CreateFramebuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ModuleRenderer3D::DrawAABB(const AABB& box) {
-	glm::vec3 vertices[8] = {
-		{box.min.x, box.min.y, box.min.z}, // Vértices de la caja
-		{box.max.x, box.min.y, box.min.z},
-		{box.min.x, box.max.y, box.min.z},
-		{box.max.x, box.max.y, box.min.z},
-		{box.min.x, box.min.y, box.max.z},
-		{box.max.x, box.min.y, box.max.z},
-		{box.min.x, box.max.y, box.max.z},
-		{box.max.x, box.max.y, box.max.z},
-	};
-
-	glBegin(GL_LINES);
-	// Conecta los vértices para formar las aristas de la caja
-	// Frente
-	glVertex3fv(&vertices[0].x); glVertex3fv(&vertices[1].x);
-	glVertex3fv(&vertices[1].x); glVertex3fv(&vertices[3].x);
-	glVertex3fv(&vertices[3].x); glVertex3fv(&vertices[2].x);
-	glVertex3fv(&vertices[2].x); glVertex3fv(&vertices[0].x);
-
-	// Atrás
-	glVertex3fv(&vertices[4].x); glVertex3fv(&vertices[5].x);
-	glVertex3fv(&vertices[5].x); glVertex3fv(&vertices[7].x);
-	glVertex3fv(&vertices[7].x); glVertex3fv(&vertices[6].x);
-	glVertex3fv(&vertices[6].x); glVertex3fv(&vertices[4].x);
-
-	// Conexiones entre frente y atrás
-	glVertex3fv(&vertices[0].x); glVertex3fv(&vertices[4].x);
-	glVertex3fv(&vertices[1].x); glVertex3fv(&vertices[5].x);
-	glVertex3fv(&vertices[2].x); glVertex3fv(&vertices[6].x);
-	glVertex3fv(&vertices[3].x); glVertex3fv(&vertices[7].x);
-	glEnd();
-}
+//void ModuleRenderer3D::DrawAABB(const AABB& box) {
+//	glm::vec3 vertices[8] = {
+//		{box.min.x, box.min.y, box.min.z}, // Vértices de la caja
+//		{box.max.x, box.min.y, box.min.z},
+//		{box.min.x, box.max.y, box.min.z},
+//		{box.max.x, box.max.y, box.min.z},
+//		{box.min.x, box.min.y, box.max.z},
+//		{box.max.x, box.min.y, box.max.z},
+//		{box.min.x, box.max.y, box.max.z},
+//		{box.max.x, box.max.y, box.max.z},
+//	};
+//
+//	glBegin(GL_LINES);
+//	// Conecta los vértices para formar las aristas de la caja
+//	// Frente
+//	glVertex3fv(&vertices[0].x); glVertex3fv(&vertices[1].x);
+//	glVertex3fv(&vertices[1].x); glVertex3fv(&vertices[3].x);
+//	glVertex3fv(&vertices[3].x); glVertex3fv(&vertices[2].x);
+//	glVertex3fv(&vertices[2].x); glVertex3fv(&vertices[0].x);
+//
+//	// Atrás
+//	glVertex3fv(&vertices[4].x); glVertex3fv(&vertices[5].x);
+//	glVertex3fv(&vertices[5].x); glVertex3fv(&vertices[7].x);
+//	glVertex3fv(&vertices[7].x); glVertex3fv(&vertices[6].x);
+//	glVertex3fv(&vertices[6].x); glVertex3fv(&vertices[4].x);
+//
+//	// Conexiones entre frente y atrás
+//	glVertex3fv(&vertices[0].x); glVertex3fv(&vertices[4].x);
+//	glVertex3fv(&vertices[1].x); glVertex3fv(&vertices[5].x);
+//	glVertex3fv(&vertices[2].x); glVertex3fv(&vertices[6].x);
+//	glVertex3fv(&vertices[3].x); glVertex3fv(&vertices[7].x);
+//	glEnd();
+//}

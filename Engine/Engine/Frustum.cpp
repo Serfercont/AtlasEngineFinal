@@ -11,6 +11,11 @@ void Frustum::Calculate(const glm::mat4& viewProjectionMatrix) {
     planes[LEFT] = glm::vec4(m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12]);
     planes[RIGHT] = glm::vec4(m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12]);
     // Repeat for TOP, BOTTOM, NEAR, FAR...
+	planes[TOP] = glm::vec4(m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13]);
+	planes[BOTTOM] = glm::vec4(m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13]);
+	planes[NEAR] = glm::vec4(m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14]);
+	planes[FAR] = glm::vec4(m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14]);
+
 
     // Normalize planes
     for (int i = 0; i < 6; ++i) {

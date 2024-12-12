@@ -4,6 +4,7 @@
 #include "ComponentTransform.h"
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
+#include "AABB.h"
 
 #include <string>
 #include <vector>
@@ -32,6 +33,9 @@ public:
 
 	std::vector<Component*> components;
 	std::vector<GameObject*> children;
+
+	glm::vec3 aabbMin;
+	glm::vec3 aabbMax;
 
 	bool isActive = true;
 	bool isEditing = false;
