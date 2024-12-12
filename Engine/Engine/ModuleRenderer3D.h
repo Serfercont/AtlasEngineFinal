@@ -23,6 +23,7 @@ public:
 
 	void OnResize(int width, int height);
 	void CreateFramebuffer();
+	void DrawAABB(const AABB& box);
 
 public:
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];

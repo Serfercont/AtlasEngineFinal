@@ -226,6 +226,9 @@ void ModuleCamera::CalculateViewMatrix()
 		X.z, Y.z, Z.z, 0.0f,
 		-glm::dot(X, pos), -glm::dot(Y, pos), -glm::dot(Z, pos), 1.0f
 	);
+
+	glm::mat4 projectionMatrix = GetProjectionMatrix();
+	frustum.Calculate(projectionMatrix * viewMatrix);
 }
 
 glm::mat4 ModuleCamera::GetProjectionMatrix() const
@@ -257,4 +260,7 @@ void ModuleCamera::SetCursor(CursorType cursorType)
 		isOrbiting = (cursorType == CursorType::ORBIT);
 		isDragging = (cursorType == CursorType::DRAG);
 	}
+}
+const Frustum& ModuleCamera::GetFrustum() const {
+	return frustum;
 }
