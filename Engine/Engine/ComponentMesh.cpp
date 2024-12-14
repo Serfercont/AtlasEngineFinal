@@ -1,5 +1,6 @@
 #include "ComponentMesh.h"
 #include "App.h"
+#include "AABB.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -58,5 +59,16 @@ void ComponentMesh::OnEditor()
 
 		ImGui::Checkbox("Vertex Normals", &showVertexNormals);
 		ImGui::Checkbox("Face Normals", &showFaceNormals);
+	}
+}
+
+void ComponentMesh::CalculateLocalAABB() {
+	if (!mesh || mesh->verticesCount == 0) return;
+
+	localAABB.SetNegativeInfinity();
+
+	for (uint i = 0; i < mesh->verticesCount; i += 3) {
+		glm::vec3 vertex(mesh->vertices[i], mesh->vertices[i + 1], mesh->vertices[i + 2]);
+		localAABB.Enclose(vertex);
 	}
 }

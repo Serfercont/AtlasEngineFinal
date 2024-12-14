@@ -123,9 +123,6 @@
     <ClCompile Include="Frustum.cpp">
       <Filter>Sources\Math</Filter>
     </ClCompile>
-    <ClCompile Include="AABB.cpp">
-      <Filter>Sources\Math</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">

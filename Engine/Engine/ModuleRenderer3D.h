@@ -2,6 +2,7 @@
 
 #include "Module.h"
 #include "Grid.h"
+#include "AABB.h"
 
 #include <SDL2/SDL_video.h>
 #include <GL/glew.h>
@@ -23,7 +24,7 @@ public:
 
 	void OnResize(int width, int height);
 	void CreateFramebuffer();
-	void DrawAABB(const AABB& box);
+	void RenderAABB(const AABB& aabb, const glm::mat4& transform);
 
 public:
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];

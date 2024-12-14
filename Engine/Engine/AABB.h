@@ -1,17 +1,32 @@
+// AABB.h
 #pragma once
-
 #include <glm/glm.hpp>
+#include <limits>
 
 class AABB {
 public:
-    AABB(const glm::vec3& min, const glm::vec3& max);
-    ~AABB();
+    glm::vec3 minPoint;
+    glm::vec3 maxPoint;
 
-    bool Intersects(const AABB& other) const;
-    glm::vec3 GetPositiveVertex(const glm::vec3& normal) const;
-    glm::vec3 GetNegativeVertex(const glm::vec3& normal) const;
+    AABB() {
+        SetNegativeInfinity();
+    }
 
-private:
-    glm::vec3 min;
-    glm::vec3 max;
+    void SetNegativeInfinity() {
+        minPoint = glm::vec3(std::numeric_limits<float>::infinity());
+        maxPoint = glm::vec3(-std::numeric_limits<float>::infinity());
+    }
+
+    void Enclose(const glm::vec3& point) {
+        minPoint = glm::min(minPoint, point);
+        maxPoint = glm::max(maxPoint, point);
+    }
+
+    glm::vec3 Center() const {
+        return (minPoint + maxPoint) * 0.5f;
+    }
+
+    glm::vec3 Size() const {
+        return maxPoint - minPoint;
+    }
 };

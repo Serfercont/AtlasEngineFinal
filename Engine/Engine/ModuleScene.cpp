@@ -27,6 +27,11 @@ bool ModuleScene::CleanUp()
 {
 	LOG(LogType::LOG_INFO, "Cleaning ModuleScene");
 
+	for (GameObject* go : gameObjects) {
+		delete go;
+	}
+	gameObjects.clear();
+
 	return true;
 }
 
@@ -36,5 +41,12 @@ GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent)
 
 	if (parent != nullptr) parent->children.push_back(gameObject);
 
+	gameObjects.push_back(gameObject);
+
 	return gameObject;
+}
+
+std::vector<GameObject*>& ModuleScene::GetGameObjects()
+{
+	return gameObjects;
 }
