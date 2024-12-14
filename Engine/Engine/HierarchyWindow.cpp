@@ -86,7 +86,6 @@ void HierarchyWindow::DrawWindow()
 
 void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* searchText)
 {
-    
     if (!node) return;
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -115,7 +114,7 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
 
     if (FilterNode(node, searchText))
     {
-        bool isOpen = ImGui::TreeNodeEx(node, flags, node->name.c_str());
+        bool isOpen = ImGui::TreeNodeEx(node->name.c_str(), flags);
 
         if (ImGui::IsItemClicked())
         {
@@ -126,7 +125,6 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
             app->editor->selectedGameObject = node;
         }
 
-       
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
         {
             ImGui::SetDragDropPayload("HIERARCHY_NODE", &node, sizeof(GameObject*));
@@ -134,19 +132,16 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
             ImGui::EndDragDropSource();
         }
 
-        
         if (ImGui::BeginDragDropTarget())
         {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
             {
                 GameObject* draggedNode = *(GameObject**)payload->Data;
 
-              
                 if (draggedNode && draggedNode != node &&
-                    !IsDescendant(draggedNode, node) && 
-                    node != draggedNode->parent)       
+                    !IsDescendant(draggedNode, node) &&
+                    node != draggedNode->parent)
                 {
-                    
                     if (draggedNode->parent)
                     {
                         auto& siblings = draggedNode->parent->children;
@@ -156,7 +151,6 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
                         );
                     }
 
-                    
                     draggedNode->parent = node;
                     node->children.push_back(draggedNode);
                 }
@@ -164,14 +158,17 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
             ImGui::EndDragDropTarget();
         }
 
-        
-        if (isOpen && !node->children.empty())
+        if (isOpen)
         {
             for (auto child : node->children)
             {
                 HierarchyTree(child, false, searchText);
             }
-            ImGui::TreePop();
+
+            if (!node->children.empty() && !(flags & ImGuiTreeNodeFlags_NoTreePushOnOpen))
+            {
+                ImGui::TreePop();
+            }
         }
 
         if (!node->isActive)
@@ -181,7 +178,6 @@ void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* s
     }
     else
     {
-        
         for (auto child : node->children)
         {
             HierarchyTree(child, false, searchText);
@@ -202,11 +198,10 @@ bool HierarchyWindow::HasCircularReference(GameObject* node, std::vector<GameObj
 {
     if (!node) return false;
 
-   
     if (std::find(visited.begin(), visited.end(), node) != visited.end())
-        return true; 
+        return true;
 
-    visited.push_back(node); 
+    visited.push_back(node);
 
     for (auto child : node->children)
     {
@@ -214,7 +209,8 @@ bool HierarchyWindow::HasCircularReference(GameObject* node, std::vector<GameObj
             return true;
     }
 
-    visited.pop_back(); 
+    visited.pop_back();
+    return false;  
 }
 
 void HierarchyWindow::DropNodeToRoot(GameObject* draggedNode)
@@ -224,7 +220,7 @@ void HierarchyWindow::DropNodeToRoot(GameObject* draggedNode)
     {
         auto& siblings = draggedNode->parent->children;
         siblings.erase(std::remove(siblings.begin(), siblings.end(), draggedNode), siblings.end());
-        draggedNode->parent = nullptr; // Mover a la raíz
+        draggedNode->parent = nullptr;  
     }
 
     app->scene->root->children.push_back(draggedNode);
