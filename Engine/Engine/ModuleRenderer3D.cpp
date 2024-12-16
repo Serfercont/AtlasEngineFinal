@@ -135,22 +135,6 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 {
 	grid.Render();
 
-	std::vector<GameObject*> gameObjects = app->scene->GetGameObjects();
-	//LOG(LogType::LOG_INFO, "Number of GameObjects: %d", gameObjects.size());
-
-	for (GameObject* go : gameObjects) {
-		ComponentMesh* mesh = static_cast<ComponentMesh*>(go->GetComponent(ComponentType::MESH));
-		if (mesh) {
-			LOG(LogType::LOG_INFO, "Found a GameObject with a mesh component.");
-			RenderAABB(mesh->localAABB, go->transform->globalTransform);
-		}
-		else {
-			LOG(LogType::LOG_WARNING, "GameObject without mesh component.");
-		}
-
-	}
-
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -227,46 +211,4 @@ void ModuleRenderer3D::CreateFramebuffer()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void ModuleRenderer3D::RenderAABB(const AABB& aabb, const glm::mat4& transform) {
-	LOG(LogType::LOG_INFO, "RenderAABB called.");
-
-	// Calcular las esquinas transformadas del AABB
-	glm::vec3 corners[8] = {
-		glm::vec3(transform * glm::vec4(aabb.minPoint.x, aabb.minPoint.y, aabb.minPoint.z, 1.0f)),
-		glm::vec3(transform * glm::vec4(aabb.maxPoint.x, aabb.minPoint.y, aabb.minPoint.z, 1.0f)),
-		glm::vec3(transform * glm::vec4(aabb.minPoint.x, aabb.maxPoint.y, aabb.minPoint.z, 1.0f)),
-		glm::vec3(transform * glm::vec4(aabb.maxPoint.x, aabb.maxPoint.y, aabb.minPoint.z, 1.0f)),
-		glm::vec3(transform * glm::vec4(aabb.minPoint.x, aabb.minPoint.y, aabb.maxPoint.z, 1.0f)),
-		glm::vec3(transform * glm::vec4(aabb.maxPoint.x, aabb.minPoint.y, aabb.maxPoint.z, 1.0f)),
-		glm::vec3(transform * glm::vec4(aabb.minPoint.x, aabb.maxPoint.y, aabb.maxPoint.z, 1.0f)),
-		glm::vec3(transform * glm::vec4(aabb.maxPoint.x, aabb.maxPoint.y, aabb.maxPoint.z, 1.0f))
-	};
-
-	for (int i = 0; i < 8; ++i) {
-		LOG(LogType::LOG_INFO, "Corner %d: (%.2f, %.2f, %.2f)", i, corners[i].x, corners[i].y, corners[i].z);
-	}
-
-	glBegin(GL_LINES);
-	glColor3f(1.0f, 0.0f, 0.0f); // Rojo para debug
-
-	// Dibujar líneas entre esquinas
-	int indices[] = { 0, 1, 1, 3, 3, 2, 2, 0, 4, 5, 5, 7, 7, 6, 6, 4, 0, 4, 1, 5, 2, 6, 3, 7 };
-	for (int i = 0; i < 24; i += 2) {
-		glVertex3f(corners[indices[i]].x, corners[indices[i]].y, corners[indices[i]].z);
-		glVertex3f(corners[indices[i + 1]].x, corners[indices[i + 1]].y, corners[indices[i + 1]].z);
-
-		LOG(LogType::LOG_INFO, "Line from (%.2f, %.2f, %.2f) to (%.2f, %.2f, %.2f)",
-			corners[indices[i]].x, corners[indices[i]].y, corners[indices[i]].z,
-			corners[indices[i + 1]].x, corners[indices[i + 1]].y, corners[indices[i + 1]].z);
-	}
-
-	glEnd();
-
-	// Verificar errores de OpenGL
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) {
-		LOG(LogType::LOG_ERROR, "OpenGL error in RenderAABB: %s", gluErrorString(error));
-	}
 }

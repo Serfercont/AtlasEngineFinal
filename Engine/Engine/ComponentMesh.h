@@ -13,15 +13,13 @@ public:
 
 	void Update() override;
 	void OnEditor() override;
-
-	void CalculateLocalAABB();
-
 public:
 	Mesh* mesh;
-
-	AABB localAABB;
 
 private:
 	bool showVertexNormals = false;
 	bool showFaceNormals = false;
+
+	bool showAABB = false;
+	bool showOBB = false;
 };

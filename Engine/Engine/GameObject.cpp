@@ -11,7 +11,6 @@ GameObject::GameObject(const char* name, GameObject* parent) : parent(parent), n
 	material = new ComponentMaterial(this);
 
 	AddComponent(transform);
-	AddComponent(mesh);
 }
 
 GameObject::~GameObject()

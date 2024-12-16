@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include <glm/gtc/type_ptr.hpp>
 
 void Mesh::InitMesh()
 {
@@ -24,6 +25,24 @@ void Mesh::InitMesh()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	if (vertices != nullptr && verticesCount > 0)
+	{
+		glm::vec3 minPoint(FLT_MAX);
+		glm::vec3 maxPoint(-FLT_MAX);
+
+		for (uint i = 0; i < verticesCount; ++i)
+		{
+			glm::vec3 vertex(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+			minPoint = glm::min(minPoint, vertex);
+			maxPoint = glm::max(maxPoint, vertex);
+		}
+
+		aabb = AABB(minPoint, maxPoint);
+
+		glm::mat4 identity(1.0f);
+		obb = CalculateOBB(identity);
+	}
 }
 
 void Mesh::DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool shadedWireframe)
@@ -159,4 +178,111 @@ void Mesh::CleanUpMesh()
 	indices = nullptr;
 	normals = nullptr;
 	texCoords = nullptr;
+}
+
+void Mesh::RenderAABB(const glm::mat4& transform)
+{
+	AABB BoundsAABB = CalculateAABB(transform);
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+	glLineWidth(2.0f);
+	glColor3f(0.0f, 0.0f, 1.0f);
+
+	glBegin(GL_LINES);
+
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.minPoint.y, BoundsAABB.minPoint.z);
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.minPoint.y, BoundsAABB.minPoint.z);
+
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.minPoint.y, BoundsAABB.minPoint.z);
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.minPoint.y, BoundsAABB.maxPoint.z);
+
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.minPoint.y, BoundsAABB.maxPoint.z);
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.minPoint.y, BoundsAABB.maxPoint.z);
+
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.minPoint.y, BoundsAABB.maxPoint.z);
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.minPoint.y, BoundsAABB.minPoint.z);
+
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.minPoint.z);
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.minPoint.z);
+
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.minPoint.z);
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.maxPoint.z);
+
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.maxPoint.z);
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.maxPoint.z);
+
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.maxPoint.z);
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.minPoint.z);
+
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.minPoint.y, BoundsAABB.minPoint.z);
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.minPoint.z);
+
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.minPoint.y, BoundsAABB.minPoint.z);
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.minPoint.z);
+
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.minPoint.y, BoundsAABB.maxPoint.z);
+	glVertex3f(BoundsAABB.maxPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.maxPoint.z);
+
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.minPoint.y, BoundsAABB.maxPoint.z);
+	glVertex3f(BoundsAABB.minPoint.x, BoundsAABB.maxPoint.y, BoundsAABB.maxPoint.z);
+
+	glEnd();
+
+	glPopAttrib();
+}
+
+void Mesh::RenderOBB(const glm::mat4& transform)
+{
+	OBB BoundsOBB = CalculateOBB(transform);
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+	glLineWidth(2.0f);
+	glColor3f(1.0f, 0.0f, 0.0f);
+
+	glBegin(GL_LINES);
+
+	// Bottom face
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[0]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[4]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[4]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[5]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[5]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[1]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[1]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[0]));
+
+	// Top face
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[2]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[6]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[6]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[7]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[7]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[3]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[3]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[2]));
+
+	// Vertical edges
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[0]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[2]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[4]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[6]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[5]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[7]));
+
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[1]));
+	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[3]));
+
+	glEnd();
+
+	glPopAttrib();
 }

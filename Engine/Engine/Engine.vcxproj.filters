@@ -230,5 +230,8 @@
     <ClInclude Include="AABB.h">
       <Filter>Sources\Math</Filter>
     </ClInclude>
+    <ClInclude Include="OBB.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

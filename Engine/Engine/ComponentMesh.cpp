@@ -1,6 +1,7 @@
 #include "ComponentMesh.h"
 #include "App.h"
 #include "AABB.h"
+#include "OBB.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -42,8 +43,20 @@ void ComponentMesh::Update()
 			app->editor->preferencesWindow->faceNormalColor
 		);
 	}
+	glPopMatrix();
 
-	if (transform != nullptr) glPopMatrix();
+	if (app->editor->selectedGameObject==gameObject)
+	{
+		if (showAABB)
+		{
+			mesh->RenderAABB(transform->globalTransform);
+			
+		}
+		if (showOBB)
+		{
+			mesh->RenderOBB(transform->globalTransform);
+		}
+	}
 }
 
 void ComponentMesh::OnEditor()
@@ -59,16 +72,11 @@ void ComponentMesh::OnEditor()
 
 		ImGui::Checkbox("Vertex Normals", &showVertexNormals);
 		ImGui::Checkbox("Face Normals", &showFaceNormals);
+
+		ImGui::Spacing();
+
+		ImGui::Checkbox("Show AABB", &showAABB);
+		ImGui::Checkbox("Show OBB", &showOBB);
 	}
 }
 
-void ComponentMesh::CalculateLocalAABB() {
-	if (!mesh || mesh->verticesCount == 0) return;
-
-	localAABB.SetNegativeInfinity();
-
-	for (uint i = 0; i < mesh->verticesCount; i += 3) {
-		glm::vec3 vertex(mesh->vertices[i], mesh->vertices[i + 1], mesh->vertices[i + 2]);
-		localAABB.Enclose(vertex);
-	}
-}

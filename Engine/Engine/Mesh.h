@@ -3,6 +3,10 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
+#include <vector>
+#include <array>
+#include "AABB.h"
+#include "OBB.h"
 
 typedef unsigned int uint;
 
@@ -13,6 +17,12 @@ public:
 	void DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool shadedWireframe);
 	void DrawNormals(bool vertexNormals, bool faceNormals, float vertexNormalLength, float faceNormalLength, glm::vec3 vertexNormalColor, glm::vec3 faceNormalColor);
 	void CleanUpMesh();
+
+	const AABB& GetAABB() const { return aabb; }
+	AABB CalculateAABB(const glm::mat4& transform) { return aabb.ApplyTransform(transform); }
+	OBB CalculateOBB(const glm::mat4& transform) { return { transform, GetAABB() }; }
+	void RenderAABB(const glm::mat4& transform);
+	void RenderOBB(const glm::mat4& transform);
 
 public:
 	uint indicesId = 0;
@@ -27,6 +37,10 @@ public:
 	uint texCoordsId = 0;
 	uint texCoordsCount = 0;
 	float* texCoords = nullptr;
+
+	AABB aabb;
+	OBB obb;
+	
 
 	// Material properties
 	glm::vec4 diffuseColor = glm::vec4(1.0f);

@@ -192,6 +192,7 @@
     <ClInclude Include="ModuleResources.h" />
     <ClInclude Include="ModuleScene.h" />
     <ClInclude Include="ModuleWindow.h" />
+    <ClInclude Include="OBB.h" />
     <ClInclude Include="PerformanceWindow.h" />
     <ClInclude Include="PreferencesWindow.h" />
     <ClInclude Include="ProjectWindow.h" />
