@@ -22,6 +22,8 @@ public:
 	Component* AddComponent(Component* component);
 	Component* GetComponent(ComponentType type);
 
+	void Delete();
+
 public:
 	GameObject* parent;
 	std::string name;

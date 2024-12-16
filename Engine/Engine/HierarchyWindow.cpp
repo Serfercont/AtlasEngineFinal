@@ -1,6 +1,6 @@
 #include "HierarchyWindow.h"
 #include "App.h"
-
+#include <vector>
 #include <algorithm>
 
 HierarchyWindow::HierarchyWindow(const WindowType type, const std::string& name) : EditorWindow(type, name)
@@ -86,86 +86,161 @@ void HierarchyWindow::DrawWindow()
 
 void HierarchyWindow::HierarchyTree(GameObject* node, bool isRoot, const char* searchText)
 {
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+    if (!node) return;
 
-	if (isRoot)
-	{
-		flags |= ImGuiTreeNodeFlags_DefaultOpen;
-	}
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
 
-	if (node->children.empty())
-	{
-		flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-	}
+    if (isRoot)
+    {
+        flags |= ImGuiTreeNodeFlags_DefaultOpen;
+    }
 
-	bool isSelected = (app->editor->selectedGameObject == node);
+    if (node->children.empty())
+    {
+        flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+    }
 
-	if (isSelected)
-	{
-		flags |= ImGuiTreeNodeFlags_Selected;
-	}
+    bool isSelected = (app->editor->selectedGameObject == node);
 
-	if (!node->isActive)
-	{
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-	}
+    if (isSelected)
+    {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
 
-	if (FilterNode(node, searchText))
-	{
-		bool isOpen = ImGui::TreeNodeEx(node, flags, node->name.c_str());
+    if (!node->isActive)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+    }
 
-		if (ImGui::IsItemClicked())
-		{
-			if (app->editor->selectedGameObject && app->editor->selectedGameObject->isEditing)
-			{
-				app->editor->selectedGameObject->isEditing = false;
-			}
-			app->editor->selectedGameObject = node;
-		}
+    if (FilterNode(node, searchText))
+    {
+        bool isOpen = ImGui::TreeNodeEx(node->name.c_str(), flags);
 
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0) && !ImGui::IsItemToggledOpen())
-		{
-			node->isEditing = true;
-		}
+        if (ImGui::IsItemClicked())
+        {
+            if (app->editor->selectedGameObject && app->editor->selectedGameObject->isEditing)
+            {
+                app->editor->selectedGameObject->isEditing = false;
+            }
+            app->editor->selectedGameObject = node;
+        }
 
-		// Rename node
-		if (node->isEditing)
-		{
-			strcpy_s(inputName, app->editor->selectedGameObject->name.c_str());
-			ImGui::SetNextItemWidth(ImGui::CalcTextSize(node->name.c_str()).x + 100);
-			if (ImGui::InputText("##edit", inputName, sizeof(inputName), inputTextFlags)
-				|| (!ImGui::IsItemActive() && !ImGui::IsAnyItemActive()))
-			{
-				if (inputName[0] != '\0') node->name = inputName;
-				node->isEditing = false;
-			}
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+        {
+            ImGui::SetDragDropPayload("HIERARCHY_NODE", &node, sizeof(GameObject*));
+            ImGui::Text("Moving %s", node->name.c_str());
+            ImGui::EndDragDropSource();
+        }
 
-			ImGui::SetKeyboardFocusHere(-1);
-		}
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+            {
+                GameObject* draggedNode = *(GameObject**)payload->Data;
 
-		// Create child nodes
-		if (isOpen && !node->children.empty())
-		{
-			for (unsigned int i = 0; i < node->children.size(); i++)
-			{
-				HierarchyTree(node->children[i], false, searchText);
-			}
-			ImGui::TreePop();
-		}
+                if (draggedNode && draggedNode != node &&
+                    !IsDescendant(draggedNode, node) &&
+                    node != draggedNode->parent)
+                {
+                    if (draggedNode->parent)
+                    {
+                        auto& siblings = draggedNode->parent->children;
+                        siblings.erase(
+                            std::remove(siblings.begin(), siblings.end(), draggedNode),
+                            siblings.end()
+                        );
+                    }
 
-		if (!node->isActive)
-		{
-			ImGui::PopStyleColor();
-		}
-	}
-	else
-	{
-		for (unsigned int i = 0; i < node->children.size(); i++)
-		{
-			HierarchyTree(node->children[i], false, searchText);
-		}
-	}
+                    draggedNode->parent = node;
+                    node->children.push_back(draggedNode);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        if (isOpen)
+        {
+            for (auto child : node->children)
+            {
+                HierarchyTree(child, false, searchText);
+            }
+
+            if (!node->children.empty() && !(flags & ImGuiTreeNodeFlags_NoTreePushOnOpen))
+            {
+                ImGui::TreePop();
+            }
+        }
+
+        if (!node->isActive)
+        {
+            ImGui::PopStyleColor();
+        }
+    }
+    else
+    {
+        for (auto child : node->children)
+        {
+            HierarchyTree(child, false, searchText);
+        }
+    }
 }
+
+bool HierarchyWindow::ValidateHierarchy(GameObject* node)
+{
+    if (!node) return false;
+
+   
+    std::vector<GameObject*> visited;
+    return !HasCircularReference(node, visited);
+}
+
+bool HierarchyWindow::HasCircularReference(GameObject* node, std::vector<GameObject*>& visited)
+{
+    if (!node) return false;
+
+    if (std::find(visited.begin(), visited.end(), node) != visited.end())
+        return true;
+
+    visited.push_back(node);
+
+    for (auto child : node->children)
+    {
+        if (HasCircularReference(child, visited))
+            return true;
+    }
+
+    visited.pop_back();
+    return false;  
+}
+
+void HierarchyWindow::DropNodeToRoot(GameObject* draggedNode)
+{
+  
+    if (draggedNode->parent)
+    {
+        auto& siblings = draggedNode->parent->children;
+        siblings.erase(std::remove(siblings.begin(), siblings.end(), draggedNode), siblings.end());
+        draggedNode->parent = nullptr;  
+    }
+
+    app->scene->root->children.push_back(draggedNode);
+}
+
+
+bool HierarchyWindow::IsDescendant(GameObject* potentialChild, GameObject* parent)
+{
+    if (!parent) return false;
+
+    for (auto child : parent->children)
+    {
+        if (child == potentialChild || IsDescendant(potentialChild, child))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 bool HierarchyWindow::FilterNode(GameObject* node, const char* searchText)
 {
