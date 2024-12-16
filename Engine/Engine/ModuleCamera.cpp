@@ -47,6 +47,8 @@ bool ModuleCamera::Update(float dt)
 		HandleInput();
 
 	CalculateViewMatrix();
+	CalculateFrustumPlanes();
+
 
 	return true;
 }
@@ -261,3 +263,55 @@ void ModuleCamera::SetCursor(CursorType cursorType)
 	}
 }
 
+void ModuleCamera::CalculateFrustumPlanes()
+{
+	glm::mat4 viewProjectionMatrix = GetProjectionMatrix() * GetViewMatrix();
+
+	const int axisIndices[6] = { 0, 0, 1, 1, 2, 2 }; 
+	const float planeSigns[6] = { 1, -1, 1, -1, 1, -1 }; 
+
+	for (int i = 0; i < 6; ++i)
+	{
+		int axis = axisIndices[i];
+		float sign = planeSigns[i];
+
+		frustumPlanes[i].normal.x = viewProjectionMatrix[0][3] + sign * viewProjectionMatrix[0][axis];
+		frustumPlanes[i].normal.y = viewProjectionMatrix[1][3] + sign * viewProjectionMatrix[1][axis];
+		frustumPlanes[i].normal.z = viewProjectionMatrix[2][3] + sign * viewProjectionMatrix[2][axis];
+		frustumPlanes[i].distance = viewProjectionMatrix[3][3] + sign * viewProjectionMatrix[3][axis];
+
+		float length = glm::length(frustumPlanes[i].normal);
+		frustumPlanes[i].normal /= length;
+		frustumPlanes[i].distance /= length;
+	}
+}
+
+bool ModuleCamera::IsBoxInsideFrustum(const AABB& box) const
+{
+	for (int i = 0; i < 6; ++i)
+	{
+		const Plane& currentPlane = frustumPlanes[i];
+		bool isAnyCornerInside = false;
+
+		for (int cornerIndex = 0; cornerIndex < 8 && !isAnyCornerInside; ++cornerIndex)
+		{
+			glm::vec3 corner(
+				(cornerIndex & 1) ? box.maxPoint.x : box.minPoint.x,
+				(cornerIndex & 2) ? box.maxPoint.y : box.minPoint.y,  
+				(cornerIndex & 4) ? box.maxPoint.z : box.minPoint.z   
+			);
+
+			if (glm::dot(currentPlane.normal, corner) + currentPlane.distance >= 0)
+			{
+				isAnyCornerInside = true;
+			}
+		}
+
+		if (!isAnyCornerInside)
+		{
+			return false;
+		}
+	}
+
+	return true; 
+}
