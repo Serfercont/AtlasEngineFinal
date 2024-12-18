@@ -243,7 +243,6 @@ void Mesh::RenderOBB(const glm::mat4& transform)
 
 	glBegin(GL_LINES);
 
-	// Bottom face
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[0]));
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[4]));
 
@@ -256,7 +255,7 @@ void Mesh::RenderOBB(const glm::mat4& transform)
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[1]));
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[0]));
 
-	// Top face
+	
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[2]));
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[6]));
 
@@ -269,7 +268,6 @@ void Mesh::RenderOBB(const glm::mat4& transform)
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[3]));
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[2]));
 
-	// Vertical edges
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[0]));
 	glVertex3fv(glm::value_ptr(BoundsOBB.vertices[2]));
 
@@ -286,3 +284,5 @@ void Mesh::RenderOBB(const glm::mat4& transform)
 
 	glPopAttrib();
 }
+
+

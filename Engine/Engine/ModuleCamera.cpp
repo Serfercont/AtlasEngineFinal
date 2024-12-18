@@ -215,25 +215,24 @@ void ModuleCamera::LookAt(const glm::vec3& spot)
 	CalculateViewMatrix();
 }
 
-const glm::mat4& ModuleCamera::GetViewMatrix() const
-{
+const glm::mat4& ModuleCamera::GetViewMatrix() const {
 	return viewMatrix;
 }
 
-void ModuleCamera::CalculateViewMatrix()
-{
+void ModuleCamera::CalculateViewMatrix() {
+	Z = glm::normalize(pos - ref); 
+	X = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), Z)); 
+	Y = glm::cross(Z, X); 
+
 	viewMatrix = glm::mat4(
 		X.x, Y.x, Z.x, 0.0f,
 		X.y, Y.y, Z.y, 0.0f,
 		X.z, Y.z, Z.z, 0.0f,
 		-glm::dot(X, pos), -glm::dot(Y, pos), -glm::dot(Z, pos), 1.0f
 	);
-
-	glm::mat4 projectionMatrix = GetProjectionMatrix();
 }
 
-glm::mat4 ModuleCamera::GetProjectionMatrix() const
-{
+glm::mat4 ModuleCamera::GetProjectionMatrix() const {
 	float aspectRatio = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
 	return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
 }
@@ -263,15 +262,13 @@ void ModuleCamera::SetCursor(CursorType cursorType)
 	}
 }
 
-void ModuleCamera::CalculateFrustumPlanes()
-{
+void ModuleCamera::CalculateFrustumPlanes() {
 	glm::mat4 viewProjectionMatrix = GetProjectionMatrix() * GetViewMatrix();
 
-	const int axisIndices[6] = { 0, 0, 1, 1, 2, 2 }; 
-	const float planeSigns[6] = { 1, -1, 1, -1, 1, -1 }; 
+	const int axisIndices[6] = { 0, 0, 1, 1, 2, 2 };
+	const float planeSigns[6] = { 1, -1, 1, -1, 1, -1 };
 
-	for (int i = 0; i < 6; ++i)
-	{
+	for (int i = 0; i < 6; ++i) {
 		int axis = axisIndices[i];
 		float sign = planeSigns[i];
 
@@ -283,8 +280,12 @@ void ModuleCamera::CalculateFrustumPlanes()
 		float length = glm::length(frustumPlanes[i].normal);
 		frustumPlanes[i].normal /= length;
 		frustumPlanes[i].distance /= length;
+
+		LOG(LogType::LOG_INFO, "Plane %d: Normal(%f, %f, %f), Distance: %f",
+			i, frustumPlanes[i].normal.x, frustumPlanes[i].normal.y, frustumPlanes[i].normal.z, frustumPlanes[i].distance);
 	}
 }
+
 
 bool ModuleCamera::IsBoxInsideFrustum(const AABB& box) const
 {
@@ -293,25 +294,69 @@ bool ModuleCamera::IsBoxInsideFrustum(const AABB& box) const
 		const Plane& currentPlane = frustumPlanes[i];
 		bool isAnyCornerInside = false;
 
-		for (int cornerIndex = 0; cornerIndex < 8 && !isAnyCornerInside; ++cornerIndex)
-		{
-			glm::vec3 corner(
-				(cornerIndex & 1) ? box.maxPoint.x : box.minPoint.x,
-				(cornerIndex & 2) ? box.maxPoint.y : box.minPoint.y,  
-				(cornerIndex & 4) ? box.maxPoint.z : box.minPoint.z   
-			);
+		glm::vec3 corners[8] = {
+			{ box.minPoint.x, box.minPoint.y, box.minPoint.z },
+			{ box.maxPoint.x, box.minPoint.y, box.minPoint.z },
+			{ box.minPoint.x, box.maxPoint.y, box.minPoint.z },
+			{ box.maxPoint.x, box.maxPoint.y, box.minPoint.z },
+			{ box.minPoint.x, box.minPoint.y, box.maxPoint.z },
+			{ box.maxPoint.x, box.minPoint.y, box.maxPoint.z },
+			{ box.minPoint.x, box.maxPoint.y, box.maxPoint.z },
+			{ box.maxPoint.x, box.maxPoint.y, box.maxPoint.z }
+		};
 
-			if (glm::dot(currentPlane.normal, corner) + currentPlane.distance >= 0)
+		for (int cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
+		{
+			float distanceToPlane = glm::dot(currentPlane.normal, corners[cornerIndex]) + currentPlane.distance;
+			if (distanceToPlane >= 0)
 			{
 				isAnyCornerInside = true;
+				break;
 			}
 		}
 
-		if (!isAnyCornerInside)
+		if (!isAnyCornerInside) 
 		{
 			return false;
 		}
 	}
 
-	return true; 
+	return true;
+}
+
+void ModuleCamera::DrawFrustum() {
+	glm::mat4 vpMatrix = GetProjectionMatrix() * GetViewMatrix();
+	glm::mat4 invVPMatrix = glm::inverse(vpMatrix);
+
+	glm::vec4 corners[8] = {
+		{-1, -1, -1, 1}, {1, -1, -1, 1},
+		{1,  1, -1, 1}, {-1,  1, -1, 1},
+		{-1, -1,  1, 1}, {1, -1,  1, 1},
+		{1,  1,  1, 1}, {-1,  1,  1, 1}
+	};
+
+	for (auto& corner : corners) {
+		corner = invVPMatrix * corner;
+		corner /= corner.w;
+	}
+
+	glPushAttrib(GL_ENABLE_BIT); 
+	glDisable(GL_LIGHTING);      
+	glLineWidth(2.0f);           
+
+	glBegin(GL_LINES);
+	for (int i = 0; i < 4; ++i) {
+		glVertex3fv(&corners[i].x); glVertex3fv(&corners[(i + 1) % 4].x);      
+		glVertex3fv(&corners[i + 4].x); glVertex3fv(&corners[((i + 1) % 4) + 4].x); 
+		glVertex3fv(&corners[i].x); glVertex3fv(&corners[i + 4].x);          
+	}
+	glEnd();
+
+	glPopAttrib(); 
+}
+
+
+void ModuleCamera::OnWindowResized(int newWidth, int newHeight) {
+    screenWidth = newWidth;
+    screenHeight = newHeight;
 }

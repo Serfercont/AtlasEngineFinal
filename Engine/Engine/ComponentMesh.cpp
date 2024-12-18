@@ -15,7 +15,6 @@ ComponentMesh::~ComponentMesh()
 
 void ComponentMesh::Update()
 {
-    // Obtén el transform del objeto para calcular la AABB global
     ComponentTransform* transform = gameObject->transform;
 
     if (transform != nullptr)
@@ -26,7 +25,7 @@ void ComponentMesh::Update()
     AABB globalAABB = mesh->GetAABB();  
     if (app->camera->IsBoxInsideFrustum(globalAABB)) 
     {
-        LOG(LogType::LOG_INFO, "Frustum INSIDE");
+        LOG(LogType::LOG_INFO, "Object %s is INSIDE the frustum", gameObject->name.c_str());
         ComponentMaterial* material = gameObject->material;
 
         mesh->DrawMesh(
@@ -50,7 +49,7 @@ void ComponentMesh::Update()
     }
     else
     {
-        LOG(LogType::LOG_INFO, "Frustum OUTSIDE");
+        LOG(LogType::LOG_INFO, "Object %s is OUTSIDE the frustum", gameObject->name.c_str());
     }
 
     glPopMatrix();

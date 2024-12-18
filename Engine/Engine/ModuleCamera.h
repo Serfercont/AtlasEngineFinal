@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Frustum.h"
 #include "Module.h"
 #include "glm/glm.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
@@ -31,6 +30,10 @@ public:
 	const glm::mat4& GetViewMatrix() const;
 	glm::mat4 GetProjectionMatrix() const;
 	bool IsBoxInsideFrustum(const AABB& box) const;
+
+	void DrawFrustum();
+
+	void OnWindowResized(int newWidth, int newHeight);
 
 private:
 	void HandleMovement(glm::vec3& newPos, float speed, float fastSpeed);

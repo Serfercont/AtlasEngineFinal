@@ -18,7 +18,10 @@ bool ModuleScene::Awake()
 
 bool ModuleScene::Update(float dt)
 {
-	root->Update();
+	for (GameObject* gameObject : gameObjects)
+    {
+        gameObject->Update();
+    }
 
 	return true;
 }
