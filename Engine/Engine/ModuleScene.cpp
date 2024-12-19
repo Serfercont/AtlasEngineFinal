@@ -12,48 +12,45 @@ ModuleScene::~ModuleScene()
 {
 }
 
-bool ModuleScene::Awake()
-{
-	root = CreateGameObject("Untitled Scene", nullptr);
+bool ModuleScene::Awake() {
+    root = CreateGameObject("Untitled Scene", nullptr);
 
-	sceneLimits=AABB(glm::vec3(-15.0f), glm::vec3(15.0f));
-	quadtreeScene = new Quadtree(sceneLimits);
+    sceneLimits = AABB(glm::vec3(-15.0f), glm::vec3(15.0f));
+    octreeScene = new Octree(sceneLimits);
 
-	return true;
+    return true;
 }
 
-bool ModuleScene::Update(float dt)
-{
-	for (GameObject* gameObject : gameObjects)
-    {
-        gameObject->Update();
-		quadtreeScene->Insert(gameObject);
+bool ModuleScene::Update(float dt) {
+    octreeScene->Clear();
+
+    for (GameObject* gameObject : gameObjects) {
+        if (gameObject->isStatic) {
+            octreeScene->Insert(gameObject);
+        }
     }
 
-	if (debugQuadtree) {
-		quadtreeScene->DrawDebug();
-	}
+    if (debugOctree) {
+        octreeScene->DrawDebug();
+    }
 
-	for (auto* gameObject : gameObjects) {
-		gameObject->Update();
-	}
+    for (auto* gameObject : gameObjects) {
+        gameObject->Update();
+    }
 
-	return true;
+    return true;
 }
 
-bool ModuleScene::CleanUp()
-{
-	LOG(LogType::LOG_INFO, "Cleaning ModuleScene");
+bool ModuleScene::CleanUp() {
+    delete octreeScene;
+    octreeScene = nullptr;
 
-	delete quadtreeScene;
-	quadtreeScene = nullptr;
+    for (auto* gameObject : gameObjects) {
+        delete gameObject;
+    }
+    gameObjects.clear();
 
-	for (auto* gameObject : gameObjects) {
-		delete gameObject;
-	}
-	gameObjects.clear();
-
-	return true;
+    return true;
 }
 
 

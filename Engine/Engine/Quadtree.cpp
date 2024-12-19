@@ -85,12 +85,12 @@ void Quadtree::Node::Insert(GameObject* object) {
 
 void Quadtree::Node::Intersect(std::vector<GameObject*>& results, const AABB& primitive) const {
     if (!bounds.Intersects(primitive)) {
-        return; // Si no intersecta, no procesar este nodo.
+        return; 
     }
 
     for (const auto* object : objects) {
         if (object && object->GetAABB().Intersects(primitive)) {
-            results.push_back(const_cast<GameObject*>(object)); // Asegura el tipo correcto.
+            results.push_back(const_cast<GameObject*>(object)); 
         }
     }
 

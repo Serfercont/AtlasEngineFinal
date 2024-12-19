@@ -43,4 +43,5 @@ public:
 
 	bool isActive = true;
 	bool isEditing = false;
+	bool isStatic = false;
 };
