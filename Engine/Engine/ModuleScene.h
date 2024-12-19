@@ -2,6 +2,7 @@
 
 #include "Module.h"
 #include "GameObject.h"
+#include "Quadtree.h"
 
 class GameObject;
 
@@ -22,5 +23,8 @@ public:
 public:
 	GameObject* root = nullptr;
 	std::vector<GameObject*> gameObjects;
+	Quadtree* quadtreeScene = nullptr; 
+	AABB sceneLimits;
+	bool debugQuadtree = true;   
 
 };

@@ -23,6 +23,10 @@ public:
 	Component* AddComponent(Component* component);
 	Component* GetComponent(ComponentType type);
 
+	AABB GetAABB() const;
+
+
+
 public:
 	GameObject* parent;
 	std::string name;

@@ -57,3 +57,9 @@ Component* GameObject::GetComponent(ComponentType type)
 	return nullptr;
 }
 
+AABB GameObject::GetAABB() const {
+	if (mesh && mesh->mesh) { 
+		return mesh->mesh->CalculateAABB(transform->globalTransform);
+	}
+	return AABB(glm::vec3(0.0f), glm::vec3(0.0f)); 
+}

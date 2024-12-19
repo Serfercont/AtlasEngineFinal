@@ -120,6 +120,10 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Sources\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="Quadtree.cpp" />
+    <ClCompile Include="AABB.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -227,5 +231,6 @@
     <ClInclude Include="OBB.h">
       <Filter>Sources\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Quadtree.h" />
   </ItemGroup>
 </Project>
