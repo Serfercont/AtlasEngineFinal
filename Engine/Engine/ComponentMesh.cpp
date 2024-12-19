@@ -16,53 +16,55 @@ ComponentMesh::~ComponentMesh()
 void ComponentMesh::Update()
 {
     ComponentTransform* transform = gameObject->transform;
+    ComponentMaterial* material = gameObject->material;
 
     if (transform != nullptr)
     {
-        glPushMatrix();
-        glMultMatrixf(glm::value_ptr(transform->globalTransform));
-    }
-    AABB globalAABB = mesh->GetAABB();  
-    if (app->camera->IsBoxInsideFrustum(globalAABB)) 
-    {
-        LOG(LogType::LOG_INFO, "Object %s is INSIDE the frustum", gameObject->name.c_str());
-        ComponentMaterial* material = gameObject->material;
+        const AABB globalAABB = mesh->CalculateAABB(transform->globalTransform);
 
-        mesh->DrawMesh(
-            material->textureId,
-            app->editor->preferencesWindow->drawTextures,
-            app->editor->preferencesWindow->wireframe,
-            app->editor->preferencesWindow->shadedWireframe
-        );
-
-        if (showVertexNormals || showFaceNormals)
+        if (app->camera->IsBoxInsideFrustum(globalAABB))
         {
-            mesh->DrawNormals(
-                showVertexNormals,
-                showFaceNormals,
-                app->editor->preferencesWindow->vertexNormalLength,
-                app->editor->preferencesWindow->faceNormalLength,
-                app->editor->preferencesWindow->vertexNormalColor,
-                app->editor->preferencesWindow->faceNormalColor
+            glPushMatrix();
+            glMultMatrixf(glm::value_ptr(transform->globalTransform));
+
+            LOG(LogType::LOG_INFO, "Object %s is INSIDE the frustum", gameObject->name.c_str());
+            
+
+            mesh->DrawMesh(
+                material->textureId,
+                app->editor->preferencesWindow->drawTextures,
+                app->editor->preferencesWindow->wireframe,
+                app->editor->preferencesWindow->shadedWireframe
             );
-        }
-    }
-    else
-    {
-        LOG(LogType::LOG_INFO, "Object %s is OUTSIDE the frustum", gameObject->name.c_str());
-    }
 
-    glPopMatrix();
+            if (showVertexNormals || showFaceNormals)
+            {
+                mesh->DrawNormals(
+                    showVertexNormals,
+                    showFaceNormals,
+                    app->editor->preferencesWindow->vertexNormalLength,
+                    app->editor->preferencesWindow->faceNormalLength,
+                    app->editor->preferencesWindow->vertexNormalColor,
+                    app->editor->preferencesWindow->faceNormalColor
+                );
+            }
+            glPopMatrix();
 
-    if (app->editor->selectedGameObject == gameObject)
-    {
-        if (showAABB)
-        {
-            mesh->RenderAABB(transform->globalTransform);
+            if (app->editor->selectedGameObject == gameObject)
+            {
+                if (showAABB)
+                {
+                    mesh->RenderAABB(transform->globalTransform);
+                }
+                if (showOBB)
+                {
+                    mesh->RenderOBB(transform->globalTransform);
+                }
+            }
         }
-        if (showOBB)
+        else
         {
-            mesh->RenderOBB(transform->globalTransform);
+            LOG(LogType::LOG_INFO, "Object %s is OUTSIDE the frustum", gameObject->name.c_str());
         }
     }
 }
