@@ -26,10 +26,7 @@ void ComponentMesh::Update()
         {
             glPushMatrix();
             glMultMatrixf(glm::value_ptr(transform->globalTransform));
-
-            LOG(LogType::LOG_INFO, "Object %s is INSIDE the frustum", gameObject->name.c_str());
-            
-
+           
             mesh->DrawMesh(
                 material->textureId,
                 app->editor->preferencesWindow->drawTextures,
@@ -61,10 +58,6 @@ void ComponentMesh::Update()
                     mesh->RenderOBB(transform->globalTransform);
                 }
             }
-        }
-        else
-        {
-            LOG(LogType::LOG_INFO, "Object %s is OUTSIDE the frustum", gameObject->name.c_str());
         }
     }
 }

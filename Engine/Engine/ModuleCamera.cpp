@@ -280,9 +280,6 @@ void ModuleCamera::CalculateFrustumPlanes() {
 		float length = glm::length(frustumPlanes[i].normal);
 		frustumPlanes[i].normal /= length;
 		frustumPlanes[i].distance /= length;
-
-		LOG(LogType::LOG_INFO, "Plane %d: Normal(%f, %f, %f), Distance: %f",
-			i, frustumPlanes[i].normal.x, frustumPlanes[i].normal.y, frustumPlanes[i].normal.z, frustumPlanes[i].distance);
 	}
 }
 
