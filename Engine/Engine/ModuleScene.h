@@ -2,6 +2,8 @@
 
 #include "Module.h"
 #include "GameObject.h"
+#include "Quadtree.h"
+#include "Octree.h"
 
 class GameObject;
 
@@ -17,6 +19,14 @@ public:
 
 	GameObject* CreateGameObject(const char* name, GameObject* parent);
 
+	std::vector<GameObject*>& GetGameObjects();
+
 public:
 	GameObject* root = nullptr;
+	std::vector<GameObject*> gameObjects;
+	Quadtree* quadtreeScene = nullptr; 
+	Octree* octreeScene = nullptr;
+	AABB sceneLimits;
+	bool debugOctree = false;
+
 };

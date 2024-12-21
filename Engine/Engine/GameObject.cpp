@@ -1,7 +1,11 @@
 #include "GameObject.h"
+#include "Component.h"
+#include "ComponentTransform.h"
+#include "ComponentMesh.h"
 
 GameObject::GameObject(const char* name, GameObject* parent) : parent(parent), name(name)
 {
+
 	transform = new ComponentTransform(this);
 	mesh = new ComponentMesh(this);
 	material = new ComponentMaterial(this);
@@ -66,6 +70,13 @@ Component* GameObject::GetComponent(ComponentType type)
 	return nullptr;
 }
 
+
+AABB GameObject::GetAABB() const {
+	if (mesh && mesh->mesh) { 
+		return mesh->mesh->CalculateAABB(transform->globalTransform);
+	}
+	return AABB(glm::vec3(0.0f), glm::vec3(0.0f)); 
+}
 
 void GameObject::Delete()
 {
