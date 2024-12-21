@@ -12,6 +12,10 @@ public:
 	void DrawWindow() override;
 
 	void HierarchyTree(GameObject* node, bool isRoot = false, const char* searchText = "");
+	bool ValidateHierarchy(GameObject* node);
+	bool HasCircularReference(GameObject* node, std::vector<GameObject*>& visited);
+	void DropNodeToRoot(GameObject* draggedNode);
+	bool IsDescendant(GameObject* potentialChild, GameObject* parent);
 	bool FilterNode(GameObject* node, const char* searchText);
 
 private:

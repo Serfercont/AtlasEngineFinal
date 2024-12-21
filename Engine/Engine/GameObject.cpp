@@ -15,6 +15,19 @@ GameObject::GameObject(const char* name, GameObject* parent) : parent(parent), n
 
 GameObject::~GameObject()
 {
+	// Liberar componentes
+	for (auto component : components)
+	{
+		delete component;
+	}
+	components.clear();
+
+	// Liberar hijos
+	for (auto child : children)
+	{
+		delete child;
+	}
+	children.clear();
 }
 
 void GameObject::Update()
@@ -57,9 +70,35 @@ Component* GameObject::GetComponent(ComponentType type)
 	return nullptr;
 }
 
+
 AABB GameObject::GetAABB() const {
 	if (mesh && mesh->mesh) { 
 		return mesh->mesh->CalculateAABB(transform->globalTransform);
 	}
 	return AABB(glm::vec3(0.0f), glm::vec3(0.0f)); 
+}
+
+void GameObject::Delete()
+{
+	
+	if (parent)
+	{
+		auto& siblings = parent->children;
+		siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
+	}
+
+	
+	for (auto child : children)
+	{
+		child->Delete();
+		delete child;
+	}
+	children.clear();
+
+	
+	for (auto component : components)
+	{
+		delete component;
+	}
+	components.clear();
 }

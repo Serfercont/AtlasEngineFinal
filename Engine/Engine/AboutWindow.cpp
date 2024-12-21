@@ -18,12 +18,12 @@ void AboutWindow::DrawWindow()
 	UpdateMouseState();
 
     // Title
-    ImGui::Text("SpectraEngine");
+    ImGui::Text("Atlas Engine");
     ImGui::Separator();
 
     // Description
     ImGui::Text("Description:");
-    ImGui::TextWrapped("SpectraEngine is a 3D game engine developed in C++ with OpenGL, currently capable of rendering geometry with a range of controls and information displays.");
+    ImGui::TextWrapped("Atlas Engine is a 3D game engine developed in C++ with OpenGL, currently capable of rendering geometry with a range of controls and information displays.");
     ImGui::Spacing();
     HyperLink("GitHub", "https://github.com/CITM-UPC/SpectraEngine");
     ImGui::Spacing();
@@ -33,9 +33,9 @@ void AboutWindow::DrawWindow()
     // Team Members
     ImGui::Text("Team Members:");
 	ImGui::Spacing();
-    HyperLink("Guillem Alqueza", "https://github.com/guillemalqueza");
-    HyperLink("Miguel Iglesias", "https://github.com/MiguelIglesiasAbarca");
-    HyperLink("Lluc Cid", "https://github.com/Lluccib");
+    HyperLink("Sergio Fernandez", "https://github.com/Serfercont");
+    HyperLink("Pau Blanco", "https://github.com/PauloWhite2004");
+    HyperLink("Carlos Gonzalez", "https://github.com/gosu00");
     ImGui::Spacing();
 
     ImGui::Separator();
