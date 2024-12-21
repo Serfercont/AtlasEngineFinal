@@ -40,9 +40,7 @@ public:
 
 	AABB aabb;
 	OBB obb;
-	
 
-	// Material properties
 	glm::vec4 diffuseColor = glm::vec4(1.0f);
 	glm::vec4 specularColor = glm::vec4(1.0f);
 	glm::vec4 ambientColor = glm::vec4(1.0f);

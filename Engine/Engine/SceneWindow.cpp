@@ -46,6 +46,19 @@ void SceneWindow::DrawWindow()
 
 			ImGui::EndMenu();
 		}
+
+		if (ImGui::BeginMenu("Debug Options"))
+		{
+			static bool debugOctreeEnabled = false; 
+
+			if (ImGui::MenuItem("Debug Octree", nullptr, debugOctreeEnabled))
+			{
+				debugOctreeEnabled = !debugOctreeEnabled; 
+				app->scene->debugOctree = debugOctreeEnabled; 
+			}
+			ImGui::EndMenu();
+		}
+
 		ImGui::PopStyleVar();
 
 		ImGui::EndMenuBar();

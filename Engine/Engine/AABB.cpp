@@ -38,25 +38,41 @@ bool AABB::Intersects(const AABB& other) const {
 
 
 void AABB::RenderAABB(const glm::mat4& transform) const {
+    AABB transformedAABB = ApplyTransform(transform);
 
     glm::vec3 corners[8] = {
-        minPoint,
-        {minPoint.x, minPoint.y, maxPoint.z},
-        {minPoint.x, maxPoint.y, minPoint.z},
-        {minPoint.x, maxPoint.y, maxPoint.z},
-        {maxPoint.x, minPoint.y, minPoint.z},
-        {maxPoint.x, minPoint.y, maxPoint.z},
-        {maxPoint.x, maxPoint.y, minPoint.z},
-        maxPoint
+        {transformedAABB.minPoint.x, transformedAABB.minPoint.y, transformedAABB.minPoint.z}, 
+        {transformedAABB.maxPoint.x, transformedAABB.minPoint.y, transformedAABB.minPoint.z},
+        {transformedAABB.maxPoint.x, transformedAABB.minPoint.y, transformedAABB.maxPoint.z}, 
+        {transformedAABB.minPoint.x, transformedAABB.minPoint.y, transformedAABB.maxPoint.z},
+        {transformedAABB.minPoint.x, transformedAABB.maxPoint.y, transformedAABB.minPoint.z}, 
+        {transformedAABB.maxPoint.x, transformedAABB.maxPoint.y, transformedAABB.minPoint.z}, 
+        {transformedAABB.maxPoint.x, transformedAABB.maxPoint.y, transformedAABB.maxPoint.z}, 
+        {transformedAABB.minPoint.x, transformedAABB.maxPoint.y, transformedAABB.maxPoint.z}  
     };
 
-    glBegin(GL_LINES);
-    // Dibuja las líneas de las aristas del AABB.
-    for (int i = 0; i < 4; ++i) {
-        glVertex3fv(&corners[i].x); glVertex3fv(&corners[(i + 1) % 4].x);         // Base inferior
-        glVertex3fv(&corners[i + 4].x); glVertex3fv(&corners[((i + 1) % 4) + 4].x); // Base superior
-        glVertex3fv(&corners[i].x); glVertex3fv(&corners[i + 4].x);               // Conexión entre bases
-    }
-    glEnd();
-}
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    glLineWidth(2.0f);
+    glColor3f(0.0f, 0.0f, 1.0f);
 
+    glBegin(GL_LINES);
+
+    
+    glVertex3fv(&corners[0].x); glVertex3fv(&corners[1].x); 
+    glVertex3fv(&corners[1].x); glVertex3fv(&corners[2].x); 
+    glVertex3fv(&corners[2].x); glVertex3fv(&corners[3].x); 
+    glVertex3fv(&corners[3].x); glVertex3fv(&corners[0].x); 
+
+    glVertex3fv(&corners[4].x); glVertex3fv(&corners[5].x);
+    glVertex3fv(&corners[5].x); glVertex3fv(&corners[6].x); 
+    glVertex3fv(&corners[6].x); glVertex3fv(&corners[7].x); 
+    glVertex3fv(&corners[7].x); glVertex3fv(&corners[4].x); 
+
+    glVertex3fv(&corners[0].x); glVertex3fv(&corners[4].x); 
+    glVertex3fv(&corners[1].x); glVertex3fv(&corners[5].x); 
+    glVertex3fv(&corners[2].x); glVertex3fv(&corners[6].x); 
+    glVertex3fv(&corners[3].x); glVertex3fv(&corners[7].x);
+
+    glEnd();
+    glPopAttrib();
+}

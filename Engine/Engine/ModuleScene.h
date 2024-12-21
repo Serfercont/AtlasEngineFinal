@@ -27,7 +27,6 @@ public:
 	Quadtree* quadtreeScene = nullptr; 
 	Octree* octreeScene = nullptr;
 	AABB sceneLimits;
-	bool debugQuadtree = false;  
-	bool debugOctree = true;
+	bool debugOctree = false;
 
 };

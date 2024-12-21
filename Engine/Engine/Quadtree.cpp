@@ -44,7 +44,6 @@ void Quadtree::DrawDebug() const {
     }
 }
 
-// Node implementation
 Quadtree::Node::Node(const AABB& limits, int level, Quadtree* parent)
     : bounds(limits), level(level), parent(parent), maxObjects(4), maxLevels(5) {}
 
@@ -102,7 +101,7 @@ void Quadtree::Node::Intersect(std::vector<GameObject*>& results, const AABB& pr
 
 
 void Quadtree::Node::DrawDebug() const {
-    bounds.RenderAABB(glm::mat4(1.0f)); // Ahora usa el método de AABB.
+    bounds.RenderAABB(glm::mat4(1.0f));
 
     for (const auto* child : children) {
         child->DrawDebug();
