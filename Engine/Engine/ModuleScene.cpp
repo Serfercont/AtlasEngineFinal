@@ -1,34 +1,58 @@
 #include "ModuleScene.h"
+#include "Quadtree.h"
 #include "App.h"
+#include "GameObject.h"
 
 ModuleScene::ModuleScene(App* app) : Module(app), root(nullptr)
 {
+
 }
 
 ModuleScene::~ModuleScene()
 {
 }
 
-bool ModuleScene::Awake()
-{
-	root = CreateGameObject("Untitled Scene", nullptr);
+bool ModuleScene::Awake() {
+    root = CreateGameObject("Untitled Scene", nullptr);
 
-	return true;
+    sceneLimits = AABB(glm::vec3(-15.0f), glm::vec3(15.0f));
+    octreeScene = new Octree(sceneLimits);
+
+    return true;
 }
 
-bool ModuleScene::Update(float dt)
-{
-	root->Update();
+bool ModuleScene::Update(float dt) {
+    octreeScene->Clear();
 
-	return true;
+    for (GameObject* gameObject : gameObjects) {
+        if (gameObject->isStatic) {
+            octreeScene->Insert(gameObject);
+        }
+    }
+
+    if (debugOctree) {
+        octreeScene->DrawDebug();
+    }
+
+    for (auto* gameObject : gameObjects) {
+        gameObject->Update();
+    }
+
+    return true;
 }
 
-bool ModuleScene::CleanUp()
-{
-	LOG(LogType::LOG_INFO, "Cleaning ModuleScene");
+bool ModuleScene::CleanUp() {
+    delete octreeScene;
+    octreeScene = nullptr;
 
-	return true;
+    for (auto* gameObject : gameObjects) {
+        delete gameObject;
+    }
+    gameObjects.clear();
+
+    return true;
 }
+
 
 GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent)
 {
@@ -36,5 +60,12 @@ GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent)
 
 	if (parent != nullptr) parent->children.push_back(gameObject);
 
+	gameObjects.push_back(gameObject);
+
 	return gameObject;
+}
+
+std::vector<GameObject*>& ModuleScene::GetGameObjects()
+{
+	return gameObjects;
 }
