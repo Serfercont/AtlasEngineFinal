@@ -26,6 +26,8 @@ public:
 	void CreateFramebuffer();
 	void RenderAABB(const AABB& aabb, const glm::mat4& transform);
 
+	bool updateFramebuffer = false;
+
 public:
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
 	unsigned int checkerTextureId;

@@ -78,3 +78,27 @@ void Octree::Node::DrawDebug() const {
     bounds.RenderAABB(glm::mat4(1.0f));
     for (const auto* child : children) child->DrawDebug();
 }
+
+void Octree::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& objects) const
+{
+    //CollectIntersectingObjects(root.get(), rayOrigin, rayDirection, objects);
+}
+
+void Octree::Node::CollectIntersectingObjects(const Node* node, const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& objects) const
+{
+    if (!node) return;
+    if (node->bounds.IntersectsRay(rayOrigin, rayDirection))
+    {
+        for (const auto& object : node->objects)
+        {
+            objects.push_back(object);
+        }
+        for (const auto& child : node->children)
+        {
+            if (child)
+            {
+               // CollectIntersectingObjects(child.get(), rayOrigin, rayDirection, objects);
+            }
+        }
+    }
+}

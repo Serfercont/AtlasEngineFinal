@@ -32,6 +32,7 @@ public:
 	bool IsBoxInsideFrustum(const AABB& box) const;
 
 	void DrawFrustum();
+	glm::vec3 GetPosition() const { return pos; }
 
 	void OnWindowResized(int newWidth, int newHeight);
 

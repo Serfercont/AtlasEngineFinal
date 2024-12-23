@@ -5,6 +5,7 @@
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 #include "AABB.h"
+#include <glm/glm.hpp>
 
 #include <string>
 #include <vector>
@@ -25,6 +26,7 @@ public:
 
 
 	AABB GetAABB() const;
+	bool IntersectsRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float& intersectionDistance) const;
 	void Delete();
 
 public:

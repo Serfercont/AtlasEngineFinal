@@ -20,6 +20,7 @@ public:
 	GameObject* CreateGameObject(const char* name, GameObject* parent);
 
 	std::vector<GameObject*>& GetGameObjects();
+	void CollectObjects(const GameObject* gameObject, std::vector<GameObject*>& objects) const;
 
 public:
 	GameObject* root = nullptr;
