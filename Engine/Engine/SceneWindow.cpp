@@ -2,6 +2,7 @@
 #include "App.h"
 
 #include <limits>
+#include <iostream>
 
 SceneWindow::SceneWindow(const WindowType type, const std::string& name) : EditorWindow(type, name)
 {
@@ -155,6 +156,12 @@ void SceneWindow::HandleMousePicking()
 	}
 
 	app->editor->selectedGameObject = selectedObject;
+
+	if (selectedObject)
+		std::cout << "Selected Object: " << selectedObject->name << std::endl;
+	else
+		std::cout << "No object selected." << std::endl;
+
 }
 
 

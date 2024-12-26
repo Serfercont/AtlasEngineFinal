@@ -1,6 +1,7 @@
 #include "Octree.h"
 #include <iostream>
 #include <algorithm>
+#include "App.h"
 
 Octree::Octree(const AABB& limits) : root(new Node(limits, 0, this)) {}
 Octree::~Octree() { Clear(); delete root; }
@@ -79,26 +80,35 @@ void Octree::Node::DrawDebug() const {
     for (const auto* child : children) child->DrawDebug();
 }
 
-void Octree::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& objects) const
+void Octree::Node::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& objects) const
 {
-    //CollectIntersectingObjects(root.get(), rayOrigin, rayDirection, objects);
-}
+    // Verificar si el rayo intersecta este nodo
+    if (!bounds.IntersectsRay(rayOrigin, rayDirection))
+        return;
 
-void Octree::Node::CollectIntersectingObjects(const Node* node, const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& objects) const
-{
-    if (!node) return;
-    if (node->bounds.IntersectsRay(rayOrigin, rayDirection))
+    // Agregar objetos si intersectan
+    for (const auto& object : this->objects)
     {
-        for (const auto& object : node->objects)
+        if (object->GetAABB().IntersectsRay(rayOrigin, rayDirection))
         {
             objects.push_back(object);
         }
-        for (const auto& child : node->children)
+    }
+
+    // Comprobar hijos recursivamente
+    for (const auto* child : children)
+    {
+        if (child)
         {
-            if (child)
-            {
-               // CollectIntersectingObjects(child.get(), rayOrigin, rayDirection, objects);
-            }
+            child->CollectIntersectingObjects(rayOrigin, rayDirection, objects);
         }
+    }
+}
+
+void Octree::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& objects) const
+{
+    if (root)
+    {
+        root->CollectIntersectingObjects(rayOrigin, rayDirection, objects);
     }
 }
