@@ -38,6 +38,7 @@ bool ModuleScene::Update(float dt) {
         gameObject->Update();
     }
 
+
     return true;
 }
 
@@ -69,3 +70,21 @@ std::vector<GameObject*>& ModuleScene::GetGameObjects()
 {
 	return gameObjects;
 }
+
+//GameObject* ModuleScene::RaycastSelection(const glm::vec2& mousePos)
+//{
+//    // Convierte la posición del mouse a un rayo en el espacio 3D
+//    glm::vec3 rayOrigin = app->camera->GetPosition(); // Obtener la posición de la cámara
+//    glm::vec3 rayDir = app->camera->ScreenToWorldRay(mousePos.x, mousePos.y); // Función que convierte el mouse a un rayo
+//
+//    // Recorre todos los GameObjects y verifica si el rayo interseca con alguno
+//    for (auto* gameObject : gameObjects) {
+//        if (gameObject->Intersects(rayOrigin, rayDir)) { // Comprobamos la intersección
+//            app->editor->selectedGameObject = gameObject;
+//            printf("Selected object: %s\n", gameObject->name.c_str());
+//            return gameObject; // Si el rayo intersecta el objeto, lo seleccionamos
+//        }
+//    }
+//    return nullptr; // Si no hay intersección
+//}
+//

@@ -20,6 +20,22 @@ void Octree::Remove(GameObject* object) { if (root) root->objects.erase(std::rem
 void Octree::Intersect(std::vector<GameObject*>& results, const AABB& primitive) const { if (root) root->Intersect(results, primitive); }
 void Octree::DrawDebug() const { if (root) root->DrawDebug(); }
 
+void Octree::Node::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const
+{
+    if (!bounds.IntersectsRay(rayOrigin, rayDirection)) return;
+
+    for (const auto& object : objects) {
+        if (object->GetAABB().IntersectsRay(rayOrigin, rayDirection)) {
+            results.push_back(object);
+        }
+    }
+
+    for (const auto& child : children) {
+        if (child) child->CollectIntersectingObjects(rayOrigin, rayDirection, results);
+    }
+}
+
+
 // Node implementation
 Octree::Node::Node(const AABB& limits, int level, Octree* parent)
     : bounds(limits), level(level), parent(parent), maxObjects(4), maxLevels(5) {}
@@ -77,4 +93,12 @@ void Octree::Node::Intersect(std::vector<GameObject*>& results, const AABB& prim
 void Octree::Node::DrawDebug() const {
     bounds.RenderAABB(glm::mat4(1.0f));
     for (const auto* child : children) child->DrawDebug();
+}
+
+
+void Octree::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const
+{
+    if (root) {
+        root->CollectIntersectingObjects(rayOrigin, rayDirection, results);
+    }
 }
