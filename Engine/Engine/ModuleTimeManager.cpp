@@ -1,73 +1,89 @@
-            //ModuleTimeManager.cpp
-            #include "ModuleTimeManager.h"
+#include "ModuleTimeManager.h"
 
-            ModuleTimeManager* ModuleTimeManager::instance = nullptr;
+ModuleTimeManager* ModuleTimeManager::instance = nullptr;
 
-            ModuleTimeManager* ModuleTimeManager::GetInstance() {
-                if (instance == nullptr) {
-                    instance = new ModuleTimeManager();
-                }
-                return instance;
-            }
+ModuleTimeManager::ModuleTimeManager()
+    : gameTime(0.0f)
+    , realTimeSinceStartup(0.0f)
+    , timeScale(1.0f)
+    , isPaused(true)
+    , frameCount(0)
+    , deltaTime(0.0f)
+    , realTimeDeltaTime(0.0f)
+    , currentState(GameState::EDITOR_MODE)
+    , realTimeStart(std::chrono::steady_clock::now())
+    , lastFrameTime(std::chrono::steady_clock::now()) // Añadimos lastFrameTime
+{
+}
 
-            ModuleTimeManager::ModuleTimeManager()
-                : gameTime(0.0f)
-                , realTimeSinceStartup(0.0f)
-                , timeScale(1.0f)
-                , isPaused(true)
-                , frameCount(0)
-                , deltaTime(0.0f)
-                , realTimeDeltaTime(0.0f) {
-            }
+ModuleTimeManager* ModuleTimeManager::GetInstance() {
+    if (instance == nullptr) {
+        instance = new ModuleTimeManager();
+    }
+    return instance;
+}
 
-            void ModuleTimeManager::Initialize() {
-                realTimeStart = std::chrono::steady_clock::now();
-                Reset();
-            }
+void ModuleTimeManager::Initialize() {
+    auto now = std::chrono::steady_clock::now();
+    realTimeStart = now;
+    lastFrameTime = now;
+    Reset();
+}
 
-            void ModuleTimeManager::Update() {
+void ModuleTimeManager::Update() {
+    // Obtener el tiempo actual
+    auto currentTime = std::chrono::steady_clock::now();
 
-                auto currentTime = std::chrono::steady_clock::now();
-                auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(
-                    currentTime - realTimeStart).count() / 1000000.0f;
+    // Calcular el delta time real entre frames
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+        currentTime - lastFrameTime);
+    realTimeDeltaTime = duration.count() / 1000000.0f;
 
-                realTimeDeltaTime = elapsedTime - realTimeSinceStartup;
-                realTimeSinceStartup = elapsedTime;
+    // Actualizar el tiempo real desde el inicio
+    auto totalDuration = std::chrono::duration_cast<std::chrono::microseconds>(
+        currentTime - realTimeStart);
+    realTimeSinceStartup = totalDuration.count() / 1000000.0f;
 
-    
-                if (!isPaused) {
-                    deltaTime = realTimeDeltaTime * timeScale;
-                    gameTime += deltaTime;
-                }
-                else {
-                    deltaTime = 0.0f;
-                }
+    // Actualizar el tiempo de juego solo si estamos en modo juego y no pausado
+    if (currentState == GameState::GAME_MODE && !isPaused) {
+        deltaTime = realTimeDeltaTime * timeScale;
+        gameTime += deltaTime;
+    }
+    else {
+        deltaTime = 0.0f;
+    }
 
-                frameCount++;
-            }
+    // Guardar el tiempo actual como último frame
+    lastFrameTime = currentTime;
+    frameCount++;
+}
 
-            void ModuleTimeManager::Reset() {
-                gameTime = 0.0f;
-                realTimeStart = std::chrono::steady_clock::now();
-                realTimeSinceStartup = 0.0f;
-                frameCount = 0;
-                deltaTime = 0.0f;
-                realTimeDeltaTime = 0.0f;
-            }
+void ModuleTimeManager::Reset() {
+    gameTime = 0.0f;
+    auto now = std::chrono::steady_clock::now();
+    realTimeStart = now;
+    lastFrameTime = now;
+    realTimeSinceStartup = 0.0f;
+    frameCount = 0;
+    deltaTime = 0.0f;
+    realTimeDeltaTime = 0.0f;
+}
 
-            void ModuleTimeManager::Play() {
-                isPaused = false;
-            }
+void ModuleTimeManager::Play() {
+    isPaused = false;
+    currentState = GameState::GAME_MODE;
+}
 
-            void ModuleTimeManager::Pause() {
-                isPaused = true;
-            }
+void ModuleTimeManager::Pause() {
+    isPaused = true;
+}
 
-            void ModuleTimeManager::Stop() {
-                isPaused = true;
-                Reset();
-            }
+void ModuleTimeManager::Stop() {
+    isPaused = false;
+    Reset();
+    currentState = GameState::EDITOR_MODE;
+}
 
-            void ModuleTimeManager::SetTimeScale(float scale) {
-                timeScale = scale;
-            }
+void ModuleTimeManager::SetTimeScale(float scale) {
+    timeScale = scale;
+}
