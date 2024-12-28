@@ -52,10 +52,6 @@ bool ModuleCamera::Update(float dt)
 	if (isMouseInside) {
 		HandleInput();
 
-		/*if (app->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
-		{
-			SelectGameObject();
-		}*/
 	}
 
 	CalculateViewMatrix();
@@ -369,81 +365,3 @@ void ModuleCamera::OnWindowResized(int newWidth, int newHeight) {
     screenWidth = newWidth;
     screenHeight = newHeight;
 }
-//Ray ModuleCamera::CreateRayFromMouse()
-//{
-//	// Obtén la posición normalizada del ratón
-//	glm::vec2 normalizedMousePos = app->input->GetNormalizedMousePosition(viewportPos, viewportSize);
-//
-//	// Calcula la matriz de vista-proyección inversa
-//	glm::mat4 viewMatrix = GetViewMatrix();
-//	glm::mat4 projectionMatrix = GetProjectionMatrix();
-//	glm::mat4 vpMatrix = projectionMatrix * viewMatrix;
-//	glm::mat4 invVP = glm::inverse(vpMatrix);
-//
-//	// Calcula los puntos cercanos y lejanos en espacio de mundo
-//	glm::vec4 nearPoint = invVP * glm::vec4(normalizedMousePos.x, normalizedMousePos.y, -1.0f, 1.0f);
-//	glm::vec4 farPoint = invVP * glm::vec4(normalizedMousePos.x, normalizedMousePos.y, 1.0f, 1.0f);
-//
-//	// Normaliza las coordenadas
-//	nearPoint /= nearPoint.w;
-//	farPoint /= farPoint.w;
-//
-//	// Crea el rayo
-//	Ray ray;
-//	ray.origin = glm::vec3(nearPoint);
-//	ray.direction = glm::normalize(glm::vec3(farPoint - nearPoint));
-//	
-//
-//	return ray;
-//}
-//
-//void ModuleCamera::SelectGameObject()
-//{
-//	Ray ray = CreateRayFromMouse();
-//	GameObject* closestObject = nullptr;
-//	float closestDistance = FLT_MAX;
-//
-//	for (GameObject* obj : app->scene->GetGameObjects())
-//	{
-//		if (AABB::RayIntersectsAABB(ray, obj->GetAABB()))
-//		{
-//			float distance = glm::length(ray.origin - obj->transform->position);
-//			if (distance < closestDistance)
-//			{
-//				closestDistance = distance;
-//				closestObject = obj;
-//			}
-//		}
-//	}
-//
-//	// Actualiza el objeto seleccionado en el editor
-//	if (closestObject)
-//	{
-//		app->editor->selectedGameObject = closestObject;
-//		printf("Selected object: %s\n", closestObject->name.c_str());
-//	}
-//}
-//
-//glm::vec3 ModuleCamera::ScreenToWorldRay(float x, float y)
-//{
-//	// Asumiendo que tienes una matriz de proyección y vista
-//	glm::mat4 projectionMatrix = app->camera->GetProjectionMatrix();
-//	glm::mat4 viewMatrix = app->camera->GetViewMatrix();
-//
-//	// Calcula las coordenadas normalizadas de dispositivo (NDC) en el rango [-1, 1]
-//	float normalizedX = (2.0f * x) / app->window->width - 1.0f;
-//	float normalizedY = 1.0f - (2.0f * y) / app->window->height;
-//	glm::vec4 rayClip(normalizedX, normalizedY, -1.0f, 1.0f);
-//
-//	// Convierte de espacio de clip a espacio de cámara
-//	glm::mat4 invProjectionView = glm::inverse(projectionMatrix * viewMatrix);
-//	glm::vec4 rayEye = invProjectionView * rayClip;
-//	rayEye.z = -1.0f;
-//	rayEye.w = 0.0f;
-//
-//	// Convierte de espacio de cámara a espacio mundial
-//	glm::vec3 rayWorld = glm::vec3(invProjectionView * rayEye);
-//	return glm::normalize(rayWorld); // Normaliza para obtener la dirección del rayo
-//}
-//
-//

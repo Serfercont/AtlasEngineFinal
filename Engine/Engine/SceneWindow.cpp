@@ -141,12 +141,10 @@ void SceneWindow::HandleMousePicking() const
 
 	float closestDistance = FLT_MAX;
 
-	std::vector<GameObject*> objects;
-	app->scene->octreeScene->CollectIntersectingObjects(rayOrigin, rayWorld, objects);
-
+	const auto& sceneObjects = app->scene->GetGameObjects(); 
 	std::unordered_set<GameObject*> reviewedObjects;
 
-	for (GameObject* object : objects)
+	for (GameObject* object : sceneObjects)
 	{
 		if (reviewedObjects.find(object) != reviewedObjects.end())
 			continue;

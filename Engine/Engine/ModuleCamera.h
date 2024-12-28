@@ -37,12 +37,6 @@ public:
 	void DrawFrustum();
 
 	void OnWindowResized(int newWidth, int newHeight);
-	Ray CreateRayFromMouse();
-	glm::vec3 ScreenToWorldRay(float x, float y);
-
-	void DrawRay(const Ray& ray);
-
-	void SelectGameObject();
 	glm::vec3 GetPosition() const { return pos; }
 
 

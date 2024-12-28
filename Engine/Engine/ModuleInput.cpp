@@ -154,16 +154,6 @@ void ModuleInput::ChangeCursor(CursorType newCursor)
 	}
 }
 
-glm::vec2 ModuleInput::GetNormalizedMousePosition(ImVec2 viewportPos, ImVec2 viewportSize) const
-{
-	ImVec2 mousePos = ImGui::GetMousePos();
-
-	float x = ((mousePos.x - viewportPos.x) / viewportSize.x) * 2.0f - 1.0f;
-	float y = 1.0f - ((mousePos.y - viewportPos.y) / viewportSize.y) * 2.0f;
-
-	return glm::vec2(x, y);
-}
-
 void ModuleInput::SetCursor()
 {
 	SDL_Cursor* sdlCursor = nullptr;
@@ -228,17 +218,4 @@ void ModuleInput::MakeCursorTransparent(SDL_Surface* surface)
 	}
 
 	if (SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
-}
-
-
-
-bool ModuleInput::GetMouseButtonDown(int button) {
-	Uint32 mouseState = SDL_GetMouseState(NULL, NULL);
-	return (mouseState & SDL_BUTTON(button)) != 0;
-}
-
-glm::vec2 ModuleInput::GetMousePosition() {
-	int x, y;
-	SDL_GetMouseState(&x, &y);
-	return glm::vec2(x, y);
 }

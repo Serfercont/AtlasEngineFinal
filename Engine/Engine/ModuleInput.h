@@ -83,10 +83,6 @@ public:
 		return mouse_y_motion;
 	}
 
-	bool GetMouseButtonDown(int button);
-
-	glm::vec2 GetMousePosition();
-
 private:
 	void SetCursor();
 	void CreateCursors();

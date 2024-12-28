@@ -18,8 +18,6 @@ public:
 	bool CleanUp();
 
 	GameObject* CreateGameObject(const char* name, GameObject* parent);
-	//GameObject* RaycastSelection(const glm::vec2& mousePos);
-
 
 	std::vector<GameObject*>& GetGameObjects();
 

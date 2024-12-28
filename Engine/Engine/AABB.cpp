@@ -26,19 +26,6 @@ AABB AABB::ApplyTransform(const glm::mat4& transform) const {
     return AABB(transformedMin, transformedMax);
 }
 
-bool AABB::RayIntersectsAABB(const Ray& ray, const AABB& aabb) {
-    glm::vec3 invDir = 1.0f / ray.direction;
-    glm::vec3 t0s = (aabb.minPoint - ray.origin) * invDir;
-    glm::vec3 t1s = (aabb.maxPoint - ray.origin) * invDir;
-
-    glm::vec3 tMin = glm::min(t0s, t1s);
-    glm::vec3 tMax = glm::max(t0s, t1s);
-
-    float tNear = glm::max(glm::max(tMin.x, tMin.y), tMin.z);
-    float tFar = glm::min(glm::min(tMax.x, tMax.y), tMax.z);
-
-    return tNear <= tFar && tFar >= 0.0f;
-}
 
 glm::vec3 AABB::GetCenter() const {
     return (minPoint + maxPoint) * 0.5f;
@@ -91,16 +78,6 @@ void AABB::RenderAABB(const glm::mat4& transform) const {
     glPopAttrib();
 }
 
-bool AABB::IntersectsRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection) const
-{
-    glm::vec3 invDir = 1.0f / rayDirection;
-    glm::vec3 t0s = (minPoint - rayOrigin) * invDir;
-    glm::vec3 t1s = (maxPoint - rayOrigin) * invDir;
 
-    float tmin = glm::max(glm::max(glm::min(t0s.x, t1s.x), glm::min(t0s.y, t1s.y)), glm::min(t0s.z, t1s.z));
-    float tmax = glm::min(glm::min(glm::max(t0s.x, t1s.x), glm::max(t0s.y, t1s.y)), glm::max(t0s.z, t1s.z));
-
-    return tmax >= tmin && tmax >= 0.0f;
-}
 
 

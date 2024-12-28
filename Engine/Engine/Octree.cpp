@@ -20,21 +20,6 @@ void Octree::Remove(GameObject* object) { if (root) root->objects.erase(std::rem
 void Octree::Intersect(std::vector<GameObject*>& results, const AABB& primitive) const { if (root) root->Intersect(results, primitive); }
 void Octree::DrawDebug() const { if (root) root->DrawDebug(); }
 
-void Octree::Node::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const
-{
-    if (!bounds.IntersectsRay(rayOrigin, rayDirection)) return;
-
-    for (const auto& object : objects) {
-        if (object->GetAABB().IntersectsRay(rayOrigin, rayDirection)) {
-            results.push_back(object);
-        }
-    }
-
-    for (const auto& child : children) {
-        if (child) child->CollectIntersectingObjects(rayOrigin, rayDirection, results);
-    }
-}
-
 
 // Node implementation
 Octree::Node::Node(const AABB& limits, int level, Octree* parent)
@@ -75,12 +60,12 @@ void Octree::Node::Insert(GameObject* object) {
 
 void Octree::Node::Intersect(std::vector<GameObject*>& results, const AABB& primitive) const {
     if (!bounds.Intersects(primitive)) {
-        return; // No procesar si no intersecta
+        return; 
     }
 
     for (const auto* object : objects) {
         if (object && object->GetAABB().Intersects(primitive)) {
-            results.push_back(const_cast<GameObject*>(object)); // Convierte el puntero si es necesario
+            results.push_back(const_cast<GameObject*>(object)); 
         }
     }
 
@@ -96,9 +81,3 @@ void Octree::Node::DrawDebug() const {
 }
 
 
-void Octree::CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const
-{
-    if (root) {
-        root->CollectIntersectingObjects(rayOrigin, rayDirection, results);
-    }
-}
