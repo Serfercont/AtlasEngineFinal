@@ -1,6 +1,6 @@
 	#include "ModuleEditor.h"
 	#include "App.h"
-
+	#include "ComponentCamera.h"
 	#include "imgui_internal.h"
 
 	ModuleEditor::ModuleEditor(App* app) : Module(app)
@@ -172,6 +172,24 @@
 				app->scene->CreateGameObject("GameObject", app->scene->root);
 				selectedGameObject = app->scene->root->children.back();
 			}
+			if (ImGui::MenuItem("Create Camera"))
+			{
+				GameObject* newCameraObject = app->scene->CreateGameObject("Camera", app->scene->root);
+				if (newCameraObject)
+				{
+					// Obtener la referencia al ModuleCamera
+					ComponentCamera* camera = new ComponentCamera(newCameraObject, app->camera);
+					newCameraObject->AddComponent(camera);
+
+					// Establecer la posición inicial
+					camera->SetFOV(60.0f);
+					camera->SetNearPlane(0.1f);
+					camera->SetFarPlane(1000.0f);
+
+					// Actualizar selectedGameObject
+					selectedGameObject = newCameraObject;
+				}
+			}
 			if (ImGui::BeginMenu("3D Object"))
 			{
 				const char* objectNames[] = { "Cube", "Sphere", "Capsule", "Cylinder" };
@@ -192,6 +210,7 @@
 
 						selectedGameObject = app->scene->root->children.back();
 					}
+
 				}
 
 				ImGui::EndMenu();
