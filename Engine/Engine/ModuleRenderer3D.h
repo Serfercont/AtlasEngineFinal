@@ -2,6 +2,7 @@
 
 #include "Module.h"
 #include "Grid.h"
+#include "AABB.h"
 
 #include <SDL2/SDL_video.h>
 #include <GL/glew.h>
@@ -23,6 +24,8 @@ public:
 
 	void OnResize(int width, int height);
 	void CreateFramebuffer();
+
+	bool updateFramebuffer = false;
 
 public:
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];

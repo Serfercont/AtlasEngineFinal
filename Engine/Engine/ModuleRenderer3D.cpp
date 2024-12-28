@@ -1,6 +1,7 @@
 #include "ModuleRenderer3D.h"
 #include "App.h"
 #include "Texture.h"
+#include "AABB.h"
 
 #include <SDL2/SDL_opengl.h>
 #include <gl/GL.h>
@@ -112,6 +113,12 @@ bool ModuleRenderer3D::Awake()
 
 bool ModuleRenderer3D::PreUpdate(float dt)
 {
+
+	if (updateFramebuffer)
+	{
+		OnResize(app->editor->sceneWindow->windowSize.x, app->editor->sceneWindow->windowSize.y);
+		updateFramebuffer = false;
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -195,13 +202,13 @@ void ModuleRenderer3D::CreateFramebuffer()
 	glBindTexture(GL_TEXTURE_2D, fboTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, app->window->width, app->window->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, app->editor->sceneWindow->windowSize.x, app->editor->sceneWindow->windowSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTexture, 0);
 
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, app->window->width, app->window->height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, app->editor->sceneWindow->windowSize.x, app->editor->sceneWindow->windowSize.y);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "AABB.h"
 #include "Component.h"
 #include "Mesh.h"
 
@@ -13,11 +13,13 @@ public:
 
 	void Update() override;
 	void OnEditor() override;
-
 public:
 	Mesh* mesh;
 
 private:
 	bool showVertexNormals = false;
 	bool showFaceNormals = false;
+
+	bool showAABB = false;
+	bool showOBB = false;
 };

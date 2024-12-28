@@ -4,8 +4,18 @@
 #include "glm/glm.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/transform.hpp"
-
+#include "Mesh.h"
 #include "ModuleInput.h"
+#include "AABB.h"
+
+
+struct Plane
+{
+	glm::vec3 normal;
+	float distance;
+};
+
+
 
 class ModuleCamera : public Module
 {
@@ -26,6 +36,13 @@ public:
 	void LookAt(const glm::vec3& spot);
 	const glm::mat4& GetViewMatrix() const;
 	glm::mat4 GetProjectionMatrix() const;
+	bool IsBoxInsideFrustum(const AABB& box) const;
+
+	void DrawFrustum();
+
+	void OnWindowResized(int newWidth, int newHeight);
+	glm::vec3 GetPosition() const { return pos; }
+
 
 	void CalculateViewMatrix();
 	void UpdateViewMatrix() { CalculateViewMatrix(); }
@@ -38,6 +55,8 @@ private:
 	glm::vec3 RotateVector(glm::vec3 const& vector, float angle, glm::vec3 const& axis);
 
 	void SetCursor(CursorType cursorType);
+
+	void CalculateFrustumPlanes();
 
 public:
 	float fov = 60.0f;
@@ -56,4 +75,6 @@ private:
 	bool isDragging = false;
 	bool isDefaultCursor = true;
 	ModuleCamera* moduleCamera = nullptr;
+
+	Plane frustumPlanes[6];
 };

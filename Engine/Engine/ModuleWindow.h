@@ -25,6 +25,7 @@ public:
 	void SetBorderless(bool enabled);
 	void SetFullDesktop(bool enabled);
 	void SetResizable(bool enabled);
+	void OnResize(int width, int height) { this->width = width; this->height = height; }
 
 public:
 	SDL_Window* window;
