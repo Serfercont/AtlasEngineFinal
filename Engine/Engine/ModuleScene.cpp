@@ -29,9 +29,15 @@ bool ModuleScene::Update(float dt) {
         
     }
 
-    if (debugOctree) {
+    if (debugOctree) 
+    {
         octreeScene->DrawDebug();
     }
+    if (DebugFrust) 
+    {
+        app->camera->DrawFrustum();
+    }
+    
 
     for (auto* gameObject : gameObjects) {
         gameObject->Update();

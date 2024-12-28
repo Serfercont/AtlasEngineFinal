@@ -28,5 +28,6 @@ public:
 	Octree* octreeScene = nullptr;
 	AABB sceneLimits;
 	bool debugOctree = false;
+	bool DebugFrust = false;
 
 };

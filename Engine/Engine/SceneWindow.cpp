@@ -53,12 +53,18 @@ void SceneWindow::DrawWindow()
 
 		if (ImGui::BeginMenu("Debug Options"))
 		{
-			static bool debugOctreeEnabled = false; 
+			static bool debugOctreeEnabled = false;
+			static bool debugRaycastEnabled = false;
 
 			if (ImGui::MenuItem("Debug Octree", nullptr, debugOctreeEnabled))
 			{
 				debugOctreeEnabled = !debugOctreeEnabled; 
 				app->scene->debugOctree = debugOctreeEnabled; 
+			}
+			if (ImGui::MenuItem("Debug Raycast", nullptr, debugRaycastEnabled))
+			{
+				debugRaycastEnabled = !debugRaycastEnabled;
+				app->scene->DebugFrust = debugRaycastEnabled;
 			}
 			ImGui::EndMenu();
 		}
