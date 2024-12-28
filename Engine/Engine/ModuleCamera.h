@@ -6,6 +6,7 @@
 #include "glm/gtx/transform.hpp"
 #include "Mesh.h"
 #include "ModuleInput.h"
+#include "AABB.h"
 
 
 struct Plane
@@ -13,6 +14,8 @@ struct Plane
 	glm::vec3 normal;
 	float distance;
 };
+
+
 
 class ModuleCamera : public Module
 {
@@ -34,6 +37,8 @@ public:
 	void DrawFrustum();
 
 	void OnWindowResized(int newWidth, int newHeight);
+	glm::vec3 GetPosition() const { return pos; }
+
 
 private:
 	void HandleMovement(glm::vec3& newPos, float speed, float fastSpeed);

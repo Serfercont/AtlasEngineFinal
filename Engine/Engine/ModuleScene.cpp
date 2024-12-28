@@ -25,18 +25,24 @@ bool ModuleScene::Update(float dt) {
     octreeScene->Clear();
 
     for (GameObject* gameObject : gameObjects) {
-        if (gameObject->isStatic) {
-            octreeScene->Insert(gameObject);
-        }
+        octreeScene->Insert(gameObject);
+        
     }
 
-    if (debugOctree) {
+    if (debugOctree) 
+    {
         octreeScene->DrawDebug();
     }
+    if (DebugFrust) 
+    {
+        app->camera->DrawFrustum();
+    }
+    
 
     for (auto* gameObject : gameObjects) {
         gameObject->Update();
     }
+
 
     return true;
 }
@@ -45,10 +51,8 @@ bool ModuleScene::CleanUp() {
     delete octreeScene;
     octreeScene = nullptr;
 
-    for (auto* gameObject : gameObjects) {
-        delete gameObject;
-    }
-    gameObjects.clear();
+    delete root;
+    root = nullptr;
 
     return true;
 }

@@ -28,10 +28,14 @@ Resource* ModuleResources::CreateResource(const std::string& fileDir, ResourceTy
 	switch (type)
 	{
 	case ResourceType::MODEL:
-		resource = new Resource(fileName, ResourceType::MODEL);
+		resource = new Resource(ResourceType::MODEL);
+		break;
+	case ResourceType::MESH:
+		resource = new Mesh();
 		break;
 	case ResourceType::TEXTURE:
-		resource = new Resource(fileName, ResourceType::TEXTURE);
+		resource = new Texture(0, 0, 0, fileDir.c_str());
+		break;
 	}
 
 	if (resource)
@@ -39,6 +43,7 @@ Resource* ModuleResources::CreateResource(const std::string& fileDir, ResourceTy
 		resource->SetAssetFileDir(fileDir.c_str());
 		std::string libraryFileDir = CreateLibraryFileDir(fileName, type);
 		resource->SetLibraryFileDir(libraryFileDir);
+		resources.push_back(resource);
 	}
 
 	return resource;
@@ -48,7 +53,7 @@ ResourceType ModuleResources::GetResourceTypeFromExtension(const std::string& ex
 {
 	if (extension == "fbx")
 		return ResourceType::MODEL;
-	else if (extension == "png" || extension == "dds")
+	else if (extension == "png" || extension == "dds" || extension == "tga")
 		return ResourceType::TEXTURE;
 	else
 		return ResourceType::UNKNOWN;
@@ -60,6 +65,9 @@ std::string ModuleResources::CreateLibraryFileDir(std::string name, ResourceType
 	{
 	case ResourceType::MODEL:
 		return "Library/Models/" + name + ".model";
+		break;
+	case ResourceType::MESH:
+		return "Library/Meshes/" + name + ".mesh";
 		break;
 	case ResourceType::TEXTURE:
 		return "Library/Textures/" + name + ".dds";
@@ -74,12 +82,10 @@ Resource* ModuleResources::FindResourceInLibrary(const std::string& fileDir, Res
 	std::string fileName = app->fileSystem->GetFileNameWithoutExtension(fileDir);
 	std::string libraryFileDir = CreateLibraryFileDir(fileName, type);
 
-	if (app->fileSystem->FileExists(libraryFileDir))
+	for (const auto& resource : resources)
 	{
-		Resource* resource = new Resource(fileName, type);
-		resource->SetAssetFileDir(fileDir.c_str());
-		resource->SetLibraryFileDir(libraryFileDir);
-		return resource;
+		if (resource->GetLibraryFileDir() == libraryFileDir)
+			return resource;
 	}
 
 	return nullptr;

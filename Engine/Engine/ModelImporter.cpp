@@ -436,6 +436,7 @@ void ModelImporter::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, s
 		}
 
 		parent->children.push_back(gameObjectNode);
+		app->scene->gameObjects.push_back(gameObjectNode);
 	}
 
 	uint32_t numChildren;
@@ -446,9 +447,10 @@ void ModelImporter::LoadNodeFromBuffer(const char* buffer, size_t& currentPos, s
 	if (numChildren > 0)
 	{
 		GameObject* holder = gameObjectNode ? gameObjectNode : new GameObject(fileName, parent);
-		if (!gameObjectNode)
+		if (!gameObjectNode) {
 			parent->children.push_back(holder);
-
+			app->scene->gameObjects.push_back(holder);
+		}
 		for (uint32_t i = 0; i < numChildren; i++)
 		{
 			LoadNodeFromBuffer(buffer, currentPos, meshes, holder, nodeName.c_str());

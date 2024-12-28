@@ -26,6 +26,7 @@ AABB AABB::ApplyTransform(const glm::mat4& transform) const {
     return AABB(transformedMin, transformedMax);
 }
 
+
 glm::vec3 AABB::GetCenter() const {
     return (minPoint + maxPoint) * 0.5f;
 }
@@ -76,3 +77,7 @@ void AABB::RenderAABB(const glm::mat4& transform) const {
     glEnd();
     glPopAttrib();
 }
+
+
+
+

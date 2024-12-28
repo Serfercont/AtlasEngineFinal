@@ -2,6 +2,10 @@
 #include <glm/glm.hpp>
 #include <limits>
 
+struct Ray {
+    glm::vec3 origin;
+    glm::vec3 direction;
+};
 class AABB {
 public:
     glm::vec3 minPoint;

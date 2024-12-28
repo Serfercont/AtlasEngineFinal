@@ -59,6 +59,10 @@ void ComponentMesh::Update()
                 }
             }
         }
+        else
+        {
+            printf("Mesh out of frustum\n");
+        }
     }
 }
 

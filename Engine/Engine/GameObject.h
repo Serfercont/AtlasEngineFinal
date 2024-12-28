@@ -27,6 +27,11 @@ public:
 	AABB GetAABB() const;
 	void Delete();
 
+	bool IntersectsRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float& intersectionDistance) const;
+
+	
+
+
 public:
 	GameObject* parent;
 	std::string name;

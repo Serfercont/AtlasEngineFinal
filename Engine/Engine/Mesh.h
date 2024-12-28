@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Resource.h"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
@@ -10,9 +10,10 @@
 
 typedef unsigned int uint;
 
-class Mesh
+class Mesh : public Resource
 {
 public:
+	Mesh() : Resource(ResourceType::MODEL) {}
 	void InitMesh();
 	void DrawMesh(GLuint textureID, bool drawTextures, bool wireframe, bool shadedWireframe);
 	void DrawNormals(bool vertexNormals, bool faceNormals, float vertexNormalLength, float faceNormalLength, glm::vec3 vertexNormalColor, glm::vec3 faceNormalColor);

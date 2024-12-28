@@ -1,6 +1,12 @@
 #include "ModuleCamera.h"
 #include "App.h"
+#include <algorithm>
+#undef max
 
+
+
+ImVec2 viewportPos = ImVec2(100, 100); 
+ImVec2 viewportSize = ImVec2(800, 600); 
 ModuleCamera::ModuleCamera(App* app) : Module(app)
 {
 	screenWidth = app->window->width;
@@ -43,8 +49,10 @@ bool ModuleCamera::Update(float dt)
 		SetCursor(CursorType::DEFAULT);
 	}
 
-	if (isMouseInside)
+	if (isMouseInside) {
 		HandleInput();
+
+	}
 
 	CalculateViewMatrix();
 	CalculateFrustumPlanes();
@@ -233,7 +241,7 @@ void ModuleCamera::CalculateViewMatrix() {
 }
 
 glm::mat4 ModuleCamera::GetProjectionMatrix() const {
-	float aspectRatio = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
+	float aspectRatio = app->editor->sceneWindow->windowSize.x / app->editor->sceneWindow->windowSize.y;
 	return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
 }
 

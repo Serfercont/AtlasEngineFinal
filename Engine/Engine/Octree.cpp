@@ -20,6 +20,7 @@ void Octree::Remove(GameObject* object) { if (root) root->objects.erase(std::rem
 void Octree::Intersect(std::vector<GameObject*>& results, const AABB& primitive) const { if (root) root->Intersect(results, primitive); }
 void Octree::DrawDebug() const { if (root) root->DrawDebug(); }
 
+
 // Node implementation
 Octree::Node::Node(const AABB& limits, int level, Octree* parent)
     : bounds(limits), level(level), parent(parent), maxObjects(4), maxLevels(5) {}
@@ -59,12 +60,12 @@ void Octree::Node::Insert(GameObject* object) {
 
 void Octree::Node::Intersect(std::vector<GameObject*>& results, const AABB& primitive) const {
     if (!bounds.Intersects(primitive)) {
-        return; // No procesar si no intersecta
+        return; 
     }
 
     for (const auto* object : objects) {
         if (object && object->GetAABB().Intersects(primitive)) {
-            results.push_back(const_cast<GameObject*>(object)); // Convierte el puntero si es necesario
+            results.push_back(const_cast<GameObject*>(object)); 
         }
     }
 
@@ -78,3 +79,5 @@ void Octree::Node::DrawDebug() const {
     bounds.RenderAABB(glm::mat4(1.0f));
     for (const auto* child : children) child->DrawDebug();
 }
+
+
