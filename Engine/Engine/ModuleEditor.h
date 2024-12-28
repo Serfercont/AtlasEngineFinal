@@ -12,6 +12,7 @@
 #include "PerformanceWindow.h"
 #include "PreferencesWindow.h"
 #include "AboutWindow.h"
+#include "TimeManagerEditorWindow.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
