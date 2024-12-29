@@ -13,6 +13,7 @@
 #include "PreferencesWindow.h"
 #include "AboutWindow.h"
 #include "GameWindow.h"
+#include "TimeManagerEditorWindow.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
