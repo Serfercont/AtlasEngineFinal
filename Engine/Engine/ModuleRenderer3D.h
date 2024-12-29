@@ -22,10 +22,28 @@ public:
 	bool PostUpdate(float dt);
 	bool CleanUp();
 
-	void OnResize(int width, int height);
-	void CreateFramebuffer();
+	//void OnResize(int width, int height);
 
-	bool updateFramebuffer = false;
+	bool updateSceneFramebuffer = false;
+	bool updateGameFramebuffer = false;
+
+	// Scene framebuffer
+	uint32_t sceneFBO = 0;
+	uint32_t sceneTextureId = 0;
+	uint32_t sceneRBO = 0;
+
+	// Game framebuffer
+	uint32_t gameFBO = 0;
+	uint32_t gameTextureId = 0;
+	uint32_t gameRBO = 0;
+
+	void CreateSceneFramebuffer();
+	void CreateGameFramebuffer();
+	void OnSceneResize(float width, float height);
+	void OnGameResize(float width, float height);
+
+private:
+	void RenderToFramebuffer(uint32_t fbo, const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
 
 public:
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];

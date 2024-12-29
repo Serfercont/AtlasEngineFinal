@@ -52,6 +52,8 @@ bool ModuleEditor::Awake()
 	editorWindows.push_back(preferencesWindow);
 	aboutWindow = new AboutWindow(WindowType::ABOUT, "About");
 	editorWindows.push_back(aboutWindow);
+	gameWindow = new GameWindow(WindowType::GAME, "Game");
+	editorWindows.push_back(gameWindow);
 
 	return ret;
 }
@@ -166,6 +168,10 @@ void ModuleEditor::MainMenuBar()
 		{
 			app->scene->CreateGameObject("GameObject", app->scene->root);
 			selectedGameObject = app->scene->root->children.back();
+		}
+		if (ImGui::MenuItem("Camera"))
+		{
+			app->scene->CreateCamera("New Camera");
 		}
 		if (ImGui::BeginMenu("3D Object"))
 		{
