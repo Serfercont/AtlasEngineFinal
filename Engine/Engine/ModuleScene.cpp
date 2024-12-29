@@ -68,29 +68,6 @@ GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent)
 
 	return gameObject;
 }
-GameObject* ModuleScene::CreateCamera(const char* name, GameObject* parent)
-{
-    GameObject* cameraObject = CreateGameObject(name, parent);
-
-    // Crear y configurar el componente cámara
-    ComponentCamera* cameraComponent = new ComponentCamera(cameraObject);
-    cameraObject->camera = cameraComponent;
-    cameraObject->AddComponent(cameraComponent);
-
-    // Si es la primera cámara en la escena, marcarla como principal
-    bool isFirstCamera = true;
-    for (auto* obj : gameObjects)
-    {
-        if (obj != cameraObject && obj->camera != nullptr)
-        {
-            isFirstCamera = false;
-            break;
-        }
-    }
-    cameraComponent->isMainCamera = isFirstCamera;
-
-    return cameraObject;
-}
 
 std::vector<GameObject*>& ModuleScene::GetGameObjects()
 {

@@ -18,7 +18,6 @@ public:
 	bool CleanUp();
 
 	GameObject* CreateGameObject(const char* name, GameObject* parent);
-	GameObject* CreateCamera(const char* name, GameObject* parent = nullptr);
 
 	std::vector<GameObject*>& GetGameObjects();
 
@@ -28,7 +27,6 @@ public:
 	Quadtree* quadtreeScene = nullptr; 
 	Octree* octreeScene = nullptr;
 	AABB sceneLimits;
-
 	bool debugOctree = false;
 	bool DebugFrust = false;
 
