@@ -15,44 +15,45 @@
 		editorWindows.clear();
 	}
 
-	bool ModuleEditor::Awake()
-	{
-		LOG(LogType::LOG_INFO, "ModuleEditor");
-		bool ret = true;
+bool ModuleEditor::Awake()
+{
+	LOG(LogType::LOG_INFO, "ModuleEditor");
+	bool ret = true;
 
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
 
-		ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 
-		ImFont* customFont = io.Fonts->AddFontFromFileTTF("Engine/Fonts/Roboto-Regular.ttf", 14.f);
-		if (customFont != nullptr)
-			io.FontDefault = customFont;
+	ImFont* customFont = io.Fonts->AddFontFromFileTTF("Engine/Fonts/Roboto-Regular.ttf", 14.f);
+	if (customFont != nullptr)
+		io.FontDefault = customFont;
 
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-		ApplyStyle();
+	ApplyStyle();
 
-		ImGui_ImplSDL2_InitForOpenGL(app->window->window, app->window->context);
-		ImGui_ImplOpenGL3_Init();
+	ImGui_ImplSDL2_InitForOpenGL(app->window->window, app->window->context);
+	ImGui_ImplOpenGL3_Init();
 
-		hierarchyWindow = new HierarchyWindow(WindowType::HIERARCHY, "Hierarchy");
-		editorWindows.push_back(hierarchyWindow);
-		inspectorWindow = new InspectorWindow(WindowType::INSPECTOR, "Inspector");
-		editorWindows.push_back(inspectorWindow);
-		consoleWindow = new ConsoleWindow(WindowType::CONSOLE, "Console");
-		editorWindows.push_back(consoleWindow);
-		projectWindow = new ProjectWindow(WindowType::PROJECT, "Project");
-		editorWindows.push_back(projectWindow);
-		sceneWindow = new SceneWindow(WindowType::SCENE, "Scene");
-		editorWindows.push_back(sceneWindow);
-		performanceWindow = new PerformanceWindow(WindowType::PERFORMANCE, "Performance");
-		editorWindows.push_back(performanceWindow);
-		preferencesWindow = new PreferencesWindow(WindowType::PREFERENCES, "Preferences");
-		editorWindows.push_back(preferencesWindow);
-		aboutWindow = new AboutWindow(WindowType::ABOUT, "About");
-		editorWindows.push_back(aboutWindow);
-
+	hierarchyWindow = new HierarchyWindow(WindowType::HIERARCHY, "Hierarchy");
+	editorWindows.push_back(hierarchyWindow);
+	inspectorWindow = new InspectorWindow(WindowType::INSPECTOR, "Inspector");
+	editorWindows.push_back(inspectorWindow);
+	consoleWindow = new ConsoleWindow(WindowType::CONSOLE, "Console");
+	editorWindows.push_back(consoleWindow);
+	projectWindow = new ProjectWindow(WindowType::PROJECT, "Project");
+	editorWindows.push_back(projectWindow);
+	sceneWindow = new SceneWindow(WindowType::SCENE, "Scene");
+	editorWindows.push_back(sceneWindow);
+	performanceWindow = new PerformanceWindow(WindowType::PERFORMANCE, "Performance");
+	editorWindows.push_back(performanceWindow);
+	preferencesWindow = new PreferencesWindow(WindowType::PREFERENCES, "Preferences");
+	editorWindows.push_back(preferencesWindow);
+	aboutWindow = new AboutWindow(WindowType::ABOUT, "About");
+	editorWindows.push_back(aboutWindow);
+	gameWindow = new GameWindow(WindowType::GAME, "Game");
+	editorWindows.push_back(gameWindow);
 			
 		auto timeManagerWindow = new TimeManagerEditorWindow();
 		editorWindows.push_back(timeManagerWindow);
@@ -165,7 +166,12 @@
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("GameObject"))
+		if (ImGui::MenuItem("Camera"))
+		{
+			app->scene->CreateCamera("New Camera");
+		}
+      ImGui::EndMenu();
+		if (ImGui::BeginMenu("3D Object"))
 		{
 			if (ImGui::MenuItem("Create Empty"))
 			{
@@ -181,7 +187,7 @@
 					ComponentCamera* camera = new ComponentCamera(newCameraObject, app->camera);
 					newCameraObject->AddComponent(camera);
 
-					// Establecer la posición inicial
+					// Establecer la posiciÃ³n inicial
 					camera->SetFOV(60.0f);
 					camera->SetNearPlane(0.1f);
 					camera->SetFarPlane(1000.0f);

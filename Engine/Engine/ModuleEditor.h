@@ -12,6 +12,7 @@
 #include "PerformanceWindow.h"
 #include "PreferencesWindow.h"
 #include "AboutWindow.h"
+#include "GameWindow.h"
 #include "TimeManagerEditorWindow.h"
 
 #include "imgui.h"
@@ -45,6 +46,8 @@ public:
 	PerformanceWindow* performanceWindow = nullptr;
 	PreferencesWindow* preferencesWindow = nullptr;
 	AboutWindow* aboutWindow = nullptr;
+	GameWindow* gameWindow = nullptr;
+	
 
 	ImVec4 dataTextColor = ImVec4(0.45f, 0.55f, 0.75f, 1.0f);
 
