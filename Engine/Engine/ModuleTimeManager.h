@@ -7,7 +7,7 @@ enum class GameState {
 };
 
 class ModuleTimeManager {
-private:
+public:
     std::chrono::steady_clock::time_point realTimeStart;
     std::chrono::steady_clock::time_point lastFrameTime; // Nueva variable
     float gameTime;

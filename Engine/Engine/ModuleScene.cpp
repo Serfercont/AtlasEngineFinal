@@ -73,3 +73,12 @@ std::vector<GameObject*>& ModuleScene::GetGameObjects()
 {
 	return gameObjects;
 }
+
+ComponentCamera* ModuleScene::GetMainCamera() const {
+    for (GameObject* gameObject : gameObjects) {
+        if (gameObject && gameObject->camera && gameObject->camera->isMainCamera) {
+            return gameObject->camera;
+        }
+    }
+    return nullptr;
+}

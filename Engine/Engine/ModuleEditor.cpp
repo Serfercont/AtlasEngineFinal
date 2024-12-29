@@ -52,6 +52,8 @@
 		editorWindows.push_back(preferencesWindow);
 		aboutWindow = new AboutWindow(WindowType::ABOUT, "About");
 		editorWindows.push_back(aboutWindow);
+		gameWindow = new GameWindow(WindowType::GAME, "Game");
+		editorWindows.push_back(gameWindow);
 
 			
 		auto timeManagerWindow = new TimeManagerEditorWindow();
@@ -177,16 +179,17 @@
 				GameObject* newCameraObject = app->scene->CreateGameObject("Camera", app->scene->root);
 				if (newCameraObject)
 				{
-					// Obtener la referencia al ModuleCamera
-					ComponentCamera* camera = new ComponentCamera(newCameraObject, app->camera);
+					ComponentCamera* camera = new ComponentCamera(newCameraObject);
+					camera->isMainCamera = true; // Marcar como cámara principal
 					newCameraObject->AddComponent(camera);
 
-					// Establecer la posición inicial
-					camera->SetFOV(60.0f);
-					camera->SetNearPlane(0.1f);
-					camera->SetFarPlane(1000.0f);
+					// Asegurarte de que es la única cámara principal
+					for (auto* go : app->scene->GetGameObjects()) {
+						if (go->camera && go->camera != camera) {
+							go->camera->isMainCamera = false;
+						}
+					}
 
-					// Actualizar selectedGameObject
 					selectedGameObject = newCameraObject;
 				}
 			}

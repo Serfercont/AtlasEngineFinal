@@ -5,6 +5,7 @@
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 #include "AABB.h"
+#include "ComponentCamera.h"
 
 #include <string>
 #include <vector>
@@ -39,6 +40,7 @@ public:
 	ComponentTransform* transform;
 	ComponentMesh* mesh;
 	ComponentMaterial* material;
+	ComponentCamera* camera;
 
 	std::vector<Component*> components;
 	std::vector<GameObject*> children;

@@ -21,6 +21,8 @@ public:
 
 	std::vector<GameObject*>& GetGameObjects();
 
+	ComponentCamera* GetMainCamera() const;
+
 public:
 	GameObject* root = nullptr;
 	std::vector<GameObject*> gameObjects;
