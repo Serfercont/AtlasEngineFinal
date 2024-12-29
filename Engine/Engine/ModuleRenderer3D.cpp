@@ -14,6 +14,7 @@
 
 ModuleRenderer3D::ModuleRenderer3D(App* app) : Module(app), rbo(0), fboTexture(0), fbo(0), checkerTextureId(0)
 {
+	timeManager = app->timeManager;
 }
 
 ModuleRenderer3D::~ModuleRenderer3D()
@@ -22,6 +23,7 @@ ModuleRenderer3D::~ModuleRenderer3D()
 
 bool ModuleRenderer3D::Awake()
 {
+	
 	bool ret = true;
 
 	GLenum err = glewInit();
@@ -129,13 +131,13 @@ void ModuleRenderer3D::RenderToFramebuffer(uint32_t fbo, const glm::mat4& projec
 bool ModuleRenderer3D::PreUpdate(float dt)
 {
 	// Actualizar framebuffers si es necesario
-	if (updateSceneFramebuffer)
+	if (updateSceneFramebuffer && timeManager != nullptr)
 	{
 		OnSceneResize(app->editor->sceneWindow->windowSize.x, app->editor->sceneWindow->windowSize.y);
 		updateSceneFramebuffer = false;
 	}
 
-	if (updateGameFramebuffer && app->isPlaying)
+	if (timeManager != nullptr && updateGameFramebuffer && timeManager->isPlaying)
 	{
 		OnGameResize(app->editor->gameWindow->windowSize.x, app->editor->gameWindow->windowSize.y);
 		updateGameFramebuffer = false;
@@ -145,7 +147,7 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 	RenderToFramebuffer(sceneFBO, app->camera->GetProjectionMatrix(), app->camera->GetViewMatrix());
 
 	// Renderizar la vista de juego si estamos en modo Play
-	if (app->isPlaying)
+	if (timeManager!=nullptr && timeManager->isPlaying)
 	{
 		ComponentCamera* gameCamera = GetActiveCamera();
 		if (gameCamera)
@@ -305,7 +307,7 @@ void ModuleRenderer3D::CreateGameFramebuffer()
 
 ComponentCamera* ModuleRenderer3D::GetActiveCamera() const
 {
-	if (app->isPlaying)
+	if (timeManager->isPlaying)
 	{
 		for (auto* gameObject : app->scene->GetGameObjects())
 		{

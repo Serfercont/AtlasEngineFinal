@@ -15,6 +15,8 @@ App::App(int argc, char* argv[])
 	editor = new ModuleEditor(this);
 	fileSystem = new ModuleFileSystem(this);
 	resources = new ModuleResources(this);
+	timeManager = ModuleTimeManager::GetInstance(this);
+
 
 	AddModule(window);
 	AddModule(camera);
@@ -25,6 +27,8 @@ App::App(int argc, char* argv[])
 	AddModule(scene);
 	AddModule(editor);
 	AddModule(renderer3D);
+	AddModule(timeManager);
+	
 }
 
 App::~App()

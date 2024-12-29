@@ -4,6 +4,7 @@
 GameWindow::GameWindow(const WindowType type, const std::string& name)
     : EditorWindow(type, name)
 {
+    timeManager = app->timeManager;
 }
 
 GameWindow::~GameWindow()
@@ -42,14 +43,14 @@ void GameWindow::DrawWindow()
     {
         windowSize = newWindowSize;
         // Necesitaremos un framebuffer específico para la Game Window
-        if (app->isPlaying)
+        if (timeManager != nullptr && timeManager->isPlaying)
         {
             app->renderer3D->OnGameResize(windowSize.x, windowSize.y);
         }
     }
 
     // Solo mostramos el contenido si estamos en modo Play
-    if (app->isPlaying)
+    if (timeManager != nullptr && timeManager->isPlaying)
     {
         ImGui::Image(
             (void*)(intptr_t)app->renderer3D->gameTextureId,
@@ -62,12 +63,14 @@ void GameWindow::DrawWindow()
         ImGui::SetCursorPos(ImVec2(10, 10));
         if (ImGui::Button("Stop"))
         {
-            app->StopGame();
+			timeManager->Stop();
+            //app->StopGame();
         }
         ImGui::SameLine();
         if (ImGui::Button("Pause"))
         {
-            app->PauseGame();
+			timeManager->Pause();
+            //app->PauseGame();
         }
     }
     else

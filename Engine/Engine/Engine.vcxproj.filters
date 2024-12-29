@@ -127,6 +127,18 @@
       <Filter>Sources\Math</Filter>
     </ClCompile>
     <ClCompile Include="Octree.cpp" />
+    <ClCompile Include="TimeManagerWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="GameWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentCamera.cpp">
+      <Filter>Sources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleTimeManager.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -238,5 +250,17 @@
       <Filter>Sources\Math</Filter>
     </ClInclude>
     <ClInclude Include="Octree.h" />
+    <ClInclude Include="TimeManagerWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="GameWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentCamera.h">
+      <Filter>Sources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleTimeManager.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

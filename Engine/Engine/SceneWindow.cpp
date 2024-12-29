@@ -80,7 +80,7 @@ void SceneWindow::DrawWindow()
 	if (windowSize.x != newWindowSize.x || windowSize.y != newWindowSize.y)
 	{
 		windowSize = newWindowSize;
-		app->renderer3D->updateFramebuffer = true;
+		app->renderer3D->updateSceneFramebuffer = true;
 	}
 
 	if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0)

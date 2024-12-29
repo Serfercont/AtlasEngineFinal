@@ -13,6 +13,8 @@
 #include "PreferencesWindow.h"
 #include "AboutWindow.h"
 #include "GameWindow.h"
+#include "TimeManagerWindow.h"
+
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -46,6 +48,7 @@ public:
 	PreferencesWindow* preferencesWindow = nullptr;
 	AboutWindow* aboutWindow = nullptr;
 	GameWindow* gameWindow = nullptr;
+	TimeManagerWindow* timeManagerWindow = nullptr;
 	
 
 	ImVec4 dataTextColor = ImVec4(0.45f, 0.55f, 0.75f, 1.0f);

@@ -14,7 +14,8 @@ enum class WindowType
 	PERFORMANCE,
 	PREFERENCES,
 	ABOUT,
-	GAME
+	GAME,
+	TIMEMANAGEMENT,
 };
 
 class EditorWindow

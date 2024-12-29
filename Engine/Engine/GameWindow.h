@@ -1,5 +1,6 @@
 #pragma once
 #include "EditorWindow.h"
+#include "ModuleTimeManager.h"
 #include <glm/glm.hpp>
 
 class GameWindow : public EditorWindow {
@@ -18,4 +19,5 @@ private:
     bool isMouseInside = false;
     ImVec2 lastMousePosition = ImVec2(0, 0);
     bool isWindowFocused = false;
+	ModuleTimeManager* timeManager;
 };

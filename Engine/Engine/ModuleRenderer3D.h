@@ -3,6 +3,8 @@
 #include "Module.h"
 #include "Grid.h"
 #include "AABB.h"
+#include "ModuleTimeManager.h"
+#include "ComponentCamera.h"
 
 #include <SDL2/SDL_video.h>
 #include <GL/glew.h>
@@ -39,6 +41,7 @@ public:
 
 	void CreateSceneFramebuffer();
 	void CreateGameFramebuffer();
+	ComponentCamera* GetActiveCamera() const;
 	void OnSceneResize(float width, float height);
 	void OnGameResize(float width, float height);
 
@@ -54,4 +57,6 @@ public:
 	GLuint fbo;
 	GLuint fboTexture;
 	GLuint rbo;
+private:
+	ModuleTimeManager* timeManager;
 };

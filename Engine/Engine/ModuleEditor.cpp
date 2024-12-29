@@ -54,6 +54,8 @@ bool ModuleEditor::Awake()
 	editorWindows.push_back(aboutWindow);
 	gameWindow = new GameWindow(WindowType::GAME, "Game");
 	editorWindows.push_back(gameWindow);
+	timeManagerWindow = new TimeManagerWindow(WindowType::TIMEMANAGEMENT, "Time Management");
+	editorWindows.push_back(timeManagerWindow);
 
 	return ret;
 }
