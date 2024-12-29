@@ -124,7 +124,7 @@ bool ComponentCamera::IsBoxInsideFrustum(const AABB& box) const
 void ComponentCamera::OnEditor()
 {
     if (ImGui::Checkbox("Main Camera", &isMainCamera)) {
-        // Si esta cÃ¡mara se marca como principal, desmarcar las demÃ¡s
+        // Si esta cámara se marca como principal, desmarcar las demás
         if (isMainCamera) {
             for (auto* go : app->scene->GetGameObjects()) {
                 if (go->camera && go->camera != this) {
