@@ -5,7 +5,7 @@
 
 ModuleScene::ModuleScene(App* app) : Module(app), root(nullptr)
 {
-
+    CamScene = new ComponentCamera(nullptr);
 }
 
 ModuleScene::~ModuleScene()
@@ -14,6 +14,14 @@ ModuleScene::~ModuleScene()
 
 bool ModuleScene::Awake() {
     root = CreateGameObject("Untitled Scene", nullptr);
+
+    GameObject* camera = CreateGameObject("Camera", root);
+    MainGameCamera = new ComponentCamera(camera);
+	MainGameCamera->isMainCamera = true;
+    camera->AddComponent(MainGameCamera);
+    camera->transform->position = glm::vec3(0.0f, 6.0f, 8.0f);
+    camera->transform->eulerRotation = glm::vec3(-30.0f, 0.0f, 0.0f);
+    camera->transform->UpdateTransform();
 
     sceneLimits = AABB(glm::vec3(-15.0f), glm::vec3(15.0f));
     octreeScene = new Octree(sceneLimits);
@@ -35,13 +43,11 @@ bool ModuleScene::Update(float dt) {
     }
     if (DebugFrust) 
     {
-        app->camera->DrawFrustum();
+       CamScene->DrawFrustum();
     }
     
 
-    for (auto* gameObject : gameObjects) {
-        gameObject->Update();
-    }
+	root->Update();
 
 
     return true;

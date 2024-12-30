@@ -182,8 +182,11 @@
 					ComponentCamera* camera = new ComponentCamera(newCameraObject);
 					camera->isMainCamera = true; // Marcar como cámara principal
 					newCameraObject->AddComponent(camera);
+					newCameraObject->transform->position = glm::vec3(0.0f, 6.0f, 8.0f);
+					newCameraObject->transform->eulerRotation = glm::vec3(-30.0f, 0.0f, 0.0f); 
+					newCameraObject->transform->UpdateTransform();
 
-					// Asegurarte de que es la única cámara principal
+					
 					for (auto* go : app->scene->GetGameObjects()) {
 						if (go->camera && go->camera != camera) {
 							go->camera->isMainCamera = false;

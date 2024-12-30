@@ -34,18 +34,11 @@ public:
 	void FrameSelected();
 	bool CleanUp();
 	void LookAt(const glm::vec3& spot);
-	const glm::mat4& GetViewMatrix() const;
-	glm::mat4 GetProjectionMatrix() const;
-	bool IsBoxInsideFrustum(const AABB& box) const;
 
-	void DrawFrustum();
 
 	void OnWindowResized(int newWidth, int newHeight);
-	glm::vec3 GetPosition() const { return pos; }
+	
 
-
-	void CalculateViewMatrix();
-	void UpdateViewMatrix() { CalculateViewMatrix(); }
 private:
 	void HandleMovement(glm::vec3& newPos, float speed, float fastSpeed);
 	void HandleZoom(float zoomSpeed);
@@ -56,7 +49,6 @@ private:
 
 	void SetCursor(CursorType cursorType);
 
-	void CalculateFrustumPlanes();
 
 public:
 	float fov = 60.0f;

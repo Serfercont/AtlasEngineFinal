@@ -91,7 +91,7 @@ void SceneWindow::DrawWindow()
 	}
 
 
-	ImGui::Image((void*)(intptr_t)app->renderer3D->fboTexture, windowSize, ImVec2(0,1), ImVec2(1,0));
+	ImGui::Image((void*)(intptr_t)app->renderer3D->sceneTextureId, windowSize, ImVec2(0,1), ImVec2(1,0));
 
 	if (ImGui::BeginDragDropTarget())
 	{
@@ -138,11 +138,11 @@ void SceneWindow::HandleMousePicking() const
 	float normalizedY = 1.0f - (2.0f * mouseY) / windowSize.y;
 
 	glm::vec4 rayClip = glm::vec4(normalizedX, normalizedY, -1.0f, 1.0f);
-	glm::vec4 rayEye = glm::inverse(app->camera->GetProjectionMatrix()) * rayClip;
+	glm::vec4 rayEye = glm::inverse(app->scene->CamScene->GetProjectionMatrix()) * rayClip;
 	rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
-	glm::vec3 rayWorld = glm::normalize(glm::vec3(glm::inverse(app->camera->GetViewMatrix()) * rayEye));
+	glm::vec3 rayWorld = glm::normalize(glm::vec3(glm::inverse(app->scene->CamScene->GetViewMatrix()) * rayEye));
 
-	glm::vec3 rayOrigin = app->camera->GetPosition();
+	glm::vec3 rayOrigin = app->scene->CamScene->GetPosition();
 	GameObject* selectedObject = nullptr;
 
 	float closestDistance = FLT_MAX;

@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Quadtree.h"
 #include "Octree.h"
+#include "ComponentCamera.h"
 
 class GameObject;
 
@@ -31,5 +32,9 @@ public:
 	AABB sceneLimits;
 	bool debugOctree = false;
 	bool DebugFrust = false;
+
+	ComponentCamera* CamScene = nullptr;
+	ComponentCamera* MainGameCamera = nullptr;
+
 
 };

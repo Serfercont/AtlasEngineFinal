@@ -45,7 +45,7 @@ void GameWindow::DrawWindow()
         // Necesitaremos un framebuffer específico para la Game Window
         if (!isPaused)
         {
-            app->renderer3D->OnResize(windowSize.x, windowSize.y);
+			app->renderer3D->updateFramebuffer = true;
         }
     }
 
@@ -64,7 +64,7 @@ void GameWindow::DrawWindow()
         }
 
         ImGui::Image(
-            (void*)(intptr_t)app->renderer3D->fboTexture,
+            (void*)(intptr_t)app->renderer3D->gameTextureId,
             windowSize,
             ImVec2(0, 1),
             ImVec2(1, 0)

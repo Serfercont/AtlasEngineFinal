@@ -15,17 +15,27 @@ ComponentMesh::~ComponentMesh()
 
 void ComponentMesh::Update()
 {
-    ComponentTransform* transform = gameObject->transform;
+    if (gameObject->transform != nullptr)
+    {
+        app->renderer3D->queuedMeshes.push_back(this);
+    }
+}
+
+void ComponentMesh::DrawMeshes(ComponentCamera* camera)
+{
+       ComponentTransform* transform = gameObject->transform;
     ComponentMaterial* material = gameObject->material;
 
     if (transform != nullptr)
     {
         const AABB globalAABB = mesh->CalculateAABB(transform->globalTransform);
 
-        if (app->camera->IsBoxInsideFrustum(globalAABB))
+        if (app->scene->CamScene->IsBoxInsideFrustum(globalAABB))
         {
             glPushMatrix();
             glMultMatrixf(glm::value_ptr(transform->globalTransform));
+
+            const auto& preferences = app->editor->preferencesWindow;
            
             mesh->DrawMesh(
                 material->textureId,
@@ -58,10 +68,21 @@ void ComponentMesh::Update()
                     mesh->RenderOBB(transform->globalTransform);
                 }
             }
+            else
+            {
+                mesh->DrawMesh(
+                    material->textureId,
+                    preferences->drawTextures,
+                    false,
+                    false
+                );
+            }
+
+            glPopMatrix();
         }
         else
         {
-            printf("Mesh out of frustum\n");
+            printf("Mesh is outside of the frustum\n");
         }
     }
 }
