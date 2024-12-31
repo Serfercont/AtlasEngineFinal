@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "ComponentTransform.h"
 #include "ComponentMesh.h"
+#include "App.h"
 
 GameObject::GameObject(const char* name, GameObject* parent) : parent(parent), name(name)
 {
@@ -16,19 +17,18 @@ GameObject::GameObject(const char* name, GameObject* parent) : parent(parent), n
 
 GameObject::~GameObject()
 {
-	// Liberar componentes
-	for (auto component : components)
-	{
+	for (auto component : components) {
 		delete component;
 	}
 	components.clear();
 
-	// Liberar hijos
-	for (auto child : children)
-	{
+	for (auto child : children) {
 		delete child;
 	}
 	children.clear();
+
+	mesh = nullptr; 
+	transform = nullptr;
 }
 
 void GameObject::Update()
@@ -73,36 +73,39 @@ Component* GameObject::GetComponent(ComponentType type)
 
 
 AABB GameObject::GetAABB() const {
-	if (mesh && mesh->mesh) { 
+	if (mesh != nullptr && mesh->mesh != nullptr) {
 		return mesh->mesh->CalculateAABB(transform->globalTransform);
 	}
-	return AABB(glm::vec3(0.0f), glm::vec3(0.0f)); 
+	return AABB(glm::vec3(0.0f), glm::vec3(0.0f));
+	
 }
 
-void GameObject::Delete()
-{
-	
-	if (parent)
-	{
+void GameObject::Delete() {
+	isDeleted = true; 
+
+	if (app->scene->octreeScene) {
+		app->scene->octreeScene->Remove(this);
+	}
+
+	if (parent) {
 		auto& siblings = parent->children;
 		siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
 	}
 
-	
-	for (auto child : children)
-	{
+	for (auto child : children) {
 		child->Delete();
 		delete child;
 	}
 	children.clear();
 
-	
-	for (auto component : components)
-	{
+	for (auto component : components) {
 		delete component;
 	}
 	components.clear();
+
+	parent = nullptr;
 }
+
 
 bool GameObject::IntersectsRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float& intersectionDistance) const
 {

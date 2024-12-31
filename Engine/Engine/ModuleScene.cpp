@@ -32,6 +32,11 @@ bool ModuleScene::Awake() {
 bool ModuleScene::Update(float dt) {
     octreeScene->Clear();
 
+    gameObjects.erase(
+        std::remove_if(gameObjects.begin(), gameObjects.end(),
+            [](GameObject* gameObject) { return gameObject->isDeleted; }),
+        gameObjects.end());
+
     for (GameObject* gameObject : gameObjects) {
         octreeScene->Insert(gameObject);
         
