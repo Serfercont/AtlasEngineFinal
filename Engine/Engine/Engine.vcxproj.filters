@@ -136,6 +136,9 @@
       <Filter>Sources\Math</Filter>
     </ClCompile>
     <ClCompile Include="Octree.cpp" />
+    <ClCompile Include="GameWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -256,5 +259,8 @@
       <Filter>Sources\Math</Filter>
     </ClInclude>
     <ClInclude Include="Octree.h" />
+    <ClInclude Include="GameWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

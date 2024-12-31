@@ -78,6 +78,7 @@ void App::PrepareUpdate()
 bool App::Update()
 {
 	bool ret = true;
+	ModuleTimeManager::GetInstance()->Update();
 
 	PrepareUpdate();
 

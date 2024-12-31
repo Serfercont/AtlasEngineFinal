@@ -1,4 +1,5 @@
 ﻿#include "TimeManagerEditorWindow.h"
+#include "App.h"
 
 TimeManagerEditorWindow::TimeManagerEditorWindow()
     : EditorWindow(WindowType::PREFERENCES, "Time Manager")
@@ -63,6 +64,7 @@ void TimeManagerEditorWindow::DrawPlaybackControls()
         }
         else {
             ModuleTimeManager::GetInstance()->Play();
+            app->editor->gameWindow->StartGame();
         }
     }
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Play");
@@ -92,6 +94,7 @@ void TimeManagerEditorWindow::DrawPlaybackControls()
 
     if (ImGui::Button("X", ImVec2(BUTTON_WIDTH, 0))) {
         ModuleTimeManager::GetInstance()->Stop();
+		app->editor->gameWindow->StopGame();
     }
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Stop");
     if (isStopped) ImGui::PopStyleColor(3);
@@ -106,22 +109,36 @@ void TimeManagerEditorWindow::DrawTimeInfo() {
 
     const ModuleTimeManager* timeManager = ModuleTimeManager::GetInstance();
 
+    // Estilo para el fondo del panel de información
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.1f, 0.1f, 0.2f, 1.0f));
 
-    ImGui::PopStyleColor();
+    // Información de tiempos
+    ImGui::BeginGroup();
+    ImGui::Text("Game Time: %.2f s", timeManager->GetTime());
+    ImGui::Text("Real Time: %.2f s", timeManager->GetRealTimeSinceStartup());
+    ImGui::Text("Delta Time: %.3f ms", timeManager->GetDeltaTime() * 1000.0f);
+    ImGui::Text("Time Scale: %.2fx", timeManager->GetTimeScale());
+    ImGui::EndGroup();
 
     ImGui::Spacing();
+    ImGui::Separator();
+
+    // Estado del juego con colores
     if (timeManager->IsPaused()) {
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.4f, 1.0f));
         ImGui::Text("Estado: PAUSADO");
+        ImGui::PopStyleColor();
     }
     else if (timeManager->GetCurrentState() == GameState::GAME_MODE) {
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 1.0f, 0.4f, 1.0f));
         ImGui::Text("Estado: EJECUTANDO");
+        ImGui::PopStyleColor();
     }
     else {
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
         ImGui::Text("Estado: EDITOR");
+        ImGui::PopStyleColor();
     }
-    ImGui::PopStyleColor();
+
+    ImGui::PopStyleColor(); // Pop del FrameBg
 }

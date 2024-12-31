@@ -143,7 +143,16 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 
 	DrawQueuedMeshes(app->scene->CamScene);
 
-	if (app->scene->CamScene)
+	if (app->scene->debugOctree)
+	{
+		app->scene->octreeScene->DrawDebug();
+	}
+	if (app->scene->DebugFrust)
+	{
+		app->scene->CamScene->DrawFrustum();
+	}
+
+	if (app->scene->MainGameCamera)
 	{
 		// Render second camera
 		glBindFramebuffer(GL_FRAMEBUFFER, gameFBO);

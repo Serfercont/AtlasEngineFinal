@@ -179,7 +179,7 @@ void ComponentCamera::DrawFrustum() {
 
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-    glLineWidth(2.0f);
+    glLineWidth(4.0f);
 
     glBegin(GL_LINES);
     for (int i = 0; i < 4; ++i) {

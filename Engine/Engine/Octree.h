@@ -13,12 +13,12 @@ public:
     void Remove(GameObject* object);
     void Intersect(std::vector<GameObject*>& results, const AABB& primitive) const;
     void DrawDebug() const;
-    void CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const;
+    //void CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const;
 public:
     class Node {
         friend class Octree;
     public:
-        void CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const;
+        //void CollectIntersectingObjects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, std::vector<GameObject*>& results) const;
         Node(const AABB& limits, int level, Octree* parent);
         ~Node();
 
