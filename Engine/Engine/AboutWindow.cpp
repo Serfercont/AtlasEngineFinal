@@ -25,7 +25,7 @@ void AboutWindow::DrawWindow()
     ImGui::Text("Description:");
     ImGui::TextWrapped("Atlas Engine is a 3D game engine developed in C++ with OpenGL, currently capable of rendering geometry with a range of controls and information displays.");
     ImGui::Spacing();
-    HyperLink("GitHub", "https://github.com/CITM-UPC/SpectraEngine");
+    HyperLink("GitHub", "https://github.com/Serfercont/AtlasEngineFinal");
     ImGui::Spacing();
 
     ImGui::Separator();
