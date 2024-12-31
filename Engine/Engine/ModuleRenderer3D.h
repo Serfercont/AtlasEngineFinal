@@ -3,6 +3,9 @@
 #include "Module.h"
 #include "Grid.h"
 #include "AABB.h"
+#include "ComponentCamera.h"
+#include "ComponentMesh.h"
+#include "ModuleCamera.h"
 
 #include <SDL2/SDL_video.h>
 #include <GL/glew.h>
@@ -20,11 +23,17 @@ public:
 	bool Awake();
 	bool PreUpdate(float dt);
 	bool PostUpdate(float dt);
+	void DrawQueuedMeshes(ComponentCamera* camera);
 	bool CleanUp();
+
+	void SetGameMode(bool enabled);
+
+	void SetGameCamera(ComponentCamera* camera);
 
 	void OnResize(int width, int height);
 	void CreateFramebuffer();
-	void RenderAABB(const AABB& aabb, const glm::mat4& transform);
+
+	bool updateFramebuffer = false;
 
 public:
 	GLubyte checkerImage[CHECKERS_WIDTH][CHECKERS_HEIGHT][4];
@@ -32,7 +41,18 @@ public:
 
 	Grid grid;
 
-	GLuint fbo;
-	GLuint fboTexture;
-	GLuint rbo;
+	GLuint sceneFBO;
+	GLuint sceneTextureId;
+	GLuint sceneRBO;
+	
+	// Game framebuffer
+	GLuint gameFBO;
+	GLuint gameTextureId ;
+	GLuint gameRBO;
+
+	std::vector<ComponentMesh*> queuedMeshes;
+
+private:
+	ComponentCamera* gameCamera = nullptr;  // Cámara de juego
+	bool isGameMode = false;
 };

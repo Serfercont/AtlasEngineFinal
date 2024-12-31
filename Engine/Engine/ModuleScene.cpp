@@ -5,7 +5,7 @@
 
 ModuleScene::ModuleScene(App* app) : Module(app), root(nullptr)
 {
-
+    CamScene = new ComponentCamera(nullptr);
 }
 
 ModuleScene::~ModuleScene()
@@ -14,6 +14,14 @@ ModuleScene::~ModuleScene()
 
 bool ModuleScene::Awake() {
     root = CreateGameObject("Untitled Scene", nullptr);
+
+    GameObject* camera = CreateGameObject("Camera", root);
+    MainGameCamera = new ComponentCamera(camera);
+	MainGameCamera->isMainCamera = true;
+    camera->AddComponent(MainGameCamera);
+    camera->transform->position = glm::vec3(0.0f, 6.0f, 8.0f);
+    camera->transform->eulerRotation = glm::vec3(-30.0f, 0.0f, 0.0f);
+    camera->transform->UpdateTransform();
 
     sceneLimits = AABB(glm::vec3(-15.0f), glm::vec3(15.0f));
     octreeScene = new Octree(sceneLimits);
@@ -24,19 +32,28 @@ bool ModuleScene::Awake() {
 bool ModuleScene::Update(float dt) {
     octreeScene->Clear();
 
+    gameObjects.erase(
+        std::remove_if(gameObjects.begin(), gameObjects.end(),
+            [](GameObject* gameObject) { return gameObject->isDeleted; }),
+        gameObjects.end());
+
     for (GameObject* gameObject : gameObjects) {
-        if (gameObject->isStatic) {
-            octreeScene->Insert(gameObject);
-        }
+        octreeScene->Insert(gameObject);
+        
     }
 
-    if (debugOctree) {
+    if (debugOctree) 
+    {
         octreeScene->DrawDebug();
     }
-
-    for (auto* gameObject : gameObjects) {
-        gameObject->Update();
+    if (DebugFrust) 
+    {
+       CamScene->DrawFrustum();
     }
+    
+
+	root->Update();
+
 
     return true;
 }
@@ -45,10 +62,8 @@ bool ModuleScene::CleanUp() {
     delete octreeScene;
     octreeScene = nullptr;
 
-    for (auto* gameObject : gameObjects) {
-        delete gameObject;
-    }
-    gameObjects.clear();
+    delete root;
+    root = nullptr;
 
     return true;
 }
@@ -68,4 +83,13 @@ GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent)
 std::vector<GameObject*>& ModuleScene::GetGameObjects()
 {
 	return gameObjects;
+}
+
+ComponentCamera* ModuleScene::GetMainCamera() const {
+    for (GameObject* gameObject : gameObjects) {
+        if (gameObject && gameObject->camera && gameObject->camera->isMainCamera) {
+            return gameObject->camera;
+        }
+    }
+    return nullptr;
 }

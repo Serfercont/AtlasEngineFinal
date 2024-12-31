@@ -2,6 +2,7 @@
 #include "AABB.h"
 #include "Component.h"
 #include "Mesh.h"
+#include "ComponentCamera.h"
 
 class Mesh;
 
@@ -12,11 +13,12 @@ public:
 	virtual ~ComponentMesh();
 
 	void Update() override;
+	void DrawMeshes(ComponentCamera* camera);
 	void OnEditor() override;
 public:
 	Mesh* mesh;
 
-private:
+public:
 	bool showVertexNormals = false;
 	bool showFaceNormals = false;
 

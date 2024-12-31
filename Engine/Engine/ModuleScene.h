@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Quadtree.h"
 #include "Octree.h"
+#include "ComponentCamera.h"
 
 class GameObject;
 
@@ -21,6 +22,8 @@ public:
 
 	std::vector<GameObject*>& GetGameObjects();
 
+	ComponentCamera* GetMainCamera() const;
+
 public:
 	GameObject* root = nullptr;
 	std::vector<GameObject*> gameObjects;
@@ -28,5 +31,10 @@ public:
 	Octree* octreeScene = nullptr;
 	AABB sceneLimits;
 	bool debugOctree = false;
+	bool DebugFrust = false;
+
+	ComponentCamera* CamScene = nullptr;
+	ComponentCamera* MainGameCamera = nullptr;
+
 
 };

@@ -15,6 +15,14 @@ ComponentMesh::~ComponentMesh()
 
 void ComponentMesh::Update()
 {
+    if (gameObject->transform != nullptr)
+    {
+        app->renderer3D->queuedMeshes.push_back(this);
+    }
+}
+
+void ComponentMesh::DrawMeshes(ComponentCamera* camera)
+{
     ComponentTransform* transform = gameObject->transform;
     ComponentMaterial* material = gameObject->material;
 
@@ -22,42 +30,66 @@ void ComponentMesh::Update()
     {
         const AABB globalAABB = mesh->CalculateAABB(transform->globalTransform);
 
-        if (app->camera->IsBoxInsideFrustum(globalAABB))
+        if (camera->IsBoxInsideFrustum(globalAABB))
         {
+            camera->meshCount++;
+            camera->vertexCount += mesh->verticesCount;
+            camera->triangleCount += mesh->indicesCount / 3;
+
             glPushMatrix();
             glMultMatrixf(glm::value_ptr(transform->globalTransform));
-           
-            mesh->DrawMesh(
-                material->textureId,
-                app->editor->preferencesWindow->drawTextures,
-                app->editor->preferencesWindow->wireframe,
-                app->editor->preferencesWindow->shadedWireframe
-            );
 
-            if (showVertexNormals || showFaceNormals)
+            const auto& preferences = app->editor->preferencesWindow;
+           
+            if (camera==app->scene->CamScene)
             {
-                mesh->DrawNormals(
-                    showVertexNormals,
-                    showFaceNormals,
-                    app->editor->preferencesWindow->vertexNormalLength,
-                    app->editor->preferencesWindow->faceNormalLength,
-                    app->editor->preferencesWindow->vertexNormalColor,
-                    app->editor->preferencesWindow->faceNormalColor
+                mesh->DrawMesh(
+                    material->textureId,
+                    app->editor->preferencesWindow->drawTextures,
+                    app->editor->preferencesWindow->wireframe,
+                    app->editor->preferencesWindow->shadedWireframe
+                );
+
+                if (showVertexNormals || showFaceNormals)
+                {
+                    mesh->DrawNormals(
+                        showVertexNormals,
+                        showFaceNormals,
+                        app->editor->preferencesWindow->vertexNormalLength,
+                        app->editor->preferencesWindow->faceNormalLength,
+                        app->editor->preferencesWindow->vertexNormalColor,
+                        app->editor->preferencesWindow->faceNormalColor
+                    );
+                }
+
+                if (app->editor->selectedGameObject == gameObject)
+                {
+                    if (showAABB)
+                    {
+                        mesh->RenderAABB(transform->globalTransform);
+                    }
+                    if (showOBB)
+                    {
+                        mesh->RenderOBB(transform->globalTransform);
+                    }
+                }
+            }
+            
+            else
+            {
+                mesh->DrawMesh(
+                    material->textureId,
+                    preferences->drawTextures,
+                    false,
+                    false
                 );
             }
-            glPopMatrix();
 
-            if (app->editor->selectedGameObject == gameObject)
-            {
-                if (showAABB)
-                {
-                    mesh->RenderAABB(transform->globalTransform);
-                }
-                if (showOBB)
-                {
-                    mesh->RenderOBB(transform->globalTransform);
-                }
-            }
+            glPopMatrix();
+        }
+        else
+        {
+            printf("Mesh is outside of the frustum\n");
         }
     }
 }

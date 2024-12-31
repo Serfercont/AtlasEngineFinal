@@ -3,6 +3,10 @@
 #include "Module.h"
 #include "SDL2/SDL.h"
 #include <memory>
+#include <glm/vec2.hpp>
+#include <imgui.h>
+#include <imgui_internal.h>
+#include "ModuleWindow.h"
 
 #define MAX_KEYS 256
 #define MAX_MOUSE_BUTTONS 5
@@ -42,6 +46,7 @@ public:
 
 	void ChangeCursor(CursorType newCursor);
 	CursorType GetCursor() { return cursor; }
+	glm::vec2 GetNormalizedMousePosition(ImVec2 viewportPos, ImVec2 viewportSize) const;
 
 	KEY_STATE GetKey(int id) const
 	{

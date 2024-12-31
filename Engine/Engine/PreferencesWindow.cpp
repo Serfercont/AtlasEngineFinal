@@ -106,15 +106,15 @@ void PreferencesWindow::DrawWindow()
 	{
 		ImGui::Text("Fov ");
 		ImGui::SameLine();
-		ImGui::SliderFloat("##Fov", &app->camera->fov, 4.0f, 120.0f);
+		ImGui::SliderFloat("##Fov", &app->scene->CamScene->fov, 4.0f, 120.0f);
 
 		ImGui::Text("Near");
 		ImGui::SameLine();
-		ImGui::InputFloat("##Near", &app->camera->nearPlane);
+		ImGui::InputFloat("##Near", &app->scene->CamScene->nearPlane);
 
 		ImGui::Text("Far ");
 		ImGui::SameLine();
-		ImGui::InputFloat("##Far", &app->camera->farPlane);
+		ImGui::InputFloat("##Far", &app->scene->CamScene->farPlane);
 	}
 
 	ImGui::End();

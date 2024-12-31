@@ -10,6 +10,7 @@
 #include "ModuleImporter.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
+#include "ModuleTimeManager.h"
 
 #include "Timer.h"
 
@@ -48,6 +49,8 @@ public:
 	bool exit = false;
 	int maxFps = 60;
 	bool vsync = true;
+
+	ModuleTimeManager* timeManager;
 
 private:
 	Timer	timer;

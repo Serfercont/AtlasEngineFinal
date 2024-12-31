@@ -120,6 +120,15 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Sources\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleTimeManager.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeManagerEditorWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentCamera.cpp">
+      <Filter>Sources\Components</Filter>
+    </ClCompile>
     <ClCompile Include="AABB.cpp">
       <Filter>Sources\Math</Filter>
     </ClCompile>
@@ -127,6 +136,9 @@
       <Filter>Sources\Math</Filter>
     </ClCompile>
     <ClCompile Include="Octree.cpp" />
+    <ClCompile Include="GameWindow.cpp">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModuleInput.h">
@@ -228,6 +240,15 @@
     <ClInclude Include="Mesh.h">
       <Filter>Sources\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleTimeManager.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManagerEditorWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentCamera.h">
+      <Filter>Sources\Components</Filter>
+    </ClInclude>
     <ClInclude Include="AABB.h">
       <Filter>Sources\Math</Filter>
     </ClInclude>
@@ -238,5 +259,8 @@
       <Filter>Sources\Math</Filter>
     </ClInclude>
     <ClInclude Include="Octree.h" />
+    <ClInclude Include="GameWindow.h">
+      <Filter>Sources\Modules\EditorWindows</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

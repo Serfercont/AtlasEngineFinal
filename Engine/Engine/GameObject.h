@@ -5,6 +5,7 @@
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 #include "AABB.h"
+#include "ComponentCamera.h"
 
 #include <string>
 #include <vector>
@@ -27,6 +28,11 @@ public:
 	AABB GetAABB() const;
 	void Delete();
 
+	bool IntersectsRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float& intersectionDistance) const;
+
+	
+
+
 public:
 	GameObject* parent;
 	std::string name;
@@ -34,6 +40,7 @@ public:
 	ComponentTransform* transform;
 	ComponentMesh* mesh;
 	ComponentMaterial* material;
+	ComponentCamera* camera;
 
 	std::vector<Component*> components;
 	std::vector<GameObject*> children;
@@ -44,4 +51,5 @@ public:
 	bool isActive = true;
 	bool isEditing = false;
 	bool isStatic = false;
+	bool isDeleted = false;
 };
