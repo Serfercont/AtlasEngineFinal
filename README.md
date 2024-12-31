@@ -45,6 +45,7 @@ El proyecto está en desarrollo activo, y el código está disponible en [GitHub
 - **AABB y OBB**: Visualización de las cajas de los objetos.
 - **Octree**: Octree para la carga.
 - **Camara GameObject**: Creación de la cámara como un objeto para visualizar el Juego en la ventana "Game".
+- **Mouse Picking**: Con el ratón en el editor se puede seleccionar los distintos objetos de la escena.
 - **Frustum Culling**: Optimización con visualización en el editor.
 - **Simulación**: Iniciar, pausar y detener con retorno al estado inicial.
 - **Inspector Avanzado**: Control de componentes como cámaras y materiales.
@@ -58,7 +59,7 @@ El proyecto está en desarrollo activo, y el código está disponible en [GitHub
 - [DeviL](https://github.com/DentonW/DevIL)
 
 ## Comentarios adicionales
-- **Referencia a otros equipos**: Este proyecto partió del código entregado previamente por otros estudiantes, siguiendo correctamente el procedimiento de fork.
+- **Referencia a otros equipos**: Este proyecto partió del código entregado en la entrega 1 de SpectraEngine. Que con el permiso del profesor y de los compañeros de clase, pudimos hacer un fork del modelo del motor de la entrega 1.
 
 Para más información o comentarios específicos, revisa el código fuente y la documentación adicional en el repositorio.
 
