@@ -52,7 +52,12 @@ public:
 
 private:
     
-    float gizmoSize = 0.5f; // Tamaño del icono de la cámara
+    float gizmoSize = 0.5f; 
+    bool isOrthographic = false;
+    bool cullEverything = false;
+    int selectedClearFlag = 0;
+    static constexpr float MIN_FOV = 1.0f;
+    static constexpr float MAX_FOV = 179.0f;
 
 private:
 

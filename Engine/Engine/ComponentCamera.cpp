@@ -141,6 +141,21 @@ void ComponentCamera::OnEditor()
                 }
             }
         }
+
+    }
+    if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Text("Fov ");
+        ImGui::SameLine();
+        ImGui::SliderFloat("##Fov", &app->scene->MainGameCamera->fov, 4.0f, 120.0f);
+
+        ImGui::Text("Near");
+        ImGui::SameLine();
+        ImGui::InputFloat("##Near", &app->scene->MainGameCamera->nearPlane);
+
+        ImGui::Text("Far ");
+        ImGui::SameLine();
+        ImGui::InputFloat("##Far", &app->scene->MainGameCamera->farPlane);
     }
 
 }
